@@ -1,0 +1,65 @@
+# Android build outputs
+build/
+*/build/
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Gradle files
+.gradle/
+gradlew
+gradlew.bat
+gradle-wrapper.jar
+gradle-wrapper.properties
+
+# Local configuration files
+local.properties
+
+# Log files
+*.log
+
+# IDE files
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Dependency directories
+libs/
+*/libs/
+
+# Generated files
+bin/
+gen/
+out/
+
+# Keystore files
+*.jks
+*.keystore
+
+# Proguard files
+proguard-rules.pro
+*.pro
+
+# Miscellaneous
+.DS_Store
+Thumbs.db
+*.bak
+*.swp
+*~
+
+# Dependency lock files
+*.lock
+
+# Android Studio navigation files
+.navigation/
+
+# Android Studio captures
+captures/
+
+# Crashlytics
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
