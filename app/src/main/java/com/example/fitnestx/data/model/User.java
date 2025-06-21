@@ -1,7 +1,7 @@
 package com.example.fitnestx.data.model;
 
 public interface User {
-    public int getId();
+    public int getUserId();
     public String getName();
     public int getAge();
     public boolean getGender();
