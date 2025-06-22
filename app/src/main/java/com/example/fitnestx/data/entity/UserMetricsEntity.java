@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey;
 import com.example.fitnestx.data.model.UserMetrics;
 
 @Entity(tableName = "USER_METRICS",
-        foreignKeys = @ForeignKey(entity = UserEntity.class, parentColumns = "id", childColumns = "userId"))
+        foreignKeys = @ForeignKey(entity = UserEntity.class, parentColumns = "userId", childColumns = "userId"))
 public class UserMetricsEntity implements UserMetrics {
 
     @PrimaryKey

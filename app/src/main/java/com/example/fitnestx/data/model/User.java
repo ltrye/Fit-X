@@ -6,6 +6,6 @@ public interface User {
     public int getAge();
     public boolean getGender();
     public String getEmail();
-    public String passwordHash();
+    public String getPassword();
     public boolean getIsActive();
 }

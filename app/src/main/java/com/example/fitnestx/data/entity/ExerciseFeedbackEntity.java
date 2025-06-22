@@ -9,7 +9,7 @@ import com.example.fitnestx.data.model.ExerciseFeedback;
 
 @Entity(tableName = "EXERCISE_FEEDBACK",
         foreignKeys = {
-                @ForeignKey(entity = UserEntity.class, parentColumns = "id", childColumns = "userId"),
+                @ForeignKey(entity = UserEntity.class, parentColumns = "userId", childColumns = "userId"),
                 @ForeignKey(entity = ExerciseEntity.class, parentColumns = "exerciseId", childColumns = "exerciseId")
         })
 public class ExerciseFeedbackEntity implements ExerciseFeedback {

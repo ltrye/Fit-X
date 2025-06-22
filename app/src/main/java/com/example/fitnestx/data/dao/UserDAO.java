@@ -17,7 +17,7 @@ public interface UserDAO {
     @Query("SELECT * FROM USER")
     LiveData<List<UserEntity>> getAllUsers();
 
-    @Query("SELECT * FROM USER WHERE id = :userId")
+    @Query("SELECT * FROM USER WHERE userId = :userId")
     UserEntity getUserById(int userId);
 
     @Query("SELECT * FROM USER WHERE isActive = 1")

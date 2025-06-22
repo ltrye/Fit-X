@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey;
 import com.example.fitnestx.data.model.AuthProvider;
 
 @Entity(tableName = "AUTH_PROVIDER",
-        foreignKeys = @ForeignKey(entity = UserEntity.class, parentColumns = "id", childColumns = "userId"))
+        foreignKeys = @ForeignKey(entity = UserEntity.class, parentColumns = "userId", childColumns = "userId"))
 public class AuthProviderEntity implements AuthProvider {
 
     @PrimaryKey

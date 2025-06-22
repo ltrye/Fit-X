@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey;
 import com.example.fitnestx.data.model.Notification;
 
 @Entity(tableName = "NOTIFICATION",
-        foreignKeys = @ForeignKey(entity = UserEntity.class, parentColumns = "id", childColumns = "userId"))
+        foreignKeys = @ForeignKey(entity = UserEntity.class, parentColumns = "userId", childColumns = "userId"))
 public class NotificationEntity implements Notification {
 
     @PrimaryKey
