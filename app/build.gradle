@@ -50,4 +50,7 @@ dependencies {
 
     // Optional - Guava support for Room, including Optional and ListenableFuture
     implementation 'androidx.room:room-guava:2.6.1'
+
+    implementation 'at.favre.lib:bcrypt:0.9.0'
+
 }

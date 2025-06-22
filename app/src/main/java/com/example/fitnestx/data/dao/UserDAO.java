@@ -20,6 +20,9 @@ public interface UserDAO {
     @Query("SELECT * FROM USER WHERE userId = :userId")
     UserEntity getUserById(int userId);
 
+    @Query("SELECT * FROM USER WHERE email = :email LIMIT 1")
+    UserEntity getUserByEmail(String email);
+
     @Query("SELECT * FROM USER WHERE isActive = 1")
     LiveData<List<UserEntity>> getActiveUsers();
 

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_register"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <!-- Greeting Text -->
+    <TextView
+        android:text="Hey there,"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_marginBottom="4dp" />
+
+    <TextView
+        android:text="Create an Account"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="32dp" />
+
+    <!-- First Name Field -->
+    <EditText
+        android:id="@+id/et_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="First Name"
+        android:layout_marginBottom="16dp"
+        android:padding="12dp"
+        android:drawableStart="@drawable/ic_profile"
+        android:background="@android:drawable/edit_text" />
+
+    <!-- Last Name Field -->
+    <EditText
+        android:id="@+id/et_last_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Last Name"
+        android:layout_marginBottom="16dp"
+        android:padding="12dp"
+        android:drawableStart="@drawable/ic_profile"
+        android:background="@android:drawable/edit_text" />
+
+    <!-- Email Field -->
+    <EditText
+        android:id="@+id/et_email"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Email"
+        android:layout_marginBottom="16dp"
+        android:padding="12dp"
+        android:drawableStart="@drawable/ic_email"
+        android:background="@android:drawable/edit_text"
+        android:inputType="textEmailAddress" />
+
+    <!-- Password Field -->
+    <EditText
+        android:id="@+id/et_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Password"
+        android:layout_marginBottom="12dp"
+        android:padding="12dp"
+        android:drawableStart="@drawable/ic_lock"
+        android:background="@android:drawable/edit_text"
+        android:drawableEnd="@drawable/ic_visibility_off"
+        android:inputType="textPassword" />
+
+    <!-- Terms and Policy CheckBox -->
+    <CheckBox
+        android:id="@+id/cb_terms"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="By continuing you accept our Privacy Policy and Terms of Use"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Register Button -->
+    <Button
+        android:id="@+id/btn_register"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Register"
+        android:textColor="@android:color/white"
+        android:background="@drawable/bg_login_button"
+        android:layout_marginBottom="16dp" />
+
+    <!-- OR Text -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="- Or -"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Continue with Google Button (Placeholder) -->
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Continue with Google"
+        android:backgroundTint="@android:color/white"
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Sign In Text -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Already have an account? "
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tv_register"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Login"
+            android:textColor="#7B6DF0"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+</LinearLayout>

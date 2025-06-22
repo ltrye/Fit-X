@@ -9,6 +9,7 @@ import java.util.List;
 import com.example.fitnestx.data.AppDatabase;
 import com.example.fitnestx.data.dao.UserDAO;
 import com.example.fitnestx.data.entity.UserEntity;
+import com.example.fitnestx.utils.PasswordUtils;
 
 public class UserRepository {
 
@@ -46,4 +47,35 @@ public class UserRepository {
     public LiveData<List<UserEntity>> getActiveUsers() {
         return userDAO.getActiveUsers();
     }
+
+    public void login(String email, String plainPassword, LoginCallback callback) {
+        new Thread(() -> {
+            UserEntity user = userDAO.getUserByEmail(email);
+            if (user != null && PasswordUtils.verifyPassword(plainPassword, user.getPassword())) {
+                callback.onResult(user);
+            } else {
+                callback.onResult(null);
+            }
+        }).start();
+    }
+
+    public void register(String name, int age, boolean gender, String email, String plainPassword) {
+        String hashedPassword = PasswordUtils.hashPassword(plainPassword);
+        UserEntity user = new UserEntity(
+                (int) System.currentTimeMillis(),
+                name,
+                age,
+                gender,
+                email,
+                hashedPassword,
+                true
+        );
+        insertUser(user);
+    }
+
+    public interface LoginCallback {
+        void onResult(UserEntity user);
+    }
+
 }
+
