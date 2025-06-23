@@ -151,8 +151,12 @@ public class DatabaseGenerator {
                 int muscleGroupId = Integer.parseInt(data[0]);
                 String name = data[1];
                 double recoveryTimeInHours = Double.parseDouble(data[2]);
-
-                MuscleGroupEntity group = new MuscleGroupEntity(muscleGroupId, name, recoveryTimeInHours);
+                // Nếu cột parentId trống -> đặt là null
+                Integer parentId = null;
+                if (data.length > 3 && !data[3].isEmpty()) {
+                    parentId = Integer.parseInt(data[3]);
+                }
+                MuscleGroupEntity group = new MuscleGroupEntity(muscleGroupId, name, recoveryTimeInHours,parentId);
                 groupDAO.insertMuscleGroup(group);
             }
             reader.close();
