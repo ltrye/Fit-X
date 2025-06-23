@@ -1,5 +1,6 @@
 package com.example.fitnestx.ui;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
@@ -28,6 +29,7 @@ public class RegisterActivity extends AppCompatActivity {
     private UserRepository userRepository;
     private TextView tvRegisterLink;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

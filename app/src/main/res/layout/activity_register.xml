@@ -96,13 +96,15 @@
         android:text="- Or -"
         android:layout_marginBottom="16dp" />
 
-    <!-- Continue with Google Button (Placeholder) -->
+    <!-- Continue with Google Button -->
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Continue with Google"
         android:backgroundTint="@android:color/white"
         android:textColor="@android:color/black"
+        android:drawableStart="@drawable/ic_google"
+        android:drawablePadding="8dp"
         android:layout_marginBottom="24dp" />
 
     <!-- Sign In Text -->
