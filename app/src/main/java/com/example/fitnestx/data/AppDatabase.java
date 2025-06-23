@@ -7,6 +7,7 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
+import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.example.fitnestx.data.converter.DateConverter;
@@ -42,7 +43,7 @@ import com.example.fitnestx.data.entity.WorkoutSessionEntity;
         NotificationEntity.class,
         UserMetricsEntity.class,
         AuthProviderEntity.class
-}, version = 1, exportSchema = false)
+}, version = 2, exportSchema = false)
 @TypeConverters(DateConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract UserDAO userDAO();
@@ -60,10 +61,27 @@ public abstract class AppDatabase extends RoomDatabase {
     private static Context sAppContext;
     private static final String DB_NAME = "FitNestX";
 
+    static final Migration MIGRATION_1_2 = new Migration(1, 2) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE INDEX IF NOT EXISTS index_WorkoutPlan_userId ON WorkoutPlan(userId)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS index_MuscleGroup_parentId ON MUSCLE_GROUP(parentId)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS index_Exercise_muscleGroupId ON Exercise(muscleGroupId)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS index_ExerciseFeedback_userId ON ExerciseFeedback(userId)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS index_SessionExercise_exerciseId ON SessionExercise(exerciseId)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS index_Notification_userId ON Notification(userId)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS index_UserMetrics_userId ON UserMetrics(userId)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS index_AuthProvider_userId ON AuthProvider(userId)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS index_WorkoutSession_planId ON WorkoutSession(planId)");
+        }
+    };
+
+
     public static synchronized AppDatabase getInstance(final Context context) {
         if (sInstance == null) {
             sAppContext = context.getApplicationContext();
             sInstance = Room.databaseBuilder(sAppContext, AppDatabase.class, DB_NAME)
+                    .addMigrations(MIGRATION_1_2)
                     .addCallback(roomCallback)
                     .build();
         }
