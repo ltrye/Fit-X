@@ -29,6 +29,7 @@ public class LoginActivity extends AppCompatActivity {
     private TextView tvRegister;
     private Button btnGoogleSignIn;
 
+    private Button btnGoogleSignIn;
     private UserRepository userRepository;
     private GoogleSignInClient mGoogleSignInClient;
 
@@ -38,6 +39,8 @@ public class LoginActivity extends AppCompatActivity {
     private static final String KEY_EMAIL = "user_email";
     private static final String KEY_ID = "user_id";
     private static final String KEY_NAME = "user_name";
+
+    private GoogleSignInClient mGoogleSignInClient;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -61,7 +64,7 @@ public class LoginActivity extends AppCompatActivity {
 
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        // Hiện/ẩn mật khẩu
+
         final boolean[] isPasswordVisible = {false};
         etPassword.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_UP) {
@@ -82,7 +85,7 @@ public class LoginActivity extends AppCompatActivity {
             return false;
         });
 
-        // Đăng nhập bằng email + password
+
         btnLogin.setOnClickListener(v -> {
             String email = etEmail.getText().toString().trim();
             String password = etPassword.getText().toString().trim();
@@ -95,6 +98,7 @@ public class LoginActivity extends AppCompatActivity {
             userRepository.login(email, password, user -> {
                 runOnUiThread(() -> {
                     if (user != null) {
+
                         // Lưu trạng thái đăng nhập
                         SharedPreferences pref = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
                         SharedPreferences.Editor editor = pref.edit();
@@ -107,6 +111,7 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(LoginActivity.this, "Hello " + user.getName(), Toast.LENGTH_SHORT).show();
 
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+
                         startActivity(intent);
                         finish();
                     } else {
@@ -116,13 +121,13 @@ public class LoginActivity extends AppCompatActivity {
             });
         });
 
-        // Đăng ký
+
         tvRegister.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
         });
 
-        // Đăng nhập bằng Google
+
         btnGoogleSignIn.setOnClickListener(v -> {
             Intent signInIntent = mGoogleSignInClient.getSignInIntent();
             startActivityForResult(signInIntent, RC_SIGN_IN);
@@ -141,6 +146,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (account != null) {
                     Toast.makeText(this, "Đăng nhập bằng Google thành công: " + account.getEmail(), Toast.LENGTH_SHORT).show();
 
+
                     int uid = userRepository.getIdByEmail(account.getEmail());
                     String userName = account.getDisplayName();
                     // Lưu trạng thái đăng nhập bằng Google
@@ -153,6 +159,7 @@ public class LoginActivity extends AppCompatActivity {
                     editor.apply();
 
                     Toast.makeText(LoginActivity.this, "Hello " + userName, Toast.LENGTH_SHORT).show();
+
 
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
@@ -183,6 +190,7 @@ public class LoginActivity extends AppCompatActivity {
         // Kiểm tra đăng nhập bằng tài khoản Google
         var account = GoogleSignIn.getLastSignedInAccount(this);
         if (account != null) {
+
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(intent);
             finish();

@@ -151,8 +151,12 @@ public class DatabaseGenerator {
                 int muscleGroupId = Integer.parseInt(data[0]);
                 String name = data[1];
                 double recoveryTimeInHours = Double.parseDouble(data[2]);
-
-                MuscleGroupEntity group = new MuscleGroupEntity(muscleGroupId, name, recoveryTimeInHours);
+                // Nếu cột parentId trống -> đặt là null
+                Integer parentId = null;
+                if (data.length > 3 && !data[3].isEmpty()) {
+                    parentId = Integer.parseInt(data[3]);
+                }
+                MuscleGroupEntity group = new MuscleGroupEntity(muscleGroupId, name, recoveryTimeInHours,parentId);
                 groupDAO.insertMuscleGroup(group);
             }
             reader.close();
@@ -178,8 +182,10 @@ public class DatabaseGenerator {
                 int muscleGroupId = Integer.parseInt(data[4]);
                 boolean equipmentRequired = Boolean.parseBoolean(data[5]);
                 int difficulty = Integer.parseInt(data[6]);
+                String imageUrl = data[7];
+                boolean isMarked = Boolean.parseBoolean(data[8]);
 
-                ExerciseEntity exercise = new ExerciseEntity(exerciseId, name, description, videoURL, muscleGroupId, equipmentRequired, difficulty);
+                ExerciseEntity exercise = new ExerciseEntity(exerciseId, name, description, videoURL, muscleGroupId, equipmentRequired,difficulty ,imageUrl,isMarked);
                 exerciseDAO.insertExercise(exercise);
             }
             reader.close();

@@ -1,7 +1,9 @@
 package com.example.fitnestx;
 
 import android.content.Intent;
+
 import android.content.SharedPreferences;
+
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.Toast;
@@ -32,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
             var mGoogleSignInClient = GoogleSignIn.getClient(MainActivity.this, gso);
 
             mGoogleSignInClient.signOut().addOnCompleteListener(task -> {
+
+
                 // Xóa trạng thái đăng nhập trong SharedPreferences
                 SharedPreferences pref = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
                 SharedPreferences.Editor editor = pref.edit();
@@ -42,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
+
 
                 Toast.makeText(MainActivity.this, "Đã đăng xuất thành công", Toast.LENGTH_SHORT).show();
             });

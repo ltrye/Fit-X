@@ -18,8 +18,12 @@ public class ExerciseEntity implements Exercise {
     private int muscleGroupId;
     private boolean equipmentRequired;
     private int difficulty;
+    private String imageUrl;
+    private boolean isMarked;
 
-    public ExerciseEntity(int exerciseId, String name, String description, String videoURL, int muscleGroupId, boolean equipmentRequired, int difficulty) {
+    public ExerciseEntity(int exerciseId, String name, String description, String videoURL,
+                          int muscleGroupId, boolean equipmentRequired, int difficulty,
+                          String imageUrl, boolean isMarked) {
         this.exerciseId = exerciseId;
         this.name = name;
         this.description = description;
@@ -27,6 +31,23 @@ public class ExerciseEntity implements Exercise {
         this.muscleGroupId = muscleGroupId;
         this.equipmentRequired = equipmentRequired;
         this.difficulty = difficulty;
+        this.imageUrl = imageUrl;
+        this.isMarked = isMarked;
+    }
+    public boolean isMarked() {
+        return isMarked;
+    }
+
+    public void setMarked(boolean marked) {
+        isMarked = marked;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
     }
 
     public void setExerciseId(int exerciseId) {

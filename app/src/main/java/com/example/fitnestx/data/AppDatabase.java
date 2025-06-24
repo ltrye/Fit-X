@@ -7,6 +7,7 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
+import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.example.fitnestx.data.converter.DateConverter;
@@ -31,6 +32,8 @@ import com.example.fitnestx.data.entity.UserMetricsEntity;
 import com.example.fitnestx.data.entity.WorkoutPlanEntity;
 import com.example.fitnestx.data.entity.WorkoutSessionEntity;
 
+import java.util.concurrent.Executors;
+
 @Database(entities = {
         UserEntity.class,
         WorkoutSessionEntity.class,
@@ -42,7 +45,7 @@ import com.example.fitnestx.data.entity.WorkoutSessionEntity;
         NotificationEntity.class,
         UserMetricsEntity.class,
         AuthProviderEntity.class
-}, version = 1, exportSchema = false)
+}, version = 4, exportSchema = false)
 @TypeConverters(DateConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract UserDAO userDAO();
@@ -60,10 +63,40 @@ public abstract class AppDatabase extends RoomDatabase {
     private static Context sAppContext;
     private static final String DB_NAME = "FitNestX";
 
+    static final Migration MIGRATION_1_2 = new Migration(1, 2) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE INDEX IF NOT EXISTS index_WorkoutPlan_userId ON WorkoutPlan(userId)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS index_MuscleGroup_parentId ON MUSCLE_GROUP(parentId)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS index_Exercise_muscleGroupId ON Exercise(muscleGroupId)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS index_ExerciseFeedback_userId ON ExerciseFeedback(userId)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS index_SessionExercise_exerciseId ON SessionExercise(exerciseId)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS index_Notification_userId ON Notification(userId)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS index_UserMetrics_userId ON UserMetrics(userId)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS index_AuthProvider_userId ON AuthProvider(userId)");
+            database.execSQL("CREATE INDEX IF NOT EXISTS index_WorkoutSession_planId ON WorkoutSession(planId)");
+        }
+    };
+    static final Migration MIGRATION_2_3 = new Migration(2, 3) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            // Thêm cột mới vào bảng EXERCISE
+            database.execSQL("ALTER TABLE EXERCISE ADD COLUMN imageUrl TEXT");
+        }
+    };
+    static final Migration MIGRATION_3_4 = new Migration(3, 4) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            // Thêm cột isMarked kiểu INTEGER (0/1 đại diện boolean)
+            database.execSQL("ALTER TABLE EXERCISE ADD COLUMN isMarked INTEGER NOT NULL DEFAULT 0");
+        }
+    };
+
     public static synchronized AppDatabase getInstance(final Context context) {
         if (sInstance == null) {
             sAppContext = context.getApplicationContext();
             sInstance = Room.databaseBuilder(sAppContext, AppDatabase.class, DB_NAME)
+                    .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4)
                     .addCallback(roomCallback)
                     .build();
         }
@@ -74,17 +107,21 @@ public abstract class AppDatabase extends RoomDatabase {
         @Override
         public void onCreate(@NonNull SupportSQLiteDatabase db) {
             super.onCreate(db);
-            AppDatabase instance = AppDatabase.getInstance(sAppContext);
-            DatabaseGenerator.readUserCSV(sAppContext, "users.csv", instance);
-            DatabaseGenerator.readWorkoutPlanCSV(sAppContext, "workout_plans.csv", instance);
-            DatabaseGenerator.readWorkoutSessionCSV(sAppContext, "workout_sessions.csv", instance);
-            DatabaseGenerator.readSessionExerciseCSV(sAppContext, "session_exercises.csv", instance);
-            DatabaseGenerator.readMuscleGroupCSV(sAppContext, "muscle_groups.csv", instance);
-            DatabaseGenerator.readExerciseCSV(sAppContext, "exercises.csv", instance);
-            DatabaseGenerator.readExerciseFeedbackCSV(sAppContext, "exercise_feedback.csv", instance);
-            DatabaseGenerator.readNotificationCSV(sAppContext, "notifications.csv", instance);
-            DatabaseGenerator.readUserMetricsCSV(sAppContext, "user_metrics.csv", instance);
-            DatabaseGenerator.readAuthProviderCSV(sAppContext, "auth_providers.csv", instance);
+            // THỰC HIỆN ĐỌC CSV TRONG EXECUTOR
+            Executors.newSingleThreadExecutor().execute(() -> {
+                AppDatabase instance = sInstance; // không gọi lại getInstance()
+
+                DatabaseGenerator.readUserCSV(sAppContext, "users.csv", instance);
+                DatabaseGenerator.readWorkoutPlanCSV(sAppContext, "workout_plans.csv", instance);
+                DatabaseGenerator.readWorkoutSessionCSV(sAppContext, "workout_sessions.csv", instance);
+                DatabaseGenerator.readSessionExerciseCSV(sAppContext, "session_exercises.csv", instance);
+                DatabaseGenerator.readMuscleGroupCSV(sAppContext, "muscle_groups.csv", instance);
+                DatabaseGenerator.readExerciseCSV(sAppContext, "exercises.csv", instance);
+                DatabaseGenerator.readExerciseFeedbackCSV(sAppContext, "exercise_feedback.csv", instance);
+                DatabaseGenerator.readNotificationCSV(sAppContext, "notifications.csv", instance);
+                DatabaseGenerator.readUserMetricsCSV(sAppContext, "user_metrics.csv", instance);
+                DatabaseGenerator.readAuthProviderCSV(sAppContext, "auth_providers.csv", instance);
+            });
         }
 
         @Override
