@@ -1,0 +1,29 @@
+muscleGroupId,name,recoveryTimeInHours,parentId
+1,Ngực,0.0,
+2,Vai,0.0,
+3,Lưng,0.0,
+4,Tay trước,0.0,
+5,Tay sau,0.0,
+6,Cơ mông,0.0,
+7,Chân,0.0,
+8,Ngực dưới,0.0,1
+9,Ngực giữa,0.0,1
+10,Ngực trên,0.0,1
+11,Vai giữa,0.0,2
+12,Vai sau,0.0,2
+13,Vai trước,0.0,2
+14,Xô(Lat),0.0,3
+15,Lưng dưới,0.0,3
+16,Lưng giữa,0.0,3
+17,Cầu vai trên,0.0,3
+18,Tay trước,0.0,4
+19,Cơ đầu ngoài,0.0,5
+20,Cơ đầu dài,0.0,5
+21,Cơ đầu trong,0.0,5
+22,Cơ mông lớn,0.0,6
+23,Cơ mông nhỡ,0.0,6
+24,Cơ mông bé,0.0,6
+25,Đùi sau,0.0,7
+26,Đùi trước,0.0,7
+27,Đùi ngoài,0.0,7
+28,Đùi trong,0.0,7
