@@ -31,6 +31,9 @@ public class UserRepository {
     public UserEntity getUserById(int userId) {
         return userDAO.getUserById(userId);
     }
+    public int getIdByEmail(String email) {
+        return userDAO.getIdByEmail(email);
+    }
 
     public void updateUser(UserEntity userEntity) {
         new Thread(() -> userDAO.updateUser(userEntity)).start();
@@ -46,6 +49,13 @@ public class UserRepository {
 
     public LiveData<List<UserEntity>> getActiveUsers() {
         return userDAO.getActiveUsers();
+    }
+
+    public void checkExistAsync(String email, CheckExistCallback callback) {
+        new Thread(() -> {
+            UserEntity user = userDAO.getUserByEmail(email);
+            callback.onResult(user);
+        }).start();
     }
 
     public void login(String email, String plainPassword, LoginCallback callback) {
@@ -77,5 +87,8 @@ public class UserRepository {
         void onResult(UserEntity user);
     }
 
+    public interface CheckExistCallback {
+        void onResult(UserEntity user);
+    }
 }
 

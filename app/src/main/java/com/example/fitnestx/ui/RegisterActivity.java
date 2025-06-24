@@ -87,21 +87,25 @@ public class RegisterActivity extends AppCompatActivity {
                 return;
             }
 
-            // Ghép firstName + lastName thành name
-            String name = firstName + " " + lastName;
+            userRepository.checkExistAsync(email, user -> {
+                runOnUiThread(() -> {
+                    if (user != null) {
+                        Toast.makeText(this, "Email đã tồn tại!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Tiếp tục đăng ký
+                        String name = firstName + " " + lastName;
+                        int age = 25;
+                        boolean gender = true;
 
-            int age = 25;
-            boolean gender = true;
+                        userRepository.register(name, age, gender, email, password);
+                        Toast.makeText(this, "Đăng ký thành công! Bạn có thể đăng nhập ngay.", Toast.LENGTH_LONG).show();
 
-            // Gọi đăng ký
-            userRepository.register(name, age, gender, email, password);
-
-            Toast.makeText(this, "Đăng ký thành công! Bạn có thể đăng nhập ngay.", Toast.LENGTH_LONG).show();
-
-            // Quay về đăng nhập
-            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-            startActivity(intent);
-            finish();
+                        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+            });
         });
 
         tvRegisterLink.setOnClickListener(v -> {
