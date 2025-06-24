@@ -48,6 +48,13 @@ public class UserRepository {
         return userDAO.getActiveUsers();
     }
 
+    public void checkExistAsync(String email, CheckExistCallback callback) {
+        new Thread(() -> {
+            UserEntity user = userDAO.getUserByEmail(email);
+            callback.onResult(user);
+        }).start();
+    }
+
     public void login(String email, String plainPassword, LoginCallback callback) {
         new Thread(() -> {
             UserEntity user = userDAO.getUserByEmail(email);
@@ -77,5 +84,8 @@ public class UserRepository {
         void onResult(UserEntity user);
     }
 
+    public interface CheckExistCallback {
+        void onResult(UserEntity user);
+    }
 }
 
