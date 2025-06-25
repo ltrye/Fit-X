@@ -16,6 +16,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.fitnestx.MainActivity;
 import com.example.fitnestx.R;
+import com.example.fitnestx.data.AppDatabase;
+import com.example.fitnestx.data.entity.AuthProviderEntity;
+import com.example.fitnestx.data.entity.UserEntity;
 import com.example.fitnestx.data.repository.UserRepository;
 import com.google.android.gms.auth.api.signin.*;
 import com.google.android.gms.common.api.ApiException;
@@ -56,6 +59,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // Cấu hình đăng nhập bằng Google
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+//                .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
 
@@ -141,18 +145,39 @@ public class LoginActivity extends AppCompatActivity {
                 if (account != null) {
                     Toast.makeText(this, "Đăng nhập bằng Google thành công: " + account.getEmail(), Toast.LENGTH_SHORT).show();
 
-                    int uid = userRepository.getIdByEmail(account.getEmail());
-                    String userName = account.getDisplayName();
                     // Lưu trạng thái đăng nhập bằng Google
                     SharedPreferences pref = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
                     SharedPreferences.Editor editor = pref.edit();
                     editor.putBoolean(KEY_LOGGED_IN, true);
                     editor.putString(KEY_EMAIL, account.getEmail());
-                    editor.putInt(KEY_ID, uid);
-                    editor.putString(KEY_NAME, userName);
+                    editor.putString(KEY_NAME, account.getDisplayName());
                     editor.apply();
 
-                    Toast.makeText(LoginActivity.this, "Hello " + userName, Toast.LENGTH_SHORT).show();
+                    new Thread(() -> {
+                        AppDatabase db = AppDatabase.getInstance(getApplicationContext());
+
+                        UserEntity user = db.userDAO().getUserByEmail(account.getEmail());
+
+                        if (user != null) {
+                            AuthProviderEntity authEntity = new AuthProviderEntity(
+                                    0,
+                                    user.getUserId(),
+                                    "GOOGLE",
+                                    account.getId()
+                            );
+
+                            db.authProviderDAO().insertAuthProvider(authEntity);
+                        } else {
+                            userRepository.register(
+                                    account.getDisplayName(),
+                                    25,
+                                    true,
+                                    account.getEmail(),
+                                    "123456");
+                        }
+                    }).start();
+
+                    Toast.makeText(LoginActivity.this, "Hello " + account.getDisplayName(), Toast.LENGTH_SHORT).show();
 
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(intent);
