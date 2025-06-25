@@ -29,7 +29,7 @@ public class LoginActivity extends AppCompatActivity {
     private TextView tvRegister;
     private Button btnGoogleSignIn;
 
-    private Button btnGoogleSignIn;
+
     private UserRepository userRepository;
     private GoogleSignInClient mGoogleSignInClient;
 
@@ -40,7 +40,7 @@ public class LoginActivity extends AppCompatActivity {
     private static final String KEY_ID = "user_id";
     private static final String KEY_NAME = "user_name";
 
-    private GoogleSignInClient mGoogleSignInClient;
+
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
