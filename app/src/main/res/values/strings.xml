@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">FitnestX</string>
+    <string name="default_web_client_id">1002813393737-bv8o526hffq960ir1ebft6ca20grook5.apps.googleusercontent.com</string>
 
         <string name="fast_forward_indicator"><![CDATA[>> 10s]]></string>
         <string name="rewind_indicator"><![CDATA[<< 10s]]></string>
