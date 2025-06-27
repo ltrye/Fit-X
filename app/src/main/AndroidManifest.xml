@@ -33,6 +33,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.ExcerciseActivity" />
+        <activity android:name=".VideoPlayerActivity" />
 
     </application>
 
