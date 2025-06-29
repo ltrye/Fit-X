@@ -2,6 +2,7 @@ package com.example.fitnestx.ui;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -32,6 +33,10 @@ public class UserSurveyActivity extends AppCompatActivity {
 
     private Calendar selectedDate;
     private SimpleDateFormat dateFormat;
+
+    // SharedPreferences constants
+    private static final String PREF_NAME = "MyAppPrefs";
+    private static final String KEY_SURVEY_COMPLETED = "survey_completed";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,10 +104,13 @@ public class UserSurveyActivity extends AppCompatActivity {
     private void setupNextButton() {
         btnNext.setOnClickListener(v -> {
             if (validateInputs()) {
-                // Save user data (you can implement this based on your needs)
+                // Save user data
                 saveUserData();
 
-                // Navigate to next screen (MainActivity for now)
+                // Mark survey as completed
+                markSurveyCompleted();
+
+                // Navigate to MainActivity
                 Intent intent = new Intent(UserSurveyActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
@@ -175,12 +183,7 @@ public class UserSurveyActivity extends AppCompatActivity {
         String weight = etWeight.getText().toString();
         String height = etHeight.getText().toString();
 
-        // Here you can save the data to SharedPreferences, database, or send to server
-        // For now, we'll just show a success message
-        Toast.makeText(this, "Profile completed successfully!", Toast.LENGTH_SHORT).show();
-
-        // You can also save to SharedPreferences like this:
-        /*
+        // Save to SharedPreferences
         SharedPreferences prefs = getSharedPreferences("UserProfile", MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString("gender", gender);
@@ -188,6 +191,14 @@ public class UserSurveyActivity extends AppCompatActivity {
         editor.putString("weight", weight);
         editor.putString("height", height);
         editor.apply();
-        */
+
+        Toast.makeText(this, "Profile completed successfully!", Toast.LENGTH_SHORT).show();
+    }
+
+    private void markSurveyCompleted() {
+        SharedPreferences pref = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putBoolean(KEY_SURVEY_COMPLETED, true);
+        editor.apply();
     }
 }
