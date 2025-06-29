@@ -11,7 +11,7 @@ import com.example.fitnestx.data.model.Notification;
         foreignKeys = @ForeignKey(entity = UserEntity.class, parentColumns = "userId", childColumns = "userId"))
 public class NotificationEntity implements Notification {
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     @NonNull
     private int notificationId;
     private int userId;

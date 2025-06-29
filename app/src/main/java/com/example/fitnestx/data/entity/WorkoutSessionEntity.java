@@ -11,7 +11,7 @@ import com.example.fitnestx.data.model.WorkoutSession;
         foreignKeys = @ForeignKey(entity = WorkoutPlanEntity.class, parentColumns = "planId", childColumns = "planId"))
 public class WorkoutSessionEntity implements WorkoutSession {
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     @NonNull
     private int sessionId;
     private int planId;
