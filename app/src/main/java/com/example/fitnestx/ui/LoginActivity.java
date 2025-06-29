@@ -59,6 +59,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // Cấu hình đăng nhập bằng Google
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+//                .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
 
@@ -108,8 +109,7 @@ public class LoginActivity extends AppCompatActivity {
                         editor.apply();
 
                         Toast.makeText(LoginActivity.this, "Hello " + user.getName(), Toast.LENGTH_SHORT).show();
-
-                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        Intent intent = new Intent(LoginActivity.this, ExcerciseActivity.class);
                         startActivity(intent);
                         finish();
                     } else {
@@ -156,7 +156,6 @@ public class LoginActivity extends AppCompatActivity {
                         AppDatabase db = AppDatabase.getInstance(getApplicationContext());
 
                         UserEntity user = db.userDAO().getUserByEmail(account.getEmail());
-
                         if (user != null) {
                             AuthProviderEntity authEntity = new AuthProviderEntity(
                                     0,
