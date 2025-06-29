@@ -11,7 +11,7 @@ import com.example.fitnestx.data.model.AuthProvider;
         foreignKeys = @ForeignKey(entity = UserEntity.class, parentColumns = "userId", childColumns = "userId"))
 public class AuthProviderEntity implements AuthProvider {
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     @NonNull
     private int providerId;
     private int userId;

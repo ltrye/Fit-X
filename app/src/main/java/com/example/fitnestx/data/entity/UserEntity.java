@@ -9,7 +9,7 @@ import com.example.fitnestx.data.model.User;
 @Entity (tableName = "USER")
 public class UserEntity implements User {
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     @NonNull
     private int userId;
     private String name;

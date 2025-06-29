@@ -184,7 +184,6 @@ public class DatabaseGenerator {
                 int difficulty = Integer.parseInt(data[6]);
                 String imageUrl = data[7];
                 boolean isMarked = Boolean.parseBoolean(data[8]);
-
                 ExerciseEntity exercise = new ExerciseEntity(exerciseId, name, description, videoURL, muscleGroupId, equipmentRequired,difficulty ,imageUrl,isMarked);
                 exerciseDAO.insertExercise(exercise);
             }
