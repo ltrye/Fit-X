@@ -10,7 +10,6 @@ constraintlayout = "2.2.1"
 media3Ui = "1.7.1"
 media3Exoplayer = "1.7.1"
 
-
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -21,7 +20,6 @@ activity = { group = "androidx.activity", name = "activity", version.ref = "acti
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 media3-ui = { group = "androidx.media3", name = "media3-ui", version.ref = "media3Ui" }
 media3-exoplayer = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "media3Exoplayer" }
-
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
