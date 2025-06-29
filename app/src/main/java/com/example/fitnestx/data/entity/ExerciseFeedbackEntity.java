@@ -14,7 +14,7 @@ import com.example.fitnestx.data.model.ExerciseFeedback;
         })
 public class ExerciseFeedbackEntity implements ExerciseFeedback {
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     @NonNull
     private int feedbackId;
     private int userId;

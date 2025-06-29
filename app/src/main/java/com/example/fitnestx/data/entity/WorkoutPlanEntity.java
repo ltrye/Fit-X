@@ -9,7 +9,7 @@ import com.example.fitnestx.data.model.WorkoutPlan;
 @Entity(tableName = "WORKOUT_PLAN")
 public class WorkoutPlanEntity implements WorkoutPlan {
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     @NonNull
     private int planId;
     private int userId;

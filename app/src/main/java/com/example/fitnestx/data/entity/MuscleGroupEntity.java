@@ -22,7 +22,7 @@ import com.example.fitnestx.data.model.MuscleGroup;
 )
 public class MuscleGroupEntity implements MuscleGroup {
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     @NonNull
     private int muscleGroupId;
     private String name;
