@@ -134,4 +134,6 @@ public class SectionExerciseAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             }
         }
     }
+
+
 }

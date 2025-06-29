@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">FitnestX</string>
+
+        <string name="fast_forward_indicator"><![CDATA[>> 10s]]></string>
+        <string name="rewind_indicator"><![CDATA[<< 10s]]></string>
 </resources>

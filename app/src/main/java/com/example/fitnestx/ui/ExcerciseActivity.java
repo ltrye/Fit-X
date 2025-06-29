@@ -1,5 +1,6 @@
 package com.example.fitnestx.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageButton;
 
@@ -58,8 +59,17 @@ public class ExcerciseActivity extends AppCompatActivity {
 
 
         // Adapter
-        sectionExerciseAdapter = new SectionExerciseAdapter(sectionItems, (pos, exercise) -> {
-            sectionExerciseAdapter.toggleExerciseStatus(pos);
+        sectionExerciseAdapter = new SectionExerciseAdapter(sectionItems, new SectionExerciseAdapter.OnItemClickListener() {
+            @Override
+            public void onExerciseClick(int position, ExerciseEntity exercise) {
+                // Mở màn hình hướng dẫn video
+                Intent intent = new Intent(ExcerciseActivity.this, DetailExerciseActivity.class);
+                intent.putExtra(DetailExerciseActivity.EXTRA_EXERCISE, String.valueOf(exercise));
+                startActivity(intent);
+
+                // Tùy chọn: vẫn toggle status nếu muốn đánh dấu đã xem
+                sectionExerciseAdapter.toggleExerciseStatus(position);
+            }
         });
 
         recyclerView.setAdapter(sectionExerciseAdapter);
@@ -124,4 +134,5 @@ public class ExcerciseActivity extends AppCompatActivity {
 
         recyclerView.setAdapter(adapter);
     }
+
 }

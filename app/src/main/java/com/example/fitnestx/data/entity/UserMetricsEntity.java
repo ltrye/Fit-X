@@ -11,7 +11,7 @@ import com.example.fitnestx.data.model.UserMetrics;
         foreignKeys = @ForeignKey(entity = UserEntity.class, parentColumns = "userId", childColumns = "userId"))
 public class UserMetricsEntity implements UserMetrics {
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     @NonNull
     private int metricId;
     private int userId;
