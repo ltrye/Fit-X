@@ -13,10 +13,14 @@
         android:padding="16dp"
         android:gravity="center_vertical">
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_arrow_back" />
+        <ImageButton
+            android:id="@+id/btn_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_arrow_back"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:padding="12dp"
+            android:contentDescription="Back" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -50,10 +54,10 @@
                 android:layout_marginTop="2dp" />
         </LinearLayout>
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_refresh"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_imageExercise"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginEnd="8dp" />
 
         <ImageView
