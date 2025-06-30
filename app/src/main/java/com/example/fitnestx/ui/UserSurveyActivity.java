@@ -255,4 +255,13 @@ public class UserSurveyActivity extends AppCompatActivity {
         super.onDestroy();
         executorService.shutdown();
     }
+
+    @Override
+    public void onBackPressed() {
+        // If the user is on this screen, they are in the middle of onboarding.
+        // Pressing back should exit the application to prevent an infinite loop.
+        // This stops them from going back to LoginActivity, which would re-trigger the check.
+        super.onBackPressed();
+        finishAffinity(); // Finishes this activity and all parent activities, effectively closing the app.
+    }
 }

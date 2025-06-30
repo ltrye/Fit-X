@@ -46,4 +46,8 @@ public class WorkoutPlanRepository {
     public void deleteAllWorkoutPlans() {
         new Thread(() -> workoutPlanDAO.deleteAllWorkoutPlans()).start();
     }
+
+    public boolean hasActivePlanForUser(int userId) {
+        return workoutPlanDAO.countActivePlansForUser(userId) > 0;
+    }
 }

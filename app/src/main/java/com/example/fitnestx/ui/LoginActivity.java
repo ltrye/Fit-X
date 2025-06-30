@@ -236,16 +236,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void navigateAfterLogin() {
-        SharedPreferences pref = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-        boolean surveyCompleted = pref.getBoolean(KEY_SURVEY_COMPLETED, false);
-
-        Intent intent;
-        if (surveyCompleted) {
-            intent = new Intent(LoginActivity.this, MainActivity.class);
-        } else {
-            intent = new Intent(LoginActivity.this, UserSurveyActivity.class);
-        }
-
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(intent);
         finish();
     }
@@ -274,6 +265,13 @@ public class LoginActivity extends AppCompatActivity {
             new Thread(() -> {
                 UserEntity user = userRepository.getUserById(userRepository.getIdByEmail(account.getEmail()));
                 if (user != null) {
+                    SharedPreferences.Editor prefEditor = pref.edit();
+                    prefEditor.putBoolean(KEY_LOGGED_IN, true);
+                    prefEditor.putString(KEY_EMAIL, account.getEmail());
+                    prefEditor.putString(KEY_NAME, account.getDisplayName());
+                    prefEditor.putInt(KEY_ID, user.getUserId());
+                    prefEditor.apply();
+
                     SharedPreferences authPrefs = getSharedPreferences("AuthPrefs", MODE_PRIVATE);
                     authPrefs.edit().putInt("userId", user.getUserId()).apply();
                     Log.d("LoginActivity", "Saved userId to AuthPrefs (auto-login): " + user.getUserId());
