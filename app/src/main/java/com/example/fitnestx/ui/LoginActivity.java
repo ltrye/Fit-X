@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -60,10 +61,8 @@ public class LoginActivity extends AppCompatActivity {
 
         // Cấu hình đăng nhập bằng Google
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-//                .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
-
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
         // Hiện/ẩn mật khẩu
@@ -89,52 +88,38 @@ public class LoginActivity extends AppCompatActivity {
 
         // Đăng nhập bằng email + password
         btnLogin.setOnClickListener(v -> {
-            android.util.Log.d("LoginActivity", "Login button clicked");
-
             String email = etEmail.getText().toString().trim();
             String password = etPassword.getText().toString().trim();
-
-            android.util.Log.d("LoginActivity", "Email: " + email + ", Password length: " + password.length());
 
             if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
                 Toast.makeText(this, "Vui lòng nhập email và mật khẩu!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            android.util.Log.d("LoginActivity", "About to call userRepository.login");
-
             try {
                 userRepository.login(email, password, user -> {
-                    android.util.Log.d("LoginActivity", "Login callback received, user: " + (user != null ? user.getName() : "null"));
-
-                    if (this.isFinishing() || this.isDestroyed()) {
-                        android.util.Log.d("LoginActivity", "Activity is finishing, skipping UI update");
-                        return; // Activity is no longer valid
+                    if (isFinishing() || isDestroyed()) {
+                        Log.d("LoginActivity", "Activity is finishing, skipping UI update");
+                        return;
                     }
 
                     runOnUiThread(() -> {
                         try {
                             if (user != null) {
-                                android.util.Log.d("LoginActivity", "Login successful, saving state");
-                                // Lưu trạng thái đăng nhập
                                 saveLoginState(user, email);
                                 Toast.makeText(LoginActivity.this, "Hello " + user.getName(), Toast.LENGTH_SHORT).show();
                                 navigateAfterLogin();
                             } else {
-                                android.util.Log.d("LoginActivity", "Login failed - invalid credentials");
                                 Toast.makeText(LoginActivity.this, "Email hoặc mật khẩu không đúng!", Toast.LENGTH_SHORT).show();
                             }
                         } catch (Exception e) {
-                            android.util.Log.e("LoginActivity", "UI update error: " + e.getMessage(), e);
+                            Log.e("LoginActivity", "UI update error: " + e.getMessage(), e);
                             Toast.makeText(LoginActivity.this, "Đã xảy ra lỗi, vui lòng thử lại!", Toast.LENGTH_SHORT).show();
                         }
                     });
                 });
-
-                android.util.Log.d("LoginActivity", "userRepository.login called successfully");
-
             } catch (Exception e) {
-                android.util.Log.e("LoginActivity", "Login error: " + e.getMessage(), e);
+                Log.e("LoginActivity", "Login error: " + e.getMessage(), e);
                 Toast.makeText(this, "Đã xảy ra lỗi, vui lòng thử lại!", Toast.LENGTH_SHORT).show();
             }
         });
@@ -160,9 +145,13 @@ public class LoginActivity extends AppCompatActivity {
         editor.putInt(KEY_ID, user.getUserId());
         editor.putString(KEY_NAME, user.getName());
         editor.apply();
+
+        // Also save userId to AuthPrefs for consistency
+        SharedPreferences authPrefs = getSharedPreferences("AuthPrefs", MODE_PRIVATE);
+        authPrefs.edit().putInt("userId", user.getUserId()).apply();
+        Log.d("LoginActivity", "Saved userId to AuthPrefs: " + user.getUserId());
     }
 
-    // Xử lý kết quả đăng nhập bằng Google
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -175,38 +164,35 @@ public class LoginActivity extends AppCompatActivity {
                     handleGoogleSignIn(account);
                 }
             } catch (ApiException e) {
+                Log.e("LoginActivity", "Google Sign-In failed: " + e.getMessage(), e);
                 Toast.makeText(this, "Đăng nhập bằng Google thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
     }
 
     private void handleGoogleSignIn(GoogleSignInAccount account) {
-        Toast.makeText(this, "Đăng nhập bằng Google thành công: " + account.getEmail(), Toast.LENGTH_SHORT).show();
-
+        Log.d("LoginActivity", "Google Sign-In successful: " + account.getEmail());
         new Thread(() -> {
             try {
                 AppDatabase db = AppDatabase.getInstance(getApplicationContext());
                 UserEntity user = db.userDAO().getUserByEmail(account.getEmail());
 
-                runOnUiThread(() -> {
-                    // Lưu trạng thái đăng nhập bằng Google
-                    SharedPreferences pref = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-                    SharedPreferences.Editor editor = pref.edit();
-                    editor.putBoolean(KEY_LOGGED_IN, true);
-                    editor.putString(KEY_EMAIL, account.getEmail());
-                    editor.putString(KEY_NAME, account.getDisplayName());
-
-                    if (user != null) {
-                        editor.putInt(KEY_ID, user.getUserId());
-                    }
-                    editor.apply();
-
-                    Toast.makeText(LoginActivity.this, "Hello " + account.getDisplayName(), Toast.LENGTH_SHORT).show();
-                    navigateAfterLogin();
-                });
+                if (user == null) {
+                    // New user, register them
+                    userRepository.register(
+                            account.getDisplayName(),
+                            25, // Default age
+                            true, // Default gender
+                            account.getEmail(),
+                            "google_default_password" // Placeholder password
+                    );
+                    // Wait briefly for registration to complete
+                    Thread.sleep(100);
+                    user = db.userDAO().getUserByEmail(account.getEmail());
+                }
 
                 if (user != null) {
-                    // User exists, add auth provider
+                    // Add auth provider
                     AuthProviderEntity authEntity = new AuthProviderEntity(
                             0,
                             user.getUserId(),
@@ -214,16 +200,34 @@ public class LoginActivity extends AppCompatActivity {
                             account.getId()
                     );
                     db.authProviderDAO().insertAuthProvider(authEntity);
+
+                    // Save login state
+                    UserEntity finalUser = user;
+                    runOnUiThread(() -> {
+                        SharedPreferences pref = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+                        SharedPreferences.Editor editor = pref.edit();
+                        editor.putBoolean(KEY_LOGGED_IN, true);
+                        editor.putString(KEY_EMAIL, account.getEmail());
+                        editor.putString(KEY_NAME, account.getDisplayName());
+                        editor.putInt(KEY_ID, finalUser.getUserId());
+                        editor.apply();
+
+                        // Also save to AuthPrefs
+                        SharedPreferences authPrefs = getSharedPreferences("AuthPrefs", MODE_PRIVATE);
+                        authPrefs.edit().putInt("userId", finalUser.getUserId()).apply();
+                        Log.d("LoginActivity", "Saved userId to AuthPrefs (Google): " + finalUser.getUserId());
+
+                        Toast.makeText(LoginActivity.this, "Hello " + account.getDisplayName(), Toast.LENGTH_SHORT).show();
+                        navigateAfterLogin();
+                    });
                 } else {
-                    // New user, register them
-                    userRepository.register(
-                            account.getDisplayName(),
-                            25,
-                            true,
-                            account.getEmail(),
-                            "123456");
+                    runOnUiThread(() -> {
+                        Log.e("LoginActivity", "Failed to retrieve or register user for email: " + account.getEmail());
+                        Toast.makeText(LoginActivity.this, "Lỗi đăng ký người dùng Google", Toast.LENGTH_SHORT).show();
+                    });
                 }
             } catch (Exception e) {
+                Log.e("LoginActivity", "Google Sign-In error: " + e.getMessage(), e);
                 runOnUiThread(() -> {
                     Toast.makeText(LoginActivity.this, "Lỗi xử lý đăng nhập: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
@@ -237,10 +241,8 @@ public class LoginActivity extends AppCompatActivity {
 
         Intent intent;
         if (surveyCompleted) {
-            // User has completed survey, go to main app
             intent = new Intent(LoginActivity.this, MainActivity.class);
         } else {
-            // First time login, go to survey
             intent = new Intent(LoginActivity.this, UserSurveyActivity.class);
         }
 
@@ -248,7 +250,6 @@ public class LoginActivity extends AppCompatActivity {
         finish();
     }
 
-    // Kiểm tra đăng nhập tự động
     @Override
     protected void onStart() {
         super.onStart();
@@ -256,23 +257,29 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences pref = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         boolean isLoggedIn = pref.getBoolean(KEY_LOGGED_IN, false);
 
-        // Kiểm tra đăng nhập bằng SharedPreferences
         if (isLoggedIn) {
             navigateAfterLogin();
             return;
         }
 
-        // Kiểm tra đăng nhập bằng tài khoản Google
         var account = GoogleSignIn.getLastSignedInAccount(this);
         if (account != null) {
-            // Save Google account info and navigate
             SharedPreferences.Editor editor = pref.edit();
             editor.putBoolean(KEY_LOGGED_IN, true);
             editor.putString(KEY_EMAIL, account.getEmail());
             editor.putString(KEY_NAME, account.getDisplayName());
             editor.apply();
 
-            navigateAfterLogin();
+            // Save userId to AuthPrefs if user exists
+            new Thread(() -> {
+                UserEntity user = userRepository.getUserById(userRepository.getIdByEmail(account.getEmail()));
+                if (user != null) {
+                    SharedPreferences authPrefs = getSharedPreferences("AuthPrefs", MODE_PRIVATE);
+                    authPrefs.edit().putInt("userId", user.getUserId()).apply();
+                    Log.d("LoginActivity", "Saved userId to AuthPrefs (auto-login): " + user.getUserId());
+                }
+                runOnUiThread(this::navigateAfterLogin);
+            }).start();
         }
     }
 }

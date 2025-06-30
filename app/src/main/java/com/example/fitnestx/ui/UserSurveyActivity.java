@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -17,10 +18,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.fitnestx.MainActivity;
 import com.example.fitnestx.R;
+import com.example.fitnestx.data.entity.UserEntity;
+import com.example.fitnestx.data.repository.UserRepository;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class UserSurveyActivity extends AppCompatActivity {
 
@@ -30,18 +35,33 @@ public class UserSurveyActivity extends AppCompatActivity {
     private EditText etWeight;
     private EditText etHeight;
     private Button btnNext;
+    private UserRepository userRepository;
+    private ExecutorService executorService;
 
     private Calendar selectedDate;
     private SimpleDateFormat dateFormat;
 
     // SharedPreferences constants
-    private static final String PREF_NAME = "MyAppPrefs";
+    private static final String PREF_NAME = "FitnestX";
     private static final String KEY_SURVEY_COMPLETED = "survey_completed";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_survey);
+
+        // Initialize repository and executor
+        userRepository = new UserRepository(this);
+        executorService = Executors.newSingleThreadExecutor();
+
+        // Check if survey is already completed
+        SharedPreferences pref = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        if (pref.getBoolean(KEY_SURVEY_COMPLETED, false)) {
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
 
         initViews();
         setupGenderSpinner();
@@ -90,55 +110,36 @@ public class UserSurveyActivity extends AppCompatActivity {
                 selectedDate.get(Calendar.DAY_OF_MONTH)
         );
 
-        // Set maximum date to today (user can't be born in the future)
         datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
-
-        // Set minimum date to 100 years ago
         Calendar minDate = Calendar.getInstance();
         minDate.add(Calendar.YEAR, -100);
         datePickerDialog.getDatePicker().setMinDate(minDate.getTimeInMillis());
-
         datePickerDialog.show();
     }
 
     private void setupNextButton() {
         btnNext.setOnClickListener(v -> {
             if (validateInputs()) {
-                // Save user data
-                saveUserData();
-
-                // Mark survey as completed
-                markSurveyCompleted();
-
-                // Navigate to MainActivity
-                Intent intent = new Intent(UserSurveyActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
+                saveUserProfile();
             }
         });
     }
 
     private boolean validateInputs() {
-        // Check gender selection
         if (spinnerGender.getSelectedItemPosition() == 0) {
             Toast.makeText(this, "Please select your gender", Toast.LENGTH_SHORT).show();
             return false;
         }
-
-        // Check date of birth
         if (tvDateBirth.getText().toString().equals("Date of Birth")) {
             Toast.makeText(this, "Please select your date of birth", Toast.LENGTH_SHORT).show();
             return false;
         }
-
-        // Check weight
         String weight = etWeight.getText().toString().trim();
         if (weight.isEmpty()) {
             Toast.makeText(this, "Please enter your weight", Toast.LENGTH_SHORT).show();
             etWeight.requestFocus();
             return false;
         }
-
         try {
             double weightValue = Double.parseDouble(weight);
             if (weightValue <= 0 || weightValue > 500) {
@@ -151,15 +152,12 @@ public class UserSurveyActivity extends AppCompatActivity {
             etWeight.requestFocus();
             return false;
         }
-
-        // Check height
         String height = etHeight.getText().toString().trim();
         if (height.isEmpty()) {
             Toast.makeText(this, "Please enter your height", Toast.LENGTH_SHORT).show();
             etHeight.requestFocus();
             return false;
         }
-
         try {
             double heightValue = Double.parseDouble(height);
             if (heightValue <= 0 || heightValue > 300) {
@@ -172,33 +170,89 @@ public class UserSurveyActivity extends AppCompatActivity {
             etHeight.requestFocus();
             return false;
         }
-
         return true;
     }
 
-    private void saveUserData() {
-        // Get the selected values
-        String gender = spinnerGender.getSelectedItem().toString();
-        String dateOfBirth = tvDateBirth.getText().toString();
-        String weight = etWeight.getText().toString();
-        String height = etHeight.getText().toString();
+    private void saveUserProfile() {
+        int userId = getCurrentUserId();
+        if (userId == -1) {
+            runOnUiThread(() -> {
+                Toast.makeText(this, "Error: User not logged in", Toast.LENGTH_SHORT).show();
+                Log.e("UserSurveyActivity", "Invalid userId");
+            });
+            return;
+        }
 
-        // Save to SharedPreferences
-        SharedPreferences prefs = getSharedPreferences("UserProfile", MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString("gender", gender);
-        editor.putString("dateOfBirth", dateOfBirth);
-        editor.putString("weight", weight);
-        editor.putString("height", height);
-        editor.apply();
+        // Map gender to boolean
+        String genderStr = spinnerGender.getSelectedItem().toString();
+        boolean gender = genderStr.equals("Male");
 
-        Toast.makeText(this, "Profile completed successfully!", Toast.LENGTH_SHORT).show();
+        // Calculate age from date of birth
+        Calendar today = Calendar.getInstance();
+        int calculatedAge = today.get(Calendar.YEAR) - selectedDate.get(Calendar.YEAR);
+        if (today.get(Calendar.DAY_OF_YEAR) < selectedDate.get(Calendar.DAY_OF_YEAR)) {
+            calculatedAge--;
+        }
+
+        // Create a final variable to use inside the lambda
+        final int finalAge = calculatedAge;
+
+        // Run database operations on background thread
+        executorService.execute(() -> {
+            try {
+                // Get user from database
+                UserEntity user = userRepository.getUserById(userId);
+                if (user == null) {
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, "Error: User not found", Toast.LENGTH_SHORT).show();
+                        Log.e("UserSurveyActivity", "User not found for userId: " + userId);
+                    });
+                    return;
+                }
+
+                // Update user data
+                user.setGender(gender);
+                user.setAge(finalAge);
+                userRepository.updateUser(user);
+
+                // Save to SharedPreferences (optional)
+                SharedPreferences prefs = getSharedPreferences("UserProfile", MODE_PRIVATE);
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putString("gender", genderStr);
+                editor.putInt("age", finalAge);
+                editor.putString("weight", etWeight.getText().toString());
+                editor.putString("height", etHeight.getText().toString());
+                editor.apply();
+
+                // Navigate to GoalSelectionActivity
+                runOnUiThread(() -> {
+                    Intent intent = new Intent(UserSurveyActivity.this, GoalSelectionActivity.class);
+                    intent.putExtra("weight", etWeight.getText().toString());
+                    intent.putExtra("height", etHeight.getText().toString());
+                    startActivity(intent);
+                    finish();
+                });
+            } catch (Exception e) {
+                runOnUiThread(() -> {
+                    Log.e("UserSurveyActivity", "Failed to save user profile", e);
+                    Toast.makeText(this, "Error saving profile: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
+            }
+        });
     }
 
-    private void markSurveyCompleted() {
-        SharedPreferences pref = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putBoolean(KEY_SURVEY_COMPLETED, true);
-        editor.apply();
+    private int getCurrentUserId() {
+        SharedPreferences prefs = getSharedPreferences("AuthPrefs", MODE_PRIVATE);
+        int userId = prefs.getInt("userId", -1);
+        if (userId == -1) {
+            Log.e("UserSurveyActivity", "No userId found in SharedPreferences");
+        }
+        return userId;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        executorService.shutdown();
     }
 }
