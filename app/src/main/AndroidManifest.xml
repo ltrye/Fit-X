@@ -41,6 +41,10 @@
             android:name=".ui.GoalSelectionActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".ui.WorkoutFrequencyActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>
