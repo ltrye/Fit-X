@@ -3,6 +3,7 @@ package com.example.fitnestx.ui;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -14,11 +15,19 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.fitnestx.MainActivity;
 import com.example.fitnestx.R;
+import com.example.fitnestx.data.entity.WorkoutPlanEntity;
 import com.example.fitnestx.data.repository.WorkoutPlanRepository;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class WorkoutFrequencyActivity extends AppCompatActivity {
 
     private WorkoutPlanRepository workoutPlanRepository;
+    private ExecutorService executorService;
 
     // UI Components
     private ImageButton btnBack;
@@ -43,8 +52,9 @@ public class WorkoutFrequencyActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_workout_frequency);
 
-        // Initialize repository
+        // Initialize repository and executor
         workoutPlanRepository = new WorkoutPlanRepository(this);
+        executorService = Executors.newSingleThreadExecutor();
 
         initViews();
         setupClickListeners();
@@ -89,8 +99,7 @@ public class WorkoutFrequencyActivity extends AppCompatActivity {
         btnAction.setOnClickListener(v -> {
             if (isShowingWarning) {
                 // Save frequency and proceed to next screen
-                saveWorkoutFrequency();
-                proceedToNextScreen();
+                saveWorkoutPlanToDatabase();
             } else {
                 // Show warning message
                 showWarningMessage();
@@ -124,28 +133,85 @@ public class WorkoutFrequencyActivity extends AppCompatActivity {
         isShowingWarning = true;
     }
 
-    private void saveWorkoutFrequency() {
+    private void saveWorkoutPlanToDatabase() {
+        // Get user ID
+        int userId = getCurrentUserId();
+        if (userId == -1) {
+            Toast.makeText(this, "Error: User not logged in", Toast.LENGTH_SHORT).show();
+            Log.e("WorkoutFrequencyActivity", "Invalid userId");
+            return;
+        }
+
+        // Run database operations on background thread
+        executorService.execute(() -> {
+            try {
+                // Get current date as start date
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                String startDate = dateFormat.format(new Date());
+
+                // Create WorkoutPlanEntity
+                WorkoutPlanEntity workoutPlan = new WorkoutPlanEntity(
+                        0, // planId is auto-generated
+                        userId,
+                        startDate,
+                        "12", // Default 12 weeks duration - you can modify this as needed
+                        selectedSlots, // daysPerWeek - this is where we save the frequency
+                        true // isActive - set to true for the new plan
+                );
+
+                // Save to Room database
+                workoutPlanRepository.insertWorkoutPlan(workoutPlan);
+
+                // Save frequency to SharedPreferences as well (for backup/quick access)
+                saveWorkoutFrequencyToPrefs();
+
+                // Mark survey as completed (same as GoalSelectionActivity)
+                markSurveyCompleted();
+
+                // Navigate to MainActivity on UI thread
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "Workout plan created successfully!", Toast.LENGTH_SHORT).show();
+                    proceedToNextScreen();
+                });
+
+            } catch (Exception e) {
+                runOnUiThread(() -> {
+                    Log.e("WorkoutFrequencyActivity", "Failed to save workout plan", e);
+                    Toast.makeText(this, "Error saving workout plan: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
+            }
+        });
+    }
+
+    private void saveWorkoutFrequencyToPrefs() {
         SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putInt(KEY_WORKOUT_FREQUENCY, selectedSlots);
         editor.apply();
-
-        Toast.makeText(this, "Workout frequency saved: " + selectedSlots + " times per week",
-                Toast.LENGTH_SHORT).show();
     }
 
-    private void proceedToNextScreen() {
-        // Mark survey as completed
+    private void markSurveyCompleted() {
         SharedPreferences pref = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
         editor.putBoolean(KEY_SURVEY_COMPLETED, true);
         editor.apply();
+    }
 
-        // Navigate to MainActivity or next onboarding screen
+    private void proceedToNextScreen() {
+        // Navigate to MainActivity
         Intent intent = new Intent(WorkoutFrequencyActivity.this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    private int getCurrentUserId() {
+        SharedPreferences prefs = getSharedPreferences("AuthPrefs", MODE_PRIVATE);
+        int userId = prefs.getInt("userId", -1);
+        if (userId == -1) {
+            Log.e("WorkoutFrequencyActivity", "No userId found in SharedPreferences");
+        }
+        return userId;
     }
 
     @Override
@@ -154,6 +220,14 @@ public class WorkoutFrequencyActivity extends AppCompatActivity {
             showFrequencySelection();
         } else {
             super.onBackPressed();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (executorService != null) {
+            executorService.shutdown();
         }
     }
 }
