@@ -18,7 +18,7 @@
             android:layout_height="280dp"
             android:layout_gravity="center"
             android:layout_marginBottom="32dp"
-            android:src="@drawable/survey_image_1"
+            android:src="@drawable/image_survey"
             android:scaleType="centerInside" />
 
         <!-- Title -->
