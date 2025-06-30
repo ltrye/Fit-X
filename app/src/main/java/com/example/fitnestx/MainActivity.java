@@ -1,9 +1,7 @@
 package com.example.fitnestx;
 
 import android.content.Intent;
-
 import android.content.SharedPreferences;
-
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.Toast;
@@ -34,24 +32,27 @@ public class MainActivity extends AppCompatActivity {
             var mGoogleSignInClient = GoogleSignIn.getClient(MainActivity.this, gso);
 
             mGoogleSignInClient.signOut().addOnCompleteListener(task -> {
-
-
-                // Xóa trạng thái đăng nhập trong SharedPreferences
-                SharedPreferences pref = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+                // Clear specific login-related keys, preserve KEY_SURVEY_COMPLETED
+                SharedPreferences pref = getSharedPreferences("FitnestX", MODE_PRIVATE);
                 SharedPreferences.Editor editor = pref.edit();
-                editor.clear();
+                editor.remove("isLoggedIn");
+                editor.remove("user_email");
+                editor.remove("user_id");
+                editor.remove("user_name");
                 editor.apply();
 
-                // Chuyển về màn hình đăng nhập
+                // Clear AuthPrefs for consistency
+                SharedPreferences authPrefs = getSharedPreferences("AuthPrefs", MODE_PRIVATE);
+                authPrefs.edit().remove("userId").apply();
+
+                // Redirect to LoginActivity
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
 
-
                 Toast.makeText(MainActivity.this, "Đã đăng xuất thành công", Toast.LENGTH_SHORT).show();
             });
         });
-
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
