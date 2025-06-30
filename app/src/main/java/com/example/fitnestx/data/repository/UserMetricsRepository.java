@@ -75,4 +75,8 @@ public class UserMetricsRepository {
             }
         }).start();
     }
+
+    public boolean hasMetricsForUser(int userId) {
+        return userMetricsDAO.countMetricsForUser(userId) > 0;
+    }
 }
