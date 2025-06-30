@@ -63,8 +63,7 @@ public class GoalSelectionActivity extends AppCompatActivity {
             if (!selectedGoal.isEmpty()) {
                 saveGoalSelection();
                 if (saveUserDataToDatabase()) {
-                    markSurveyCompleted();
-                    Intent intent = new Intent(GoalSelectionActivity.this, MainActivity.class);
+                    Intent intent = new Intent(GoalSelectionActivity.this, WorkoutFrequencyActivity.class);
                     startActivity(intent);
                     finish();
                 }
@@ -144,13 +143,6 @@ public class GoalSelectionActivity extends AppCompatActivity {
             Toast.makeText(this, "Error saving profile: " + e.getMessage(), Toast.LENGTH_LONG).show();
             return false;
         }
-    }
-
-    private void markSurveyCompleted() {
-        SharedPreferences pref = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putBoolean(KEY_SURVEY_COMPLETED, true);
-        editor.apply();
     }
 
     private int getCurrentUserId() {
