@@ -1,14 +1,15 @@
 package com.example.fitnestx.data.repository;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
-
-import java.util.List;
 
 import com.example.fitnestx.data.AppDatabase;
 import com.example.fitnestx.data.dao.UserMetricsDAO;
 import com.example.fitnestx.data.entity.UserMetricsEntity;
+
+import java.util.List;
 
 public class UserMetricsRepository {
 
@@ -20,7 +21,14 @@ public class UserMetricsRepository {
     }
 
     public void insertUserMetric(UserMetricsEntity metric) {
-        new Thread(() -> userMetricsDAO.insertUserMetric(metric)).start();
+        new Thread(() -> {
+            try {
+                userMetricsDAO.insertUserMetric(metric);
+                Log.d("UserMetricsRepository", "Successfully inserted user metric for userId: " + metric.getUserId());
+            } catch (Exception e) {
+                Log.e("UserMetricsRepository", "Failed to insert user metric", e);
+            }
+        }).start();
     }
 
     public LiveData<List<UserMetricsEntity>> getAllUserMetrics() {
@@ -36,14 +44,39 @@ public class UserMetricsRepository {
     }
 
     public void updateUserMetric(UserMetricsEntity metric) {
-        new Thread(() -> userMetricsDAO.updateUserMetric(metric)).start();
+        new Thread(() -> {
+            try {
+                userMetricsDAO.updateUserMetric(metric);
+                Log.d("UserMetricsRepository", "Successfully updated user metric for userId: " + metric.getUserId());
+            } catch (Exception e) {
+                Log.e("UserMetricsRepository", "Failed to update user metric", e);
+            }
+        }).start();
     }
 
     public void deleteUserMetric(UserMetricsEntity metric) {
-        new Thread(() -> userMetricsDAO.deleteUserMetric(metric)).start();
+        new Thread(() -> {
+            try {
+                userMetricsDAO.deleteUserMetric(metric);
+                Log.d("UserMetricsRepository", "Successfully deleted user metric for userId: " + metric.getUserId());
+            } catch (Exception e) {
+                Log.e("UserMetricsRepository", "Failed to delete user metric", e);
+            }
+        }).start();
     }
 
     public void deleteAllUserMetrics() {
-        new Thread(() -> userMetricsDAO.deleteAllUserMetrics()).start();
+        new Thread(() -> {
+            try {
+                userMetricsDAO.deleteAllUserMetrics();
+                Log.d("UserMetricsRepository", "Successfully deleted all user metrics");
+            } catch (Exception e) {
+                Log.e("UserMetricsRepository", "Failed to delete all user metrics", e);
+            }
+        }).start();
+    }
+
+    public boolean hasMetricsForUser(int userId) {
+        return userMetricsDAO.countMetricsForUser(userId) > 0;
     }
 }

@@ -34,4 +34,7 @@ public interface UserMetricsDAO {
 
     @Query("DELETE FROM USER_METRICS")
     void deleteAllUserMetrics();
+
+    @Query("SELECT COUNT(*) FROM user_metrics WHERE userId = :userId")
+    int countMetricsForUser(int userId);
 }
