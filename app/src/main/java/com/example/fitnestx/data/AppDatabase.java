@@ -90,11 +90,12 @@ public abstract class AppDatabase extends RoomDatabase {
             database.execSQL("ALTER TABLE EXERCISE ADD COLUMN isMarked INTEGER NOT NULL DEFAULT 0");
         }
     };
-
     static final Migration MIGRATION_4_5 = new Migration(4, 5) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
-            // Skip this migration as it was causing issues
+
+            database.execSQL("ALTER TABLE MuscleGroup ADD COLUMN image TEXT");
+            database.execSQL("ALTER TABLE MuscleGroup ADD COLUMN spec TEXT");
         }
     };
 

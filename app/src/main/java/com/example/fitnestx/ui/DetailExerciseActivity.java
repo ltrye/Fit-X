@@ -29,16 +29,25 @@ import androidx.media3.ui.AspectRatioFrameLayout;
 import androidx.media3.ui.PlayerView;
 
 import com.example.fitnestx.R;
+import com.example.fitnestx.data.entity.ExerciseEntity;
+import com.example.fitnestx.data.repository.ExerciseRepository;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class DetailExerciseActivity extends AppCompatActivity {
+    public static final String EXTRA_EXERCISE_ID = "exercise_id";
+
     public static final String EXTRA_EXERCISE = "HAHA";
     private static final String TAG = "ExoPlayerDebug";
 
     private PlayerView playerView;
     private ExoPlayer player;
     private ImageView closeButton;
-
+    private Button skipButton;
+    private  ExerciseEntity exerciseEntity;
     private TextView exerciseTitle, exerciseDescription;
+    private ExerciseRepository exerciseRepository;
 
 
     @OptIn(markerClass = UnstableApi.class)
@@ -46,7 +55,7 @@ public class DetailExerciseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_exercise);
-
+        exerciseRepository = new ExerciseRepository(this);
         // Khởi tạo views
         initViews();
 
@@ -63,7 +72,7 @@ public class DetailExerciseActivity extends AppCompatActivity {
         exerciseTitle = findViewById(R.id.exercise_title);
         exerciseDescription = findViewById(R.id.exercise_description);
         closeButton = findViewById(R.id.close_button);
-//        skipButton = findViewById(R.id.skip_button);
+        skipButton = findViewById(R.id.skip_button);
 //        nextButton = findViewById(R.id.next_button);
 
     }
@@ -117,18 +126,43 @@ public class DetailExerciseActivity extends AppCompatActivity {
     private void setupUI() {
         // Lấy dữ liệu từ Intent
         Intent intent = getIntent();
-        String exerciseData = intent.getStringExtra(EXTRA_EXERCISE);
-        exerciseTitle.setText(exerciseData != null ? exerciseData : "Tên bài tập (Exercise)");
-        exerciseDescription.setText("A jumping jack, also known as a star jump...");
+        int exerciseId = getIntent().getIntExtra(EXTRA_EXERCISE_ID, -1);
+
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+             exerciseEntity = exerciseRepository.getExerciseById(exerciseId);
+             String des = exerciseRepository.GetDesByExId(exerciseId);
+            if (exerciseEntity != null) {
+                runOnUiThread(() -> {
+                    // Cập nhật UI ở đây
+                    exerciseTitle.setText(exerciseEntity != null ? exerciseEntity.getName() : "Tên bài tập (Exercise)");
+                    exerciseDescription.setText(des);
+                    Log.d("hehe", "Name: " + exerciseEntity.toString());
+                    Log.d("hehe","des: "+ des);
+                });
+            }
+        });
+
 
         // Sự kiện nút đóng
         closeButton.setOnClickListener(v -> finish());
 
         // Sự kiện nút Skip
-//        skipButton.setOnClickListener(v -> {
-//            player.seekTo(0); // Quay lại đầu video
-//            Toast.makeText(this, "Đã quay lại đầu video", Toast.LENGTH_SHORT).show();
-//        });
+        skipButton.setOnClickListener(v -> {
+        ExecutorService executorSkip = Executors.newSingleThreadExecutor();
+
+            executorSkip.execute(() -> {
+        // Cập nhật isMarked = true trong DB
+         exerciseEntity.setMarked(true);
+        exerciseRepository.updateExercise(exerciseEntity);
+
+        // Trở lại UI thread để kết thúc activity
+        runOnUiThread(() -> {
+            Toast.makeText(this, "Đã đánh dấu hoàn thành", Toast.LENGTH_SHORT).show();
+            finish(); // Quay lại màn hình trước
+        });
+    });
+});
 //
 //        // Sự kiện nút Next
 //        nextButton.setOnClickListener(v -> {

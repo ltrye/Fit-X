@@ -1,6 +1,71 @@
 exerciseId,name,description,videoURL,muscleGroupId,equipmentRequired,difficulty,imageUrl,isMarked
-1,Push-up,Classic push-up that targets chest and triceps,https://example.com/pushup.mp4,1,false,2,https://img.com/pushup.png,false
-2,Squat,Lower body strength exercise,https://example.com/squat.mp4,7,false,1,https://img.com/pushup.png,false
-3,Bench Press,Chest exercise using barbell or dumbbell,https://example.com/benchpress.mp4,1,true,3,https://img.com/pushup.png,false
-4,Pull-up,Upper body pulling motion,https://example.com/pullup.mp4,3,true,3,https://img.com/pushup.png,false
-5,Shoulder Press,Targets shoulders with overhead press,https://example.com/shoulderpress.mp4,2,true,2,https://img.com/pushup.png,false
+1,Decline bench press,Decline Bench Press là bài tập đẩy ngực sử dụng ghế nghiêng xuống để tập trung vào phần ngực dưới,,8,False,2,,False
+2,Chest dip,,,8,False,2,,False
+3,Decline push-up,,,8,False,2,,False
+4,Flat bench press,,,9,False,2,,False
+5,Dumbbell bench press,,,9,False,2,,False
+6,Push-ups,,,9,False,2,,False
+7,Incline bench press,,,10,False,2,,False
+8,Incline dumbbell fly,,,10,False,2,,False
+9,Incline push-up,,,10,False,2,,False
+10,Lateral raise,,,11,False,2,,False
+11,Dumbbell upright row,,,11,False,2,,False
+12,Cable lateral raise,,,11,False,2,,False
+13,Reverse fly,,,12,False,2,,False
+14,Face pull,,,12,False,2,,False
+15,Rear delt row,,,12,False,2,,False
+16,Front raise,,,13,False,2,,False
+17,Overhead press,,,13,False,2,,False
+18,Arnold press,,,13,False,2,,False
+19,Pull-up,,,14,False,2,,False
+20,Lat pulldown,,,14,False,2,,False
+21,One-arm dumbbell row,,,14,False,2,,False
+22,Deadlift,,,15,False,2,,False
+23,Back extension,,,15,False,2,,False
+24,Good morning,,,15,False,2,,False
+25,Barbell row,,,16,False,2,,False
+26,Seated cable row,,,16,False,2,,False
+27,Face pull,,,16,False,2,,False
+28,Barbell shrug,,,17,False,2,,False
+29,Dumbbell shrug,,,17,False,2,,False
+30,Upright row,,,17,False,2,,False
+31,Barbell curl,,,18,False,2,,False
+32,Dumbbell curl,,,18,False,2,,False
+33,Hammer curl,,,18,False,2,,False
+34,Reverse curl,,,18,False,2,,False
+35,Triceps pushdown,,,19,False,2,,False
+36,Kickbacks,,,19,False,2,,False
+37,Dips,,,19,False,2,,False
+38,Overhead triceps extension,,,20,False,2,,False
+39,Close-grip bench press,,,20,False,2,,False
+40,Skull crusher,,,20,False,2,,False
+41,Diamond push-up,,,21,False,2,,False
+42,Reverse-grip pushdown,,,21,False,2,,False
+43,One-arm cable pushdown,,,21,False,2,,False
+44,Hip thrust,,,22,False,2,,False
+45,Barbell squat,,,22,False,2,,False
+46,Deadlift,,,22,False,2,,False
+47,Side-lying leg raise,,,23,False,2,,False
+48,Band walks,,,23,False,2,,False
+49,Clamshell,,,23,False,2,,False
+50,Cable kickback,,,24,False,2,,False
+51,Single-leg glute bridge,,,24,False,2,,False
+52,Side-lying abduction,,,24,False,2,,False
+53,Romanian deadlift,,,25,False,2,,False
+54,Leg curl,,,25,False,2,,False
+55,Glute-ham raise,,,25,False,2,,False
+56,Squats,,,26,False,2,,False
+57,Leg press,,,26,False,2,,False
+58,Leg extension,,,26,False,2,,False
+59,Band walks,,,27,False,2,,False
+60,Hip abduction cable,,,27,False,2,,False
+61,Side step-up,,,27,False,2,,False
+62,Sumo squat,,,28,False,2,,False
+63,Adductor machine,,,28,False,2,,False
+64,Side lunge,,,28,False,2,,False
+65,Jumping jacks,,,29,False,2,,False
+66,Burpees,,,29,False,2,,False
+67,Incline walking,,,29,False,2,,False
+68,High knees,,,29,False,2,,False
+69,Running,,,29,False,2,,False
+70,Jump squat,,,29,False,2,,False
