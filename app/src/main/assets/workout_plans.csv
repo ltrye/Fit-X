@@ -1,0 +1,4 @@
+planId,userId,startDate,durationInWeeks,daysPerWeek,isActive
+1,1,2025-06-30,8,6,true
+2,2,2024-02-15,6,4,true
+3,3,2024-03-01,12,5,false
