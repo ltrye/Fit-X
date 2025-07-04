@@ -56,15 +56,6 @@
             android:textColor="@color/text_primary"
             android:layout_marginBottom="8dp" />
 
-        <!-- Subtitle -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Nhảy cơ"
-            android:textSize="16sp"
-            android:textColor="@color/text_secondary"
-            android:layout_marginBottom="20dp" />
-
         <!-- Descriptions label -->
         <TextView
             android:layout_width="wrap_content"
