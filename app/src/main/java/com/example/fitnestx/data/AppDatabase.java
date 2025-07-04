@@ -45,7 +45,7 @@ import java.util.concurrent.Executors;
         NotificationEntity.class,
         UserMetricsEntity.class,
         AuthProviderEntity.class
-}, version = 4, exportSchema = false)
+}, version = 5, exportSchema = false)
 @TypeConverters(DateConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract UserDAO userDAO();
@@ -91,12 +91,20 @@ public abstract class AppDatabase extends RoomDatabase {
             database.execSQL("ALTER TABLE EXERCISE ADD COLUMN isMarked INTEGER NOT NULL DEFAULT 0");
         }
     };
+    static final Migration MIGRATION_4_5 = new Migration(4, 5) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+
+            database.execSQL("ALTER TABLE MuscleGroup ADD COLUMN image TEXT");
+            database.execSQL("ALTER TABLE MuscleGroup ADD COLUMN spec TEXT");
+        }
+    };
 
     public static synchronized AppDatabase getInstance(final Context context) {
         if (sInstance == null) {
             sAppContext = context.getApplicationContext();
             sInstance = Room.databaseBuilder(sAppContext, AppDatabase.class, DB_NAME)
-                    .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4)
+                    .addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,MIGRATION_4_5)
                     .addCallback(roomCallback)
                     .build();
         }
