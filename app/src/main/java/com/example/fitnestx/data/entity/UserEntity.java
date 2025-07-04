@@ -19,14 +19,6 @@ public class UserEntity implements User {
     private String password;
     private boolean isActive;
 
-//    public UserEntity(int userId, String name, int age, boolean gender, String email, String password) {
-//        this.userId = userId;
-//        this.name = name;
-//        this.age = age;
-//        this.gender = gender;
-//        this.email = email;
-//        this.password = password;
-//    }
 
     public UserEntity(int userId, String name, int age, boolean gender, String email, String password, boolean isActive) {
         this.userId = userId;

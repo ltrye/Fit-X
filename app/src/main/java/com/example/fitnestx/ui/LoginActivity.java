@@ -109,7 +109,7 @@ public class LoginActivity extends AppCompatActivity {
                         editor.apply();
 
                         Toast.makeText(LoginActivity.this, "Hello " + user.getName(), Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(LoginActivity.this, ExcerciseActivity.class);
+                        Intent intent = new Intent(LoginActivity.this, PlanActivity.class);
                         startActivity(intent);
                         finish();
                     } else {
