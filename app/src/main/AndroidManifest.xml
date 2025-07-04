@@ -34,7 +34,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.ExcerciseActivity" />
-        <activity android:name=".VideoPlayerActivity" />
+        <activity android:name=".ui.PlanActivity" />
+<!--        <activity android:name=".VideoPlayerActivity" />-->
 
         <activity android:name=".ui.DetailExerciseActivity"
                     android:configChanges="orientation|screenLayout|layoutDirection"
