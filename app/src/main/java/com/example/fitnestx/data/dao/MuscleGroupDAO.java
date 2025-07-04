@@ -8,6 +8,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
+import com.example.fitnestx.data.entity.ExerciseEntity;
 import com.example.fitnestx.data.entity.MuscleGroupEntity;
 
 import java.util.List;
@@ -16,7 +17,8 @@ import java.util.List;
 public interface MuscleGroupDAO {
     @Query("SELECT * FROM MUSCLE_GROUP")
     LiveData<List<MuscleGroupEntity>> getAllMuscleGroups();
-
+    @Query("SELECT * FROM MUSCLE_GROUP")
+    List<MuscleGroupEntity> getAllList();
     @Query("SELECT * FROM MUSCLE_GROUP WHERE muscleGroupId = :muscleGroupId")
     MuscleGroupEntity getMuscleGroupById(int muscleGroupId);
 

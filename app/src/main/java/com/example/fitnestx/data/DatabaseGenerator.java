@@ -156,7 +156,9 @@ public class DatabaseGenerator {
                 if (data.length > 3 && !data[3].isEmpty()) {
                     parentId = Integer.parseInt(data[3]);
                 }
-                MuscleGroupEntity group = new MuscleGroupEntity(muscleGroupId, name, recoveryTimeInHours,parentId);
+                String image = data[4];
+                String spec = data[5];
+                MuscleGroupEntity group = new MuscleGroupEntity(muscleGroupId, name, recoveryTimeInHours,parentId,image,spec);
                 groupDAO.insertMuscleGroup(group);
             }
             reader.close();
@@ -253,7 +255,10 @@ public class DatabaseGenerator {
             String line;
             UserMetricsDAO metricsDAO = instance.userMetricsDAO();
             while ((line = reader.readLine()) != null) {
+                if (line.trim().isEmpty()) continue; // bỏ dòng trống
+
                 String[] data = line.split(",");
+                if (data.length < 7) continue;
                 int metricId = Integer.parseInt(data[0]);
                 int userId = Integer.parseInt(data[1]);
                 String timestamp = data[2];
