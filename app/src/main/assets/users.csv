@@ -1,1 +1,2 @@
-fbt,30,1,lonme@gmail.com,$2a$12$xM13Yv1VJ1m0KV7q4c1XK.AjIrKZyKmKBwFi9OH1lUComoWwRgEPy,1
+userId,name,age,gender,email,password,isActive
+1,lonmup mupkhit,25,true,lonkham@gmail.com,$2a$12$PZMllgpH2JO8bnoqhNghIu9GEf2UW.bZQ3U9ycatlD.MHExXGs08.,true

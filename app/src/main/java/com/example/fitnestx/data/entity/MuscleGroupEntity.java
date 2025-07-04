@@ -27,15 +27,35 @@ public class MuscleGroupEntity implements MuscleGroup {
     private int muscleGroupId;
     private String name;
     private double recoveryTimeInHours;
+    private String image;
+    private String spec;
     @Nullable
     private Integer parentId;
 
 
-    public MuscleGroupEntity(int muscleGroupId, String name, double recoveryTimeInHours, Integer parentId) {
+    public MuscleGroupEntity(int muscleGroupId, String name, double recoveryTimeInHours, Integer parentId, String image,String spec) {
         this.muscleGroupId = muscleGroupId;
         this.name = name;
         this.recoveryTimeInHours = recoveryTimeInHours;
         this.parentId = parentId;
+        this.image = image;
+        this.spec = spec;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getSpec() {
+        return spec;
+    }
+
+    public void setSpec(String spec) {
+        this.spec = spec;
     }
 
     public void setMuscleGroupId(int muscleGroupId) {

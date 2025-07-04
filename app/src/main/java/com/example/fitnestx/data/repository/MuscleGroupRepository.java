@@ -18,7 +18,9 @@ public class MuscleGroupRepository {
         AppDatabase appDatabase = AppDatabase.getInstance(context);
         muscleGroupDAO = appDatabase.muscleGroupDAO();
     }
-
+    public List<MuscleGroupEntity> getListMuscleGroup() {
+        return muscleGroupDAO.getAllList();
+    }
     public void insertMuscleGroup(MuscleGroupEntity muscleGroup) {
         new Thread(() -> muscleGroupDAO.insertMuscleGroup(muscleGroup)).start();
     }
