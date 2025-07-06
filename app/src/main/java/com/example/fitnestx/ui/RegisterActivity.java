@@ -2,6 +2,7 @@ package com.example.fitnestx.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -28,6 +29,12 @@ public class RegisterActivity extends AppCompatActivity {
 
     private UserRepository userRepository;
     private TextView tvRegisterLink;
+
+    // SharedPreferences constants
+    private static final String PREF_NAME = "FitnestX ";
+    private static final String KEY_LOGGED_IN = "isLoggedIn";
+    private static final String KEY_EMAIL = "user_email";
+    private static final String KEY_NAME = "user_name";
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -98,9 +105,19 @@ public class RegisterActivity extends AppCompatActivity {
                         boolean gender = true;
 
                         userRepository.register(name, age, gender, email, password);
-                        Toast.makeText(this, "Đăng ký thành công! Bạn có thể đăng nhập ngay.", Toast.LENGTH_LONG).show();
 
-                        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                        // Save login state for new user
+                        SharedPreferences pref = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+                        SharedPreferences.Editor editor = pref.edit();
+                        editor.putBoolean(KEY_LOGGED_IN, true);
+                        editor.putString(KEY_EMAIL, email);
+                        editor.putString(KEY_NAME, name);
+                        editor.apply();
+
+                        Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_LONG).show();
+
+                        // Navigate to survey for new users
+                        Intent intent = new Intent(RegisterActivity.this, UserSurveyActivity.class);
                         startActivity(intent);
                         finish();
                     }
@@ -115,4 +132,3 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 }
-

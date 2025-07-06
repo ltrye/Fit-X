@@ -34,4 +34,7 @@ public interface WorkoutPlanDAO {
 
     @Query("DELETE FROM WORKOUT_PLAN")
     void deleteAllWorkoutPlans();
+
+    @Query("SELECT COUNT(*) FROM workout_plan WHERE userId = :userId AND isActive = 1")
+    int countActivePlansForUser(int userId);
 }
