@@ -236,7 +236,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void navigateAfterLogin() {
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        Intent intent = new Intent(LoginActivity.this, PlanActivity.class);
         startActivity(intent);
         finish();
     }

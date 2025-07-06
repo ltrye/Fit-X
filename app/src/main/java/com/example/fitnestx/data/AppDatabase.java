@@ -102,7 +102,7 @@ public abstract class AppDatabase extends RoomDatabase {
     static final Migration MIGRATION_5_6 = new Migration(5, 6) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
-            database.execSQL("ALTER TABLE MUSCLE_GROUP ADD COLUMN parentId INTEGER");
+            //database.execSQL("ALTER TABLE MUSCLE_GROUP ADD COLUMN parentId INTEGER");
             database.execSQL("CREATE INDEX IF NOT EXISTS index_MUSCLE_GROUP_parentId ON MUSCLE_GROUP(parentId)");
         }
     };
