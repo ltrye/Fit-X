@@ -45,7 +45,9 @@ import java.util.concurrent.Executors;
         NotificationEntity.class,
         UserMetricsEntity.class,
         AuthProviderEntity.class
+
 }, version = 7, exportSchema = false)
+
 @TypeConverters(DateConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract UserDAO userDAO();
@@ -99,6 +101,7 @@ public abstract class AppDatabase extends RoomDatabase {
         }
     };
 
+
     static final Migration MIGRATION_5_6 = new Migration(5, 6) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
@@ -114,12 +117,15 @@ public abstract class AppDatabase extends RoomDatabase {
         }
     };
 
+
     public static synchronized AppDatabase getInstance(final Context context) {
         if (sInstance == null) {
             sAppContext = context.getApplicationContext();
             sInstance = Room.databaseBuilder(sAppContext, AppDatabase.class, DB_NAME)
+
                     .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
                     .fallbackToDestructiveMigration()
+
                     .addCallback(roomCallback)
                     .build();
         }
