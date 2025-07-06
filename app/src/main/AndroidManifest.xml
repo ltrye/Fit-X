@@ -33,6 +33,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.ExcerciseActivity" />
+        <activity android:name=".ui.DetailExerciseActivity" />
         <activity
             android:name=".ui.UserSurveyActivity"
             android:exported="false" />
