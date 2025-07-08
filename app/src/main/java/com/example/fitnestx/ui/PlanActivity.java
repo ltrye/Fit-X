@@ -1,11 +1,13 @@
 package com.example.fitnestx.ui;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -52,6 +54,15 @@ public class PlanActivity extends AppCompatActivity {
         initViews();
         setupRecyclerView();
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1001 && resultCode == RESULT_OK) {
+            setupRecyclerView(); // Load lại dữ liệu khi quay về
+        }
     }
 
     private void initViews() {
@@ -103,16 +114,23 @@ public class PlanActivity extends AppCompatActivity {
             }
 
             List<WorkoutSessionEntity> sessions = workoutSessionRepository.getWorkoutSessionsByPlanId(planId);
+
             sessions.sort((s1, s2) -> {
                 int day1 = extractDayNumber(s1.getDate());
                 int day2 = extractDayNumber(s2.getDate());
                 return Integer.compare(day1, day2);
             });
 
+
+
             runOnUiThread(() -> {
-                goalAdapter = new GoalAdapter(sessions, this, sessionExerciseRepository);
-                recyclerView.setLayoutManager(new LinearLayoutManager(this));
-                recyclerView.setAdapter(goalAdapter);
+                if (goalAdapter == null) {
+                    goalAdapter = new GoalAdapter(sessions, PlanActivity.this, sessionExerciseRepository);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(this));
+                    recyclerView.setAdapter(goalAdapter);
+                } else {
+                    goalAdapter.updateData(sessions); // ← Sử dụng được vì bạn đã thêm hàm này
+                }
             });
         });
     }

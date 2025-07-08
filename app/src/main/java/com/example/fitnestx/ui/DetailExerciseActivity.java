@@ -33,7 +33,9 @@ import com.example.fitnestx.data.entity.ExerciseEntity;
 import com.example.fitnestx.data.entity.SessionExerciseEntity;
 import com.example.fitnestx.data.repository.ExerciseRepository;
 import com.example.fitnestx.data.repository.SessionExerciseRepository;
+import com.example.fitnestx.viewmodel.ExerciseWithSessionStatus;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -42,11 +44,13 @@ public class DetailExerciseActivity extends AppCompatActivity {
 
     public static final String EXTRA_EXERCISE = "HAHA";
     private static final String TAG = "ExoPlayerDebug";
-
+//    public static final String EXTRA_EXERCISE_ID = "exercise_id";
+    private List<ExerciseWithSessionStatus> exerciseList;
+    private int currentIndex;
     private PlayerView playerView;
     private ExoPlayer player;
     private ImageView closeButton;
-    private Button skipButton;
+    private Button skipButton,nextButton;
     private  ExerciseEntity exerciseEntity;
     private TextView exerciseTitle, exerciseDescription;
     private ExerciseRepository exerciseRepository;
@@ -60,6 +64,9 @@ public class DetailExerciseActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail_exercise);
         exerciseRepository = new ExerciseRepository(this);
         sessionExerciseRepository = new SessionExerciseRepository(this);
+        Intent intent = getIntent();
+        currentIndex = intent.getIntExtra("currentIndex", 0);
+        exerciseList = (List<ExerciseWithSessionStatus>) intent.getSerializableExtra("exerciseList");
         // Khởi tạo views
         initViews();
 
@@ -77,7 +84,7 @@ public class DetailExerciseActivity extends AppCompatActivity {
         exerciseDescription = findViewById(R.id.exercise_description);
         closeButton = findViewById(R.id.close_button);
         skipButton = findViewById(R.id.skip_button);
-//        nextButton = findViewById(R.id.next_button);
+        nextButton = findViewById(R.id.next_button);
 
     }
 
@@ -119,18 +126,33 @@ public class DetailExerciseActivity extends AppCompatActivity {
         // Lắng nghe lỗi phát lại
         player.addListener(new Player.Listener() {
             @Override
+            public void onPlaybackStateChanged(int state) {
+                if (state == Player.STATE_ENDED) {
+                    runOnUiThread(() -> {
+                        nextButton.setEnabled(true);
+                        nextButton.setAlpha(1.0f); // hiện rõ nút Next
+                    });
+                }
+            }
+
+            @Override
             public void onPlayerError(PlaybackException error) {
                 Log.e(TAG, "Player error: " + error.getMessage());
                 Toast.makeText(DetailExerciseActivity.this, "Lỗi phát video: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+
     }
 
     @OptIn(markerClass = UnstableApi.class)
     private void setupUI() {
         // Lấy dữ liệu từ Intent
+        nextButton.setEnabled(false);
+        nextButton.setAlpha(0.5f); // làm mờ
+
         Intent intent = getIntent();
-        int exerciseId = getIntent().getIntExtra(EXTRA_EXERCISE_ID, -1);
+        ExerciseWithSessionStatus currentExercise = exerciseList.get(currentIndex);
+        int exerciseId = currentExercise.getExercise().getExerciseId();
         int sessionId = getIntent().getIntExtra("sessionId",-1);
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -142,8 +164,7 @@ public class DetailExerciseActivity extends AppCompatActivity {
                     // Cập nhật UI ở đây
                     exerciseTitle.setText(exerciseEntity != null ? exerciseEntity.getName() : "Tên bài tập (Exercise)");
                     exerciseDescription.setText(des);
-                    Log.d("hehe", "Name: " + exerciseEntity.toString());
-                    Log.d("hehe","des: "+ des);
+
                 });
             }
         });
@@ -170,15 +191,32 @@ public class DetailExerciseActivity extends AppCompatActivity {
         });
     });
 });
-//
-//        // Sự kiện nút Next
-//        nextButton.setOnClickListener(v -> {
-//            // TODO: Thêm logic để chuyển sang video/bài tập tiếp theo
-//            Toast.makeText(this, "Chuyển sang bài tập tiếp theo", Toast.LENGTH_SHORT).show();
-//            // Ví dụ: MediaItem nextMediaItem = MediaItem.fromUri("NEW_VIDEO_URI");
-//            // player.setMediaItem(nextMediaItem);
-//            // player.prepare();
-//        });
+        nextButton.setOnClickListener(v -> {
+            ExecutorService executor1 = Executors.newSingleThreadExecutor();
+            executor1.execute(() -> {
+                SessionExerciseEntity sessionExerciseEntity =
+                        sessionExerciseRepository.getSessionExercise(sessionId, exerciseList.get(currentIndex).getExercise().getExerciseId());
+
+                sessionExerciseEntity.setMarked(true);
+                sessionExerciseRepository.updateSessionExercise(sessionExerciseEntity);
+
+                runOnUiThread(() -> {
+                    if (currentIndex + 1 < exerciseList.size()) {
+                        Intent nextIntent = new Intent(DetailExerciseActivity.this, DetailExerciseActivity.class);
+                        nextIntent.putExtra("currentIndex", currentIndex + 1);
+                        nextIntent.putExtra("exerciseList", (java.io.Serializable) exerciseList);
+                        nextIntent.putExtra("sessionId", sessionId);
+                        startActivity(nextIntent);
+                        finish();
+                    } else {
+                        Toast.makeText(this, "Đã hoàn thành tất cả bài tập", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                });
+            });
+        });
+
+
 
 
     }
