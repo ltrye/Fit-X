@@ -30,6 +30,7 @@
             android:layout_marginStart="16dp">
 
             <TextView
+                android:id="@+id/Spec"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tên buổi tập: Push"
@@ -40,12 +41,13 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="11 Exercises"
+                android:text="6 Exercises"
                 android:textSize="14sp"
                 android:textColor="#666666"
                 android:layout_marginTop="2dp" />
 
             <TextView
+                android:id="@+id/Date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Buổi tập 1"

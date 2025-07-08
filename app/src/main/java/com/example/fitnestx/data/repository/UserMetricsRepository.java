@@ -20,6 +20,10 @@ public class UserMetricsRepository {
         userMetricsDAO = appDatabase.userMetricsDAO();
     }
 
+    public UserMetricsEntity getUserMetricByUserId(int userId) {
+        return userMetricsDAO.getUserMetricByUserId(userId);
+    }
+
     public void insertUserMetric(UserMetricsEntity metric) {
         new Thread(() -> {
             try {
