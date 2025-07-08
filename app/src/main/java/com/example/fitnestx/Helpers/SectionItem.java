@@ -1,14 +1,22 @@
 package com.example.fitnestx.Helpers;
 
 import com.example.fitnestx.data.entity.ExerciseEntity;
+import com.example.fitnestx.viewmodel.ExerciseWithSessionStatus;
 
 public class SectionItem {
     public static final int TYPE_HEADER = 0;
     public static final int TYPE_ITEM = 1;
-
+    private ExerciseWithSessionStatus exerciseWithStatus;
     private int type;
     private String headerTitle;
     private ExerciseEntity exercise;
+    public ExerciseWithSessionStatus getExerciseWithStatus() {
+        return exerciseWithStatus;
+    }
+
+    public void setExerciseWithStatus(ExerciseWithSessionStatus e) {
+        this.exerciseWithStatus = e;
+    }
 
     // Constructor cho Header
     public SectionItem(String headerTitle) {
@@ -17,9 +25,10 @@ public class SectionItem {
     }
 
     // Constructor cho Item
-    public SectionItem(ExerciseEntity exercise) {
+    public SectionItem(ExerciseWithSessionStatus exerciseWithStatus) {
         this.type = TYPE_ITEM;
-        this.exercise = exercise;
+
+        this.exerciseWithStatus = exerciseWithStatus;
     }
 
     public int getType() {

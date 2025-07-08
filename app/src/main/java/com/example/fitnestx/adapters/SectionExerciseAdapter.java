@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide;
 import com.example.fitnestx.Helpers.SectionItem;
 import com.example.fitnestx.R;
 import com.example.fitnestx.data.entity.ExerciseEntity;
+import com.example.fitnestx.viewmodel.ExerciseWithSessionStatus;
 
 import java.util.List;
 
@@ -49,7 +50,7 @@ public class SectionExerciseAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             super(itemView);
             exerciseImage = itemView.findViewById(R.id.ivExerciseImage);
             exerciseName = itemView.findViewById(R.id.tvExerciseName);
-            exerciseDescription = itemView.findViewById(R.id.tvExerciseDescription);
+            //exerciseDescription = itemView.findViewById(R.id.tvExerciseDescription);
             exerciseDifficulty = itemView.findViewById(R.id.tvExerciseDifficulty);
             statusIcon = itemView.findViewById(R.id.ivStatusIcon);
         }
@@ -80,11 +81,13 @@ public class SectionExerciseAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         if (item.getType() == SectionItem.TYPE_HEADER) {
             ((HeaderViewHolder) holder).headerText.setText(item.getHeaderTitle());
         } else {
-            ExerciseEntity exercise = item.getExercise();
+            ExerciseWithSessionStatus ex = item.getExerciseWithStatus();
+            ExerciseEntity exercise = ex.getExercise();
+            boolean isMarked = ex.isMarked();
             ExerciseViewHolder viewHolder = (ExerciseViewHolder) holder;
 
             viewHolder.exerciseName.setText(exercise.getName());
-            viewHolder.exerciseDescription.setText(exercise.getDescription());
+            //viewHolder.exerciseDescription.setText(exercise.getDescription());
 
             String difficultyText = getDifficultyText(exercise.getDifficulty());
             viewHolder.exerciseDifficulty.setText(difficultyText);
@@ -99,7 +102,7 @@ public class SectionExerciseAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             }
 
             viewHolder.statusIcon.setImageResource(
-                    exercise.isMarked() ? R.drawable.ic_check : R.drawable.ic_arrow_right
+                    isMarked ? R.drawable.ic_check : R.drawable.ic_arrow_right
             );
 
             viewHolder.itemView.setOnClickListener(v -> {
@@ -123,13 +126,18 @@ public class SectionExerciseAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             default: return "Không xác định";
         }
     }
+    public void updateData(List<SectionItem> newItems) {
+        this.items.clear();
+        this.items.addAll(newItems);
+        notifyDataSetChanged();
+    }
 
     public void toggleExerciseStatus(int position) {
         if (position >= 0 && position < items.size()) {
             SectionItem item = items.get(position);
             if (item.getType() == SectionItem.TYPE_ITEM) {
                 ExerciseEntity exercise = item.getExercise();
-                exercise.setMarked(!exercise.isMarked());
+                exercise.setMarked(exercise.isMarked() ? false : true);
                 notifyItemChanged(position);
             }
         }

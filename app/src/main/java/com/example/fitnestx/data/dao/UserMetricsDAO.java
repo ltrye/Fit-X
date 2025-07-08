@@ -19,6 +19,8 @@ public interface UserMetricsDAO {
 
     @Query("SELECT * FROM USER_METRICS WHERE metricId = :metricId")
     UserMetricsEntity getUserMetricById(int metricId);
+    @Query("SELECT * FROM USER_METRICS WHERE userId = :userId")
+    UserMetricsEntity getUserMetricByUserId(int userId);
 
     @Query("SELECT * FROM USER_METRICS WHERE userId = :userId")
     LiveData<List<UserMetricsEntity>> getUserMetricsByUserId(int userId);
