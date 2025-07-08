@@ -21,6 +21,9 @@ public class SessionExerciseRepository {
     public List<Integer> GetListIdExercsieBySessionId(int sessionId) {
         return sessionExerciseDAO.GetListIdExercsieBySessionId(sessionId);
     }
+    public List<SessionExerciseEntity> getExercisesListBySessionId(int sessionId) {
+        return sessionExerciseDAO.getExercisesListBySessionId(sessionId);
+    }
     public int TotalSessionExerciseById(int sessionId) {
         return sessionExerciseDAO.TotalSessionExercise(sessionId);
     }

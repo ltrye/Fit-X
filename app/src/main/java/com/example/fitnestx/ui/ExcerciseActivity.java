@@ -1,5 +1,6 @@
 package com.example.fitnestx.ui;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -60,7 +61,11 @@ public class ExcerciseActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         btnBack = findViewById(R.id.btn_back);
-        btnBack.setOnClickListener(v -> finish());
+        btnBack.setOnClickListener(v -> {
+            setResult(Activity.RESULT_OK);
+            finish();
+        });
+
 
         Spec = findViewById(R.id.Spec);
         Date = findViewById(R.id.Date);
@@ -73,6 +78,7 @@ public class ExcerciseActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        setupActionRecyclerView();
         reloadExercises(); // Tạo thêm hàm này để tái nạp danh sách từ DB
     }
     private void reloadExercises() {
@@ -138,6 +144,13 @@ public class ExcerciseActivity extends AppCompatActivity {
                 }
             }
 
+            List<ExerciseWithSessionStatus> exerciseItems = new ArrayList<>();
+            for (SectionItem item : sectionItems) {
+                if (item.getType() == SectionItem.TYPE_ITEM) {
+                    exerciseItems.add(item.getExerciseWithStatus());
+                }
+            }
+
             runOnUiThread(() -> {
                 Spec.setText(spec);
                 Date.setText(date);
@@ -146,10 +159,20 @@ public class ExcerciseActivity extends AppCompatActivity {
                     sectionExerciseAdapter = new SectionExerciseAdapter(sectionItems, new SectionExerciseAdapter.OnItemClickListener() {
                         @Override
                         public void onExerciseClick(int position, ExerciseEntity exercise) {
-                            Intent detailIntent = new Intent(ExcerciseActivity.this, DetailExerciseActivity.class);
-                            detailIntent.putExtra(DetailExerciseActivity.EXTRA_EXERCISE_ID, exercise.getExerciseId());
-                            detailIntent.putExtra("sessionId", sessionId);
-                            startActivity(detailIntent);
+                            int actualIndex = -1;
+                            for (int i = 0; i < exerciseItems.size(); i++) {
+                                if (exerciseItems.get(i).getExercise().getExerciseId() == exercise.getExerciseId()) {
+                                    actualIndex = i;
+                                    break;
+                                }
+                            }
+                            if (actualIndex != -1) {
+                                Intent detailIntent = new Intent(ExcerciseActivity.this, DetailExerciseActivity.class);
+                                detailIntent.putExtra("sessionId", sessionId);
+                                detailIntent.putExtra("currentIndex", actualIndex);
+                                detailIntent.putExtra("exerciseList", new ArrayList<>(exerciseItems)); // must be Serializable
+                                startActivity(detailIntent);
+                            }
                         }
                     });
                     recyclerView.setAdapter(sectionExerciseAdapter);

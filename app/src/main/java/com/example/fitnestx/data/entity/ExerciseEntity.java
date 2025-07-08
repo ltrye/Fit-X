@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey;
 import com.example.fitnestx.data.model.Exercise;
 
 @Entity(tableName = "EXERCISE")
-public class ExerciseEntity implements Exercise {
+public class ExerciseEntity implements Exercise  {
 
     @PrimaryKey(autoGenerate = true)
     @NonNull
