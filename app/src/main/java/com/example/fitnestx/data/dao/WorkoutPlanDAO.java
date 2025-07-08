@@ -23,6 +23,10 @@ public interface WorkoutPlanDAO {
     @Query("SELECT * FROM WORKOUT_PLAN WHERE userId = :userId")
     LiveData<List<WorkoutPlanEntity>> getWorkoutPlansByUserId(int userId);
 
+    @Query("SELECT * FROM WORKOUT_PLAN WHERE userId = :userId ORDER BY planId DESC LIMIT 1")
+
+    WorkoutPlanEntity getWorkoutPlanEntityByUserId(int userId);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertWorkoutPlan(WorkoutPlanEntity plan);
 

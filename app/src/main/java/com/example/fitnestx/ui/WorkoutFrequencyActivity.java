@@ -13,10 +13,20 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.fitnestx.Helpers.GeneratePlan;
 import com.example.fitnestx.MainActivity;
 import com.example.fitnestx.R;
+import com.example.fitnestx.data.entity.UserEntity;
+import com.example.fitnestx.data.entity.UserMetricsEntity;
 import com.example.fitnestx.data.entity.WorkoutPlanEntity;
+import com.example.fitnestx.data.entity.WorkoutSessionEntity;
+import com.example.fitnestx.data.repository.ExerciseRepository;
+import com.example.fitnestx.data.repository.MuscleGroupRepository;
+import com.example.fitnestx.data.repository.SessionExerciseRepository;
+import com.example.fitnestx.data.repository.UserMetricsRepository;
+import com.example.fitnestx.data.repository.UserRepository;
 import com.example.fitnestx.data.repository.WorkoutPlanRepository;
+import com.example.fitnestx.data.repository.WorkoutSessionRepository;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -41,11 +51,19 @@ public class WorkoutFrequencyActivity extends AppCompatActivity {
     // State variables
     private int selectedSlots = 3;
     private boolean isShowingWarning = false;
+    private int planId;
 
     // SharedPreferences constants
     private static final String PREF_NAME = "FitnestX";
     private static final String KEY_SURVEY_COMPLETED = "survey_completed";
     private static final String KEY_WORKOUT_FREQUENCY = "workout_frequency";
+    private GeneratePlan generatePlan;
+    private ExerciseRepository exerciseRepository;
+    private MuscleGroupRepository muscleGroupRepository;
+    private WorkoutSessionRepository workoutSessionRepository;
+    private SessionExerciseRepository sessionExerciseRepository;
+    private UserMetricsRepository userMetricsRepository;
+    private UserRepository userRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,11 +72,17 @@ public class WorkoutFrequencyActivity extends AppCompatActivity {
 
         // Initialize repository and executor
         workoutPlanRepository = new WorkoutPlanRepository(this);
+        exerciseRepository = new ExerciseRepository(this);
+        muscleGroupRepository = new MuscleGroupRepository(this);
+        workoutSessionRepository = new WorkoutSessionRepository(this);
+        sessionExerciseRepository = new SessionExerciseRepository(this);
         executorService = Executors.newSingleThreadExecutor();
-
+        userMetricsRepository = new UserMetricsRepository(this);
+        userRepository = new UserRepository(this);
         initViews();
         setupClickListeners();
         updateSlotsDisplay();
+
     }
 
     private void initViews() {
@@ -156,17 +180,24 @@ public class WorkoutFrequencyActivity extends AppCompatActivity {
                         startDate,
                         "12", // Default 12 weeks duration - you can modify this as needed
                         selectedSlots, // daysPerWeek - this is where we save the frequency
-                        true // isActive - set to true for the new plan
+                        true,// isActive - set to true for the new plan
+                        ""
                 );
 
                 // Save to Room database
                 workoutPlanRepository.insertWorkoutPlan(workoutPlan);
-
+                Thread.sleep(200);
                 // Save frequency to SharedPreferences as well (for backup/quick access)
                 saveWorkoutFrequencyToPrefs();
 
                 // Mark survey as completed (same as GoalSelectionActivity)
                 markSurveyCompleted();
+                WorkoutPlanEntity plan = workoutPlanRepository.getWorkoutPlansByUserId(userId);
+                UserMetricsEntity userMetrics = userMetricsRepository.getUserMetricByUserId(userId);
+                UserEntity userEntity = userRepository.getUserById(userId);
+                planId = plan.getPlanId();
+                generatePlan = new GeneratePlan(plan.getPlanId(), 21.5, userMetrics.getGoal(), userEntity.getGender(), selectedSlots, exerciseRepository, muscleGroupRepository, workoutSessionRepository, sessionExerciseRepository, workoutPlanRepository);
+                generatePlan.Generation();
 
                 // Navigate to MainActivity on UI thread
                 runOnUiThread(() -> {
@@ -199,7 +230,8 @@ public class WorkoutFrequencyActivity extends AppCompatActivity {
 
     private void proceedToNextScreen() {
         // Navigate to MainActivity
-        Intent intent = new Intent(WorkoutFrequencyActivity.this, MainActivity.class);
+        Intent intent = new Intent(WorkoutFrequencyActivity.this, PlanActivity.class);
+        intent.putExtra("planId", planId);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -16,9 +17,12 @@ import com.example.fitnestx.adapters.ImageExerciseAdapter;
 import com.example.fitnestx.adapters.SectionExerciseAdapter;
 import com.example.fitnestx.data.entity.ExerciseEntity;
 import com.example.fitnestx.data.entity.MuscleGroupEntity;
+import com.example.fitnestx.data.entity.SessionExerciseEntity;
 import com.example.fitnestx.data.repository.ExerciseRepository;
 import com.example.fitnestx.data.repository.MuscleGroupRepository;
 import com.example.fitnestx.data.repository.SessionExerciseRepository;
+import com.example.fitnestx.data.repository.WorkoutSessionRepository;
+import com.example.fitnestx.viewmodel.ExerciseWithSessionStatus;
 
 
 import java.util.ArrayList;
@@ -34,9 +38,14 @@ public class ExcerciseActivity extends AppCompatActivity {
     private SectionExerciseAdapter sectionExerciseAdapter;
     private RecyclerView recyclerView;
     ImageButton btnBack;
+    TextView Spec, Date;
     private ExerciseRepository exerciseRepository;
     private SessionExerciseRepository sessionExerciseRepository;
+    private SessionExerciseEntity sessionExerciseEntity;
+    private ExerciseWithSessionStatus exerciseWithSessionStatus;
     private MuscleGroupRepository muscleGroupRepository;
+    private WorkoutSessionRepository workoutSessionRepository;
+    String spec, date;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +54,7 @@ public class ExcerciseActivity extends AppCompatActivity {
         exerciseRepository = new ExerciseRepository(this);
         sessionExerciseRepository = new SessionExerciseRepository(this);
         muscleGroupRepository = new MuscleGroupRepository(this);
+        workoutSessionRepository = new WorkoutSessionRepository(this);
 
         recyclerView = findViewById(R.id.recyclerViewExercises);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -52,14 +62,25 @@ public class ExcerciseActivity extends AppCompatActivity {
         btnBack = findViewById(R.id.btn_back);
         btnBack.setOnClickListener(v -> finish());
 
-        setupActionRecyclerView();
+        Spec = findViewById(R.id.Spec);
+        Date = findViewById(R.id.Date);
 
+        setupActionRecyclerView();
+        reloadExercises();
+
+
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        reloadExercises(); // Tạo thêm hàm này để tái nạp danh sách từ DB
+    }
+    private void reloadExercises() {
         Intent intent = getIntent();
         int sessionId = intent.getIntExtra("sessionId", -1);
 
-        // Chạy trong background thread
         Executors.newSingleThreadExecutor().execute(() -> {
-            // 1. Load tất cả dữ liệu
+            date = workoutSessionRepository.getWorkoutSessionById(sessionId).getDate();
             List<Integer> exerciseIds = sessionExerciseRepository.GetListIdExercsieBySessionId(sessionId);
             List<ExerciseEntity> exercises = new ArrayList<>();
             for (int id : exerciseIds) {
@@ -78,25 +99,32 @@ public class ExcerciseActivity extends AppCompatActivity {
                 }
             }
 
-            // 2. Group theo parentId thực sự
             Map<Integer, List<ExerciseEntity>> groupedByParent = new HashMap<>();
             Set<Integer> usedParentIds = new HashSet<>();
-
+            Set<String> usedSpecs = new HashSet<>();
             for (ExerciseEntity ex : exercises) {
                 int childId = ex.getMuscleGroupId();
                 Integer parentId = childToParentMap.get(childId);
-
                 if (parentId != null) {
                     groupedByParent.computeIfAbsent(parentId, k -> new ArrayList<>()).add(ex);
                     usedParentIds.add(parentId);
                 } else {
-                    // Nếu không có parent thì group theo chính nó
                     groupedByParent.computeIfAbsent(childId, k -> new ArrayList<>()).add(ex);
                     usedParentIds.add(childId);
                 }
             }
+            StringBuilder specBuilder = new StringBuilder();
+            for (Integer parentId : usedParentIds) {
+                MuscleGroupEntity muscleGroupEntity = muscleGroupRepository.getMuscleGroupById(parentId);
+                String spec = muscleGroupEntity.getSpec();
+                if (usedSpecs.add(spec)) { // chỉ thêm nếu chưa tồn tại
+                    specBuilder.append(spec).append(" And ");
+                }
+            }
 
-            // 3. Tạo section items
+            spec = specBuilder.toString();
+            spec = spec.substring(0, spec.length() - 5); // xóa " And " cuối cùng
+
             List<SectionItem> sectionItems = new ArrayList<>();
             for (Integer parentId : groupedByParent.keySet()) {
                 MuscleGroupEntity group = idToGroup.get(parentId);
@@ -104,65 +132,36 @@ public class ExcerciseActivity extends AppCompatActivity {
 
                 sectionItems.add(new SectionItem(title)); // Header
                 for (ExerciseEntity ex : groupedByParent.get(parentId)) {
-                    sectionItems.add(new SectionItem(ex));
+                    sessionExerciseEntity = sessionExerciseRepository.getSessionExercise(sessionId,ex.getExerciseId());
+                    exerciseWithSessionStatus = new ExerciseWithSessionStatus(ex,sessionExerciseEntity.isMarked());
+                    sectionItems.add(new SectionItem(exerciseWithSessionStatus));
                 }
             }
 
-
-            // Cập nhật UI trên Main Thread
             runOnUiThread(() -> {
-                sectionExerciseAdapter = new SectionExerciseAdapter(sectionItems, new SectionExerciseAdapter.OnItemClickListener() {
-                    @Override
-                    public void onExerciseClick(int position, ExerciseEntity exercise) {
-                        Intent detailIntent = new Intent(ExcerciseActivity.this, DetailExerciseActivity.class);
-                        detailIntent.putExtra(DetailExerciseActivity.EXTRA_EXERCISE_ID, exercise.getExerciseId());
-                        startActivity(detailIntent);
-                        sectionExerciseAdapter.toggleExerciseStatus(position);
-                    }
-                });
-
-                recyclerView.setAdapter(sectionExerciseAdapter);
+                Spec.setText(spec);
+                Date.setText(date);
+                if (sectionExerciseAdapter == null) {
+                    // Adapter chưa được tạo, tạo mới và gán vào RecyclerView
+                    sectionExerciseAdapter = new SectionExerciseAdapter(sectionItems, new SectionExerciseAdapter.OnItemClickListener() {
+                        @Override
+                        public void onExerciseClick(int position, ExerciseEntity exercise) {
+                            Intent detailIntent = new Intent(ExcerciseActivity.this, DetailExerciseActivity.class);
+                            detailIntent.putExtra(DetailExerciseActivity.EXTRA_EXERCISE_ID, exercise.getExerciseId());
+                            detailIntent.putExtra("sessionId", sessionId);
+                            startActivity(detailIntent);
+                        }
+                    });
+                    recyclerView.setAdapter(sectionExerciseAdapter);
+                } else {
+                    // Adapter đã có, chỉ cần update dữ liệu
+                    sectionExerciseAdapter.updateData(sectionItems);
+                }
             });
         });
     }
 
-    private List<SectionItem> groupExercisesByParentGroup(List<ExerciseEntity> exercises, List<MuscleGroupEntity> muscleGroups) {
-        // Tạo map id -> MuscleGroupEntity
-        Map<Integer, MuscleGroupEntity> groupMap = new HashMap<>();
-        for (MuscleGroupEntity group : muscleGroups) {
-            groupMap.put(group.getMuscleGroupId(), group);
-        }
-
-        // Group bài tập theo parent group id
-        Map<Integer, List<ExerciseEntity>> grouped = new HashMap<>();
-        for (ExerciseEntity ex : exercises) {
-            MuscleGroupEntity group = groupMap.get(ex.getMuscleGroupId());
-            int parentId = (group != null && group.getParentId() != null)
-                    ? group.getParentId()
-                    : ex.getMuscleGroupId();
-
-            if (!grouped.containsKey(parentId)) {
-                grouped.put(parentId, new ArrayList<>());
-            }
-            grouped.get(parentId).add(ex);
-        }
-
-        // Tạo list SectionItem
-        List<SectionItem> sectionItems = new ArrayList<>();
-        for (Map.Entry<Integer, List<ExerciseEntity>> entry : grouped.entrySet()) {
-            String groupName = groupMap.containsKey(entry.getKey())
-                    ? groupMap.get(entry.getKey()).getName()
-                    : "Nhóm khác";
-
-            sectionItems.add(new SectionItem(groupName)); // Header
-            for (ExerciseEntity ex : entry.getValue()) {
-                sectionItems.add(new SectionItem(ex));
-            }
-        }
-
-        return sectionItems;
-    }
-    private void setupActionRecyclerView() {
+     private void setupActionRecyclerView() {
         RecyclerView recyclerView = findViewById(R.id.recycler_view_imageExercise);
 
         // Tạo danh sách icons

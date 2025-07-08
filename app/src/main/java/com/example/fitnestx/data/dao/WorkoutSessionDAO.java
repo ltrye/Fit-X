@@ -23,6 +23,8 @@ public interface WorkoutSessionDAO {
     @Query("SELECT * FROM WORKOUT_SESSION WHERE planId = :planId")
     LiveData<List<WorkoutSessionEntity>> getWorkoutSessionsByPlanId(int planId);
 
+    @Query("SELECT * FROM WORKOUT_SESSION WHERE planId = :planId")
+    List<WorkoutSessionEntity> getWorkoutSessionsByPlanIdList(int planId);
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertWorkoutSession(WorkoutSessionEntity session);
 
