@@ -17,6 +17,9 @@ public interface ExerciseDAO {
     @Query("SELECT * FROM EXERCISE")
     LiveData<List<ExerciseEntity>> getAllExercises();
 
+    @Query("SELECT * FROM EXERCISE")
+    List<ExerciseEntity> getListOfExercises();
+
 
 
     @Query("SELECT * FROM EXERCISE WHERE exerciseId = :exerciseId")

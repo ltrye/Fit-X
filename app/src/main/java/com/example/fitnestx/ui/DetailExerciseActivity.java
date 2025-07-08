@@ -30,7 +30,9 @@ import androidx.media3.ui.PlayerView;
 
 import com.example.fitnestx.R;
 import com.example.fitnestx.data.entity.ExerciseEntity;
+import com.example.fitnestx.data.entity.SessionExerciseEntity;
 import com.example.fitnestx.data.repository.ExerciseRepository;
+import com.example.fitnestx.data.repository.SessionExerciseRepository;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -48,7 +50,8 @@ public class DetailExerciseActivity extends AppCompatActivity {
     private  ExerciseEntity exerciseEntity;
     private TextView exerciseTitle, exerciseDescription;
     private ExerciseRepository exerciseRepository;
-
+    private SessionExerciseRepository sessionExerciseRepository;
+    private SessionExerciseEntity sessionExerciseEntity;
 
     @OptIn(markerClass = UnstableApi.class)
     @Override
@@ -56,6 +59,7 @@ public class DetailExerciseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_exercise);
         exerciseRepository = new ExerciseRepository(this);
+        sessionExerciseRepository = new SessionExerciseRepository(this);
         // Khởi tạo views
         initViews();
 
@@ -127,6 +131,7 @@ public class DetailExerciseActivity extends AppCompatActivity {
         // Lấy dữ liệu từ Intent
         Intent intent = getIntent();
         int exerciseId = getIntent().getIntExtra(EXTRA_EXERCISE_ID, -1);
+        int sessionId = getIntent().getIntExtra("sessionId",-1);
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
@@ -153,8 +158,10 @@ public class DetailExerciseActivity extends AppCompatActivity {
 
             executorSkip.execute(() -> {
         // Cập nhật isMarked = true trong DB
-         exerciseEntity.setMarked(true);
-        exerciseRepository.updateExercise(exerciseEntity);
+          sessionExerciseEntity = sessionExerciseRepository.getSessionExercise(sessionId,exerciseId);
+
+          sessionExerciseEntity.setMarked(true);
+          sessionExerciseRepository.updateSessionExercise(sessionExerciseEntity);
 
         // Trở lại UI thread để kết thúc activity
         runOnUiThread(() -> {

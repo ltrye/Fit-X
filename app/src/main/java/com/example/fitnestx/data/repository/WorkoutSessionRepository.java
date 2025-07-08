@@ -31,8 +31,8 @@ public class WorkoutSessionRepository {
         return workoutSessionDAO.getWorkoutSessionById(sessionId);
     }
 
-    public LiveData<List<WorkoutSessionEntity>> getWorkoutSessionsByPlanId(int planId) {
-        return workoutSessionDAO.getWorkoutSessionsByPlanId(planId);
+    public List<WorkoutSessionEntity> getWorkoutSessionsByPlanId(int planId) {
+        return workoutSessionDAO.getWorkoutSessionsByPlanIdList(planId);
     }
 
     public void updateWorkoutSession(WorkoutSessionEntity session) {
