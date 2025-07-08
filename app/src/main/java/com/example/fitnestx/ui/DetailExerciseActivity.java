@@ -20,6 +20,7 @@ import android.widget.Toast;
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GestureDetectorCompat;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
@@ -33,6 +34,7 @@ import com.example.fitnestx.data.entity.ExerciseEntity;
 import com.example.fitnestx.data.entity.SessionExerciseEntity;
 import com.example.fitnestx.data.repository.ExerciseRepository;
 import com.example.fitnestx.data.repository.SessionExerciseRepository;
+import com.example.fitnestx.fragments.TopMenuFragment;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -68,7 +70,9 @@ public class DetailExerciseActivity extends AppCompatActivity {
 
         // Thiết lập UI và sự kiện
         setupUI();
-
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_top_menu, new TopMenuFragment());
+        transaction.commit();
     }
 
     private void initViews() {
@@ -99,12 +103,12 @@ public class DetailExerciseActivity extends AppCompatActivity {
 
             playerView.setFullscreenButtonClickListener(isFullscreen -> {
                 if (isFullscreen) {
-                   getWindow().getDecorView().setSystemUiVisibility(PlayerView.SYSTEM_UI_FLAG_FULLSCREEN|View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY|View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+                    getWindow().getDecorView().setSystemUiVisibility(PlayerView.SYSTEM_UI_FLAG_FULLSCREEN|View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY|View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
                     playerView.getLayoutParams().height = ViewGroup.LayoutParams.MATCH_PARENT;
                     findViewById(R.id.button_container).setVisibility(View.GONE);
                 } else {
-                  getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
-                  float pxheight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,200f,getResources().getDisplayMetrics());
+                    getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+                    float pxheight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,200f,getResources().getDisplayMetrics());
                     ViewGroup.LayoutParams layoutParams = playerView.getLayoutParams();
                     layoutParams.height = (int)pxheight;
                     playerView.setLayoutParams(layoutParams);
@@ -135,8 +139,8 @@ public class DetailExerciseActivity extends AppCompatActivity {
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
-             exerciseEntity = exerciseRepository.getExerciseById(exerciseId);
-             String des = exerciseRepository.GetDesByExId(exerciseId);
+            exerciseEntity = exerciseRepository.getExerciseById(exerciseId);
+            String des = exerciseRepository.GetDesByExId(exerciseId);
             if (exerciseEntity != null) {
                 runOnUiThread(() -> {
                     // Cập nhật UI ở đây
@@ -152,24 +156,25 @@ public class DetailExerciseActivity extends AppCompatActivity {
         // Sự kiện nút đóng
         closeButton.setOnClickListener(v -> finish());
 
-        // Sự kiện nút Skip
-        skipButton.setOnClickListener(v -> {
-        ExecutorService executorSkip = Executors.newSingleThreadExecutor();
+        // Sự kiện nút Skip - chỉ hiển thị khi có sessionId
+        if (sessionId != -1) {
+            skipButton.setOnClickListener(v -> {
+                ExecutorService executorSkip = Executors.newSingleThreadExecutor();
+                executorSkip.execute(() -> {
+                    sessionExerciseEntity = sessionExerciseRepository.getSessionExercise(sessionId, exerciseId);
+                    sessionExerciseEntity.setMarked(true);
+                    sessionExerciseRepository.updateSessionExercise(sessionExerciseEntity);
 
-            executorSkip.execute(() -> {
-        // Cập nhật isMarked = true trong DB
-          sessionExerciseEntity = sessionExerciseRepository.getSessionExercise(sessionId,exerciseId);
-
-          sessionExerciseEntity.setMarked(true);
-          sessionExerciseRepository.updateSessionExercise(sessionExerciseEntity);
-
-        // Trở lại UI thread để kết thúc activity
-        runOnUiThread(() -> {
-            Toast.makeText(this, "Đã đánh dấu hoàn thành", Toast.LENGTH_SHORT).show();
-            finish(); // Quay lại màn hình trước
-        });
-    });
-});
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, "Đã đánh dấu hoàn thành", Toast.LENGTH_SHORT).show();
+                        finish();
+                    });
+                });
+            });
+        } else {
+            // Ẩn nút Skip khi xem bài tập đơn lẻ
+            skipButton.setVisibility(View.GONE);
+        }
 //
 //        // Sự kiện nút Next
 //        nextButton.setOnClickListener(v -> {
