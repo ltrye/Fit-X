@@ -69,6 +69,7 @@ public class DatabaseGenerator {
             String line;
             WorkoutPlanDAO planDAO = instance.workoutPlanDAO();
             while ((line = reader.readLine()) != null) {
+                if (line.trim().isEmpty()) continue; // bỏ qua dòng trống
                 String[] data = line.split(",");
                 int planId = Integer.parseInt(data[0]);
                 int userId = Integer.parseInt(data[1]);
@@ -76,8 +77,9 @@ public class DatabaseGenerator {
                 String durationInWeeks = data[3];
                 int daysPerWeek = Integer.parseInt(data[4]);
                 boolean isActive = Boolean.parseBoolean(data[5]);
+                String note = data[6];
 
-                WorkoutPlanEntity plan = new WorkoutPlanEntity(planId, userId, startDate, durationInWeeks, daysPerWeek, isActive);
+                WorkoutPlanEntity plan = new WorkoutPlanEntity(planId, userId, startDate, durationInWeeks, daysPerWeek, isActive,note);
                 planDAO.insertWorkoutPlan(plan);
             }
             reader.close();
@@ -128,8 +130,8 @@ public class DatabaseGenerator {
                 int sets = Integer.parseInt(data[4]);
                 int reps = Integer.parseInt(data[5]);
                 boolean isOptional = Boolean.parseBoolean(data[6]);
-
-                SessionExerciseEntity sessionExercise = new SessionExerciseEntity(sessionId, exerciseId, order, restTime, sets, reps, isOptional);
+                boolean isMarked = Boolean.parseBoolean(data[7]);
+                SessionExerciseEntity sessionExercise = new SessionExerciseEntity(sessionId, exerciseId, order, restTime, sets, reps, isOptional,isMarked);
                 exerciseDAO.insertSessionExercise(sessionExercise);
             }
             reader.close();

@@ -26,8 +26,8 @@ public class ExerciseRepository {
         new Thread(() -> exerciseDAO.insertExercise(exercise)).start();
     }
 
-    public LiveData<List<ExerciseEntity>> getAllExercises() {
-        return exerciseDAO.getAllExercises();
+    public List<ExerciseEntity> getAllExercises() {
+        return exerciseDAO.getListOfExercises();
     }
 
     public ExerciseEntity getExerciseById(int exerciseId) {

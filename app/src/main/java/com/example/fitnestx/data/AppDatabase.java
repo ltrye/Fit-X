@@ -46,7 +46,7 @@ import java.util.concurrent.Executors;
         UserMetricsEntity.class,
         AuthProviderEntity.class
 
-}, version = 7, exportSchema = false)
+}, version = 8, exportSchema = false)
 
 @TypeConverters(DateConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
@@ -114,6 +114,12 @@ public abstract class AppDatabase extends RoomDatabase {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("DROP INDEX IF EXISTS index_WORKOUT_SESSION_planId");
+        }
+    };
+    static final Migration MIGRATION_7_8 = new Migration(7, 8) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE SESSION_EXERCISE ADD COLUMN isMarked INTEGER NOT NULL DEFAULT 0");
         }
     };
 
