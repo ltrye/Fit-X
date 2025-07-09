@@ -196,7 +196,7 @@ public class WorkoutFrequencyActivity extends AppCompatActivity {
                 UserMetricsEntity userMetrics = userMetricsRepository.getUserMetricByUserId(userId);
                 UserEntity userEntity = userRepository.getUserById(userId);
                 planId = plan.getPlanId();
-                generatePlan = new GeneratePlan(plan.getPlanId(), 21.5, userMetrics.getGoal(), userEntity.getGender(), selectedSlots, exerciseRepository, muscleGroupRepository, workoutSessionRepository, sessionExerciseRepository, workoutPlanRepository);
+                generatePlan = new GeneratePlan(plan.getPlanId(), userMetrics.getBmi(), userMetrics.getGoal(), userEntity.getGender(), selectedSlots, exerciseRepository, muscleGroupRepository, workoutSessionRepository, sessionExerciseRepository, workoutPlanRepository);
                 generatePlan.Generation();
 
                 // Navigate to MainActivity on UI thread
@@ -226,10 +226,11 @@ public class WorkoutFrequencyActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = pref.edit();
         editor.putBoolean(KEY_SURVEY_COMPLETED, true);
         editor.apply();
+        Log.d("WorkoutFrequencyActivity", "Survey marked as completed");
     }
 
     private void proceedToNextScreen() {
-        // Navigate to MainActivity
+        // Navigate to PlanActivity
         Intent intent = new Intent(WorkoutFrequencyActivity.this, PlanActivity.class);
         intent.putExtra("planId", planId);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
