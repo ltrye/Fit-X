@@ -39,9 +39,10 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/ExerciseCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="6 Exercises"
+                android:text=""
                 android:textSize="14sp"
                 android:textColor="#666666"
                 android:layout_marginTop="2dp" />
@@ -62,10 +63,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp" />
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_share" />
+      
     </LinearLayout>
 
     <!-- Exercises Section -->
