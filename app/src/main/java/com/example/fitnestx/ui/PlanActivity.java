@@ -40,6 +40,7 @@ public class PlanActivity extends AppCompatActivity {
     private UserMetricsRepository userMetricsRepository;
     private WorkoutPlanRepository workoutPlanRepository;
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
+    public static final int REQUEST_CODE_EXERCISE = 1001; // Bất kỳ số nào bạn chọn
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,13 +57,37 @@ public class PlanActivity extends AppCompatActivity {
 
     }
 
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        setupRecyclerView(); // Luôn reload dữ liệu khi màn hình được resume
+//    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == 1001 && resultCode == RESULT_OK) {
-            setupRecyclerView(); // Load lại dữ liệu khi quay về
+        if (requestCode == REQUEST_CODE_EXERCISE && resultCode == RESULT_OK && data != null) {
+            int sessionId = data.getIntExtra("sessionId", -1);
+            if (sessionId != -1) {
+                updateSingleSession(sessionId);
+            }
         }
+    }
+    private void updateSingleSession(int sessionId) {
+        executorService.execute(() -> {
+            WorkoutSessionEntity updatedSession = workoutSessionRepository.getWorkoutSessionById(sessionId);
+            if (updatedSession == null) return;
+
+            runOnUiThread(() -> {
+                for (int i = 0; i < goalAdapter.getItemCount(); i++) {
+                    WorkoutSessionEntity session = goalAdapter.getItem(i);
+                    if (session.getSessionId() == sessionId) {
+                        goalAdapter.updateItem(i, updatedSession);
+                        break;
+                    }
+                }
+            });
+        });
     }
 
     private void initViews() {
@@ -125,7 +150,7 @@ public class PlanActivity extends AppCompatActivity {
 
             runOnUiThread(() -> {
                 if (goalAdapter == null) {
-                    goalAdapter = new GoalAdapter(sessions, PlanActivity.this, sessionExerciseRepository);
+                    goalAdapter = new GoalAdapter(sessions, this, sessionExerciseRepository);
                     recyclerView.setLayoutManager(new LinearLayoutManager(this));
                     recyclerView.setAdapter(goalAdapter);
                 } else {
@@ -145,13 +170,15 @@ public class PlanActivity extends AppCompatActivity {
         }
         return userId;
     }
-    private int extractDayNumber(String label) {
-        // Giả sử format luôn là "Ngày <số>"
+    private int extractDayNumber(String date) {
+        if (date == null) return 0;
         try {
-            return Integer.parseInt(label.replaceAll("[^0-9]", "").trim());
+            date = date.trim().toLowerCase().replace("ngày", "").trim();
+            return Integer.parseInt(date);
         } catch (NumberFormatException e) {
-            return 0; // fallback nếu có lỗi
+            return 0;
         }
     }
+
 
 }

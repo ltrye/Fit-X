@@ -1,71 +1,71 @@
 exerciseId,name,description,videoURL,muscleGroupId,equipmentRequired,difficulty,imageUrl,isMarked
-1,Decline bench press,Decline Bench Press là bài tập đẩy ngực sử dụng ghế nghiêng xuống để tập trung vào phần ngực dưới,,8,False,2,,False
-2,Chest dip,,,8,False,2,,False
-3,Decline push-up,,,8,False,2,,False
-4,Flat bench press,,,9,False,2,,False
-5,Dumbbell bench press,,,9,False,2,,False
-6,Push-ups,,,9,False,2,,False
-7,Incline bench press,,,10,False,2,,False
-8,Incline dumbbell fly,,,10,False,2,,False
-9,Incline push-up,,,10,False,2,,False
-10,Lateral raise,,,11,False,2,,False
-11,Dumbbell upright row,,,11,False,2,,False
-12,Cable lateral raise,,,11,False,2,,False
-13,Reverse fly,,,12,False,2,,False
-14,Face pull,,,12,False,2,,False
-15,Rear delt row,,,12,False,2,,False
-16,Front raise,,,13,False,2,,False
-17,Overhead press,,,13,False,2,,False
-18,Arnold press,,,13,False,2,,False
-19,Pull-up,,,14,False,2,,False
-20,Lat pulldown,,,14,False,2,,False
-21,One-arm dumbbell row,,,14,False,2,,False
-22,Deadlift,,,15,False,2,,False
-23,Back extension,,,15,False,2,,False
-24,Good morning,,,15,False,2,,False
-25,Barbell row,,,16,False,2,,False
-26,Seated cable row,,,16,False,2,,False
-27,Face pull,,,16,False,2,,False
-28,Barbell shrug,,,17,False,2,,False
-29,Dumbbell shrug,,,17,False,2,,False
-30,Upright row,,,17,False,2,,False
-31,Barbell curl,,,18,False,2,,False
-32,Dumbbell curl,,,18,False,2,,False
-33,Hammer curl,,,18,False,2,,False
-34,Reverse curl,,,18,False,2,,False
-35,Triceps pushdown,,,19,False,2,,False
-36,Kickbacks,,,19,False,2,,False
-37,Dips,,,19,False,2,,False
-38,Overhead triceps extension,,,20,False,2,,False
-39,Close-grip bench press,,,20,False,2,,False
-40,Skull crusher,,,20,False,2,,False
-41,Diamond push-up,,,21,False,2,,False
-42,Reverse-grip pushdown,,,21,False,2,,False
-43,One-arm cable pushdown,,,21,False,2,,False
-44,Hip thrust,,,22,False,2,,False
-45,Barbell squat,,,22,False,2,,False
-46,Deadlift,,,22,False,2,,False
-47,Side-lying leg raise,,,23,False,2,,False
-48,Band walks,,,23,False,2,,False
-49,Clamshell,,,23,False,2,,False
-50,Cable kickback,,,24,False,2,,False
-51,Single-leg glute bridge,,,24,False,2,,False
-52,Side-lying abduction,,,24,False,2,,False
-53,Romanian deadlift,,,25,False,2,,False
-54,Leg curl,,,25,False,2,,False
-55,Glute-ham raise,,,25,False,2,,False
-56,Squats,,,26,False,2,,False
-57,Leg press,,,26,False,2,,False
-58,Leg extension,,,26,False,2,,False
-59,Band walks,,,27,False,2,,False
-60,Hip abduction cable,,,27,False,2,,False
-61,Side step-up,,,27,False,2,,False
-62,Sumo squat,,,28,False,2,,False
-63,Adductor machine,,,28,False,2,,False
-64,Side lunge,,,28,False,2,,False
-65,Jumping jacks,,,29,False,2,,False
-66,Burpees,,,29,False,2,,False
-67,Incline walking,,,29,False,2,,False
-68,High knees,,,29,False,2,,False
-69,Running,,,29,False,2,,False
-70,Jump squat,,,29,False,2,,False
+1,Decline bench press,Decline Bench Press là bài tập đẩy ngực sử dụng ghế nghiêng xuống để tập trung vào phần ngực dưới,GymVideo/Chest/LowerChest/Decline_Barbell_Bench_Press.mp4,8,False,2,,False
+2,Chest dip,,GymVideo/Chest/LowerChest/Chest_Dip_Technique.mp4,8,False,2,,False
+3,Decline push-up,,GymVideo/Chest/LowerChest/Decline_Push_Up.mp4,8,False,2,,False
+4,Flat bench press,,GymVideo/Chest/MiddleChest/Flat_Barbell_Bench_Press.mp4,9,False,2,,False
+5,Dumbbell bench press,,GymVideo/Chest/MiddleChest/Dumbbell_Bench_Press.mp4,9,False,2,,False
+6,Push-ups,,GymVideo/Chest/MiddleChest/PUSH_UP.mp4,9,False,2,,False
+7,Incline bench press,,GymVideo/Chest/UpperChest/incline_barbell_bench_press.mp4,10,False,2,,False
+8,Incline dumbbell fly,,GymVideo/Chest/UpperChest/Dumbbell_Fly.mp4,10,False,2,,False
+9,Incline push-up,,GymVideo/Chest/UpperChest/incline_push_up.mp4,10,False,2,,False
+10,Lateral raise,,GymVideo/Shoulder/Middle_Shoulder/standing_dumbbell_lateral_raise.mp4,11,False,2,,False
+11,Dumbbell upright row,,GymVideo/Shoulder/Middle_Shoulder/Barbell_Upright_Row.mp4,11,False,2,,False
+12,Cable lateral raise,,GymVideo/Shoulder/Middle_Shoulder/cable_lateral_raise.mp4,11,False,2,,False
+13,Reverse fly,,GymVideo/Shoulder/Lower_Shoulder/Dumbbell_Reverse_Fly.mp4,12,False,2,,False
+14,Face pull,,GymVideo/Shoulder/Lower_Shoulder/Face_Pull.mp4,12,False,2,,False
+15,Rear delt row,,GymVideo/Shoulder/Lower_Shoulder/Barbell_Rear_Delt_Row.mp4,12,False,2,,False
+16,Front raise,,GymVideo/Shoulder/Upper_Shoulder/Dumbbell_Front_Raise.mp4,13,False,2,,False
+17,Overhead press,,GymVideo/Shoulder/Upper_Shoulder/Barbell_Overhead_Press.mp4,13,False,2,,False
+18,Arnold press,,GymVideo/Shoulder/Upper_Shoulder/Standing_dumbbell_arnold_press.mp4,13,False,2,,False
+19,Pull-up,,GymVideo/Back/Lat/Wide_pull_up.mp4,14,False,2,,False
+20,Lat pulldown,,GymVideo/Back/Lat/Lat_pull_Down.mp4,14,False,2,,False
+21,One-arm dumbbell row,,GymVideo/Back/Lat/One_Arm_Dumbbell_Rowl.mp4,14,False,2,,False
+22,Deadlift,,GymVideo/Back/Lower_Back/Sumo_deadlift.mp4,15,False,2,,False
+23,Back extension,,GymVideo/Back/Lower_Back/Back_Extension.mp4,15,False,2,,False
+24,Good morning,,GymVideo/Back/Lower_Back/Good_Morning.mp4,15,False,2,,False
+25,Barbell row,,GymVideo/Back/Middle_Back/Bent_Over_Dumbbell_Row.mp4,16,False,2,,False
+26,Seated cable row,,GymVideo/Back/Middle_Back/Seated_Row_to_Waist.mp4,16,False,2,,False
+27,Face pull,,GymVideo/Back/Middle_Back/Face_Pull.mp4,16,False,2,,False
+28,Barbell shrug,,GymVideo/Back/Upper_Trap/Standing_Barbell_Shrug.mp4,17,False,2,,False
+29,Dumbbell shrug,,GymVideo/Back/Upper_Trap/Dumbbell_Shrugs.mp4,17,False,2,,False
+30,Upright row,,GymVideo/Back/Upper_Trap/Barbell_Upright_Row.mp4,17,False,2,,False
+31,Barbell curl,,GymVideo/Bicepts/Bycepts/Barbell_Curl.mp4,18,False,2,,False
+32,Dumbbell curl,,GymVideo/Bicepts/Bycepts/Dumbbell_Curl.mp4,18,False,2,,False
+33,Hammer curl,,GymVideo/Bicepts/Bycepts/Dumbbell_Hammer_Curls.mp4,18,False,2,,False
+34,Reverse curl,,GymVideo/Bicepts/Bycepts/Standing_Low_pulley_Handle_Reverse_Curl.mp4,18,False,2,,False
+35,Triceps pushdown,,GymVideo/Tricepts/Outter_Head/Triceps_Push_Down.mp4,19,False,2,,False
+36,Kickbacks,,GymVideo/Tricepts/Outter_Head/Dumbbell_Kickback.mp4,19,False,2,,False
+37,Dips,,GymVideo/Tricepts/Outter_Head/Tricep_Bench_Dip.mp4,19,False,2,,False
+38,Overhead triceps extension,,GymVideo/Tricepts/Long_Head/Overhead_Cable_Tricep_Extension.mp4,20,False,2,,False
+39,Close-grip bench press,,GymVideo/Tricepts/Long_Head/Close_Grip_Barbell_Bench_Press.mp4,20,False,2,,False
+40,Skull crusher,,GymVideo/Tricepts/Long_Head/Skull_Crushers.mp4,20,False,2,,False
+41,Diamond push-up,,GymVideo/Tricepts/Inner_Head/DIAMOND_PUSH_UP.mp4,21,False,2,,False
+42,Reverse-grip pushdown,,GymVideo/Tricepts/Inner_Head/Reverse_Grip_Triceps_Pushdown.mp4,21,False,2,,False
+43,One-arm cable pushdown,,GymVideo/Tricepts/Inner_Head/Triceps_Push_Down.mp4,21,False,2,,False
+44,Hip thrust,,GymVideo/Glut/Big_Glut/Hip_Thrust.mp4,22,False,2,,False
+45,Barbell squat,,GymVideo/Glut/Big_Glut/Bulgarian_Split_Squat.mp4,22,False,2,,False
+46,Deadlift,,GymVideo/Glut/Big_Glut/Dumbbell_Romanian_Deadlift.mp4,22,False,2,,False
+47,Side-lying leg raise,,GymVideo/Glut/Middle_Glut/Side_Lying_Leg_Lifts.mp4,23,False,2,,False
+48,Band walks,,GymVideo/Glut/Middle_Glut/Monster_Walk.mp4,23,False,2,,False
+49,Clamshell,,GymVideo/Glut/Middle_Glut/Clamshell.mp4,23,False,2,,False
+50,Cable kickback,,GymVideo/Glut/Small_Glut/Glute_Kickback.mp4,24,False,2,,False
+51,Single-leg glute bridge,,GymVideo/Glut/Small_Glut/Glute_Bridge.mp4,24,False,2,,False
+52,Side-lying abduction,,GymVideo/Glut/Small_Glut/Banded_Sidelying_Hip_Abduction.mp4,24,False,2,,False
+53,Romanian deadlift,,GymVideo/Legs/hamstrings/Romanian_Deadlift.mp4,25,False,2,,False
+54,Leg curl,,GymVideo/Legs/hamstrings/Lying_Leg_Curl.mp4,25,False,2,,False
+55,Glute-ham raise,,GymVideo/Legs/hamstrings/Glute_Ham_Raise_trimmed.mp4,25,False,2,,False
+56,Squats,,GymVideo/Legs/Quads/Hack_squat.mp4,26,False,2,,False
+57,Leg press,,GymVideo/Legs/Quads/Incline_Leg_Press.mp4,26,False,2,,False
+58,Leg extension,,GymVideo/Legs/Quads/Leg_Extension.mp4,26,False,2,,False
+59,Band walks,,GymVideo/Legs/outer_thigh/Band_Walk.mp4,27,False,2,,False
+60,Hip abduction cable,,GymVideo/Legs/outer_thigh/Hip_Abduction_Cable.mp4,27,False,2,,False
+61,Side step-up,,GymVideo/Legs/outer_thigh/Side_Dumbbell_Step_up.mp4,27,False,2,,False
+62,Sumo squat,,GymVideo/Legs/Inner_thigh/Sumo_Squats.mp4,28,False,2,,False
+63,Adductor machine,,GymVideo/Legs/Inner_thigh/Hip_Abductor_Machine.mp4,28,False,2,,False
+64,Side lunge,,GymVideo/Legs/Inner_thigh/SIDE_LUNGES.mp4,28,False,2,,False
+65,Jumping jacks,,GymVideo/cardio/Jumping_Jack.mp4,29,False,2,,False
+66,Burpees,,GymVideo/cardio/Burpees.mp4,29,False,2,,False
+67,Incline walking,,GymVideo/cardio/Incline_Walking.mp4,29,False,2,,False
+68,High knees,,GymVideo/cardio/High_Knee.mp4,29,False,2,,False
+69,Running,,GymVideo/cardio/Running.mp4,29,False,2,,False
+70,Jump squat,,GymVideo/cardio/Squat_Jumps.mp4,29,False,2,,False
