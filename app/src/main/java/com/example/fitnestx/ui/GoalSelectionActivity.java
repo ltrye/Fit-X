@@ -130,7 +130,7 @@ public class GoalSelectionActivity extends AppCompatActivity {
                     timestamp,
                     weightValue,
                     heightValue * 100, // Store height in cm
-                    21.5,
+                    bmi,
                     selectedGoal
             );
 
