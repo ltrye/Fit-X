@@ -1,5 +1,7 @@
 package com.example.fitnestx.Helpers;
 
+import android.util.Log;
+
 import com.example.fitnestx.data.entity.ExerciseEntity;
 import com.example.fitnestx.data.entity.MuscleGroupEntity;
 import com.example.fitnestx.data.entity.SessionExerciseEntity;
@@ -23,63 +25,757 @@ public class GeneratePlan {
     private int planId;
     private double bmi;
     private String goal;
-    private boolean gender;
-
+    private boolean gender; // true = male, false = female
     private int daysPerWeek;
+
     private ExerciseRepository exerciseRepository;
     private MuscleGroupRepository muscleGroupRepository;
     private WorkoutSessionRepository workoutSessionRepository;
-    private WorkoutSessionEntity workoutSessionEntity;
     private SessionExerciseRepository sessionExerciseRepository;
     private WorkoutPlanRepository workoutPlanRepository;
 
-    public GeneratePlan(int planId, double bmi, String goal, boolean gender, int daysPerWeek, ExerciseRepository exerciseRepository, MuscleGroupRepository muscleGroupRepository, WorkoutSessionRepository workoutSessionRepository, SessionExerciseRepository sessionExerciseRepository, WorkoutPlanRepository workoutPlanRepository) {
+    // BMI Categories
+    private static final double BMI_UNDERWEIGHT = 18.5;
+    private static final double BMI_NORMAL = 25.0;
+    private static final double BMI_OVERWEIGHT = 29.9;
+
+    // Muscle Group IDs (based on your database structure)
+    private static final int CHEST = 1;
+    private static final int SHOULDERS = 2;
+    private static final int BACK = 3;
+    private static final int BICEPS = 4;
+    private static final int TRICEPS = 5;
+    private static final int QUADS = 6;
+    private static final int GLUTES = 7;
+    private static final int CARDIO = 29;
+
+    public GeneratePlan(int planId, double bmi, String goal, boolean gender, int daysPerWeek,
+                        ExerciseRepository exerciseRepository, MuscleGroupRepository muscleGroupRepository,
+                        WorkoutSessionRepository workoutSessionRepository, SessionExerciseRepository sessionExerciseRepository,
+                        WorkoutPlanRepository workoutPlanRepository) {
         this.planId = planId;
         this.bmi = bmi;
         this.goal = goal;
         this.gender = gender;
-
         this.daysPerWeek = daysPerWeek;
         this.exerciseRepository = exerciseRepository;
         this.muscleGroupRepository = muscleGroupRepository;
         this.workoutSessionRepository = workoutSessionRepository;
         this.sessionExerciseRepository = sessionExerciseRepository;
         this.workoutPlanRepository = workoutPlanRepository;
+
+        Log.d("GeneratePlan", "Initialized with BMI: " + bmi + ", Goal: " + goal + ", Gender: " + (gender ? "Male" : "Female") + ", Days: " + daysPerWeek);
     }
 
     public void Generation() {
-        InsertWorkoutSession();
-        InsertByBmiAndTargetAndGender();
+        Log.d("GeneratePlan", "Starting workout plan generation...");
+        insertWorkoutSessions();
+        try {
+            Thread.sleep(200); // Wait for sessions to be inserted
+        } catch (InterruptedException e) {
+            Log.e("GeneratePlan", "Thread interrupted", e);
+        }
+        generateWorkoutPlan();
+        addSpecialNotes();
+        Log.d("GeneratePlan", "Workout plan generation completed");
     }
 
-    public void InsertWorkoutSession() {
-        for (int index = 1; index <= daysPerWeek; index++) {
-            workoutSessionEntity = new WorkoutSessionEntity(planId, "Ngày " + index, 1, false);
-            workoutSessionRepository.insertWorkoutSession(workoutSessionEntity);
+    private void insertWorkoutSessions() {
+        Log.d("GeneratePlan", "Inserting " + daysPerWeek + " workout sessions");
+        for (int day = 1; day <= daysPerWeek; day++) {
+            WorkoutSessionEntity session = new WorkoutSessionEntity(planId, "Ngày " + day, 1, false);
+            workoutSessionRepository.insertWorkoutSession(session);
         }
     }
 
-    public void InsertByBmiAndTargetAndGender() {
-        if ("improve_shape".equals(goal) && daysPerWeek== 2) {
-            insertExerciseCaseSpecCase1Case4();
-        } else if (("lean_tone".equals(goal) || "lose_fat".equals(goal)) && daysPerWeek == 2) {
-            insertExerciseCaseSpecCase2Case3();
+    private void generateWorkoutPlan() {
+        List<WorkoutSessionEntity> sessions = workoutSessionRepository.getWorkoutSessionsByPlanId(planId);
+        if (sessions.isEmpty()) {
+            Log.e("GeneratePlan", "No sessions found for planId: " + planId);
+            return;
         }
-        else if ("improve_shape".equals(goal) && bmi == 21.5 && gender) {
-            insertExerciseCase1();
-        } else if ("lean_tone".equals(goal) && bmi == 21.5  && gender) {
-            insertExerciseCase2();
-        } else if ("lose_fat".equals(goal) && bmi == 21.5  && gender) {
-            insertExerciseCase2();
-            WorkoutPlanEntity workoutPlanEntity = workoutPlanRepository.getWorkoutPlanById(planId);
-            workoutPlanEntity.setNote("Chế độ ăn nên nạp nhiều protein, ít carb và hạn chế đồ dầu mỡ nhé");
-            workoutPlanRepository.updateWorkoutPlan(workoutPlanEntity);
-        } else if ("improve_shape".equals(goal) && !gender && bmi == 21.5)  {
-            insertExerciseCase4();
+
+        Log.d("GeneratePlan", "Found " + sessions.size() + " sessions to populate");
+
+        // Sort sessions by day number
+        sessions.sort((s1, s2) -> {
+            int day1 = extractDayNumber(s1.getDate());
+            int day2 = extractDayNumber(s2.getDate());
+            return Integer.compare(day1, day2);
+        });
+
+        BMICategory bmiCategory = getBMICategory();
+        Log.d("GeneratePlan", "BMI Category: " + bmiCategory);
+
+        if (gender) { // Male
+            generateMaleWorkout(sessions, bmiCategory);
+        } else { // Female
+            generateFemaleWorkout(sessions, bmiCategory);
         }
     }
 
-    Map<Integer, List<ExerciseEntity>> groupExercisesByParent() {
+    private int extractDayNumber(String label) {
+        try {
+            return Integer.parseInt(label.replaceAll("[^0-9]", "").trim());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    private BMICategory getBMICategory() {
+        if (bmi < BMI_UNDERWEIGHT) return BMICategory.UNDERWEIGHT;
+        if (bmi < BMI_NORMAL) return BMICategory.NORMAL;
+        if (bmi <= BMI_OVERWEIGHT) return BMICategory.OVERWEIGHT;
+        return BMICategory.OBESE;
+    }
+
+    private void generateMaleWorkout(List<WorkoutSessionEntity> sessions, BMICategory bmiCategory) {
+        Log.d("GeneratePlan", "Generating male workout for " + bmiCategory + " with goal: " + goal);
+
+        boolean includeCardio = shouldIncludeCardio(bmiCategory);
+        int exercisesPerDay = getExercisesPerDay(bmiCategory, true);
+
+        switch (goal) {
+            case "improve_shape":
+                generateMaleImproveShapeWorkout(sessions, includeCardio, exercisesPerDay);
+                break;
+            case "lean_tone":
+            case "lose_fat":
+                generateMaleLeanToneWorkout(sessions, exercisesPerDay);
+                break;
+            default:
+                generateMaleImproveShapeWorkout(sessions, includeCardio, exercisesPerDay);
+                break;
+        }
+    }
+
+    private void generateFemaleWorkout(List<WorkoutSessionEntity> sessions, BMICategory bmiCategory) {
+        Log.d("GeneratePlan", "Generating female workout for " + bmiCategory + " with goal: " + goal);
+
+        boolean includeCardio = shouldIncludeCardio(bmiCategory);
+        int exercisesPerDay = getExercisesPerDay(bmiCategory, false);
+
+        switch (goal) {
+            case "improve_shape":
+                generateFemaleImproveShapeWorkout(sessions, includeCardio, exercisesPerDay);
+                break;
+            case "lean_tone":
+            case "lose_fat":
+                generateFemaleLeanToneWorkout(sessions, exercisesPerDay);
+                break;
+            default:
+                generateFemaleImproveShapeWorkout(sessions, includeCardio, exercisesPerDay);
+                break;
+        }
+    }
+
+    private boolean shouldIncludeCardio(BMICategory bmiCategory) {
+        boolean includeCardio = bmiCategory == BMICategory.OVERWEIGHT || bmiCategory == BMICategory.OBESE ||
+                goal.equals("lean_tone") || goal.equals("lose_fat");
+
+        // Don't include cardio for underweight users
+        if (bmiCategory == BMICategory.UNDERWEIGHT) {
+            includeCardio = false;
+        }
+
+        Log.d("GeneratePlan", "Include cardio: " + includeCardio);
+        return includeCardio;
+    }
+
+    private int getExercisesPerDay(BMICategory bmiCategory, boolean isMale) {
+        int exercises;
+        if (bmiCategory == BMICategory.OBESE) {
+            exercises = 3; // Reduced for obese users
+        } else if (isMale) {
+            exercises = 6; // Standard for males
+        } else {
+            exercises = 5; // Standard for females
+        }
+        Log.d("GeneratePlan", "Exercises per day: " + exercises);
+        return exercises;
+    }
+
+    // MALE WORKOUT IMPLEMENTATIONS
+    private void generateMaleImproveShapeWorkout(List<WorkoutSessionEntity> sessions, boolean addCardio, int exercisesPerDay) {
+        Log.d("GeneratePlan", "Generating male improve_shape workout, " + daysPerWeek + " days");
+
+        switch (daysPerWeek) {
+            case 2:
+                generateMaleUpperLowerSplit(sessions, addCardio, exercisesPerDay);
+                break;
+            case 3:
+                generateMalePushPullLegSplit(sessions, addCardio, exercisesPerDay);
+                break;
+            case 4:
+                generateMalePushPullLegFullBodySplit(sessions, addCardio, exercisesPerDay);
+                break;
+            case 5:
+                generateMalePushPullLegUpperLowerSplit(sessions, addCardio, exercisesPerDay);
+                break;
+            case 6:
+                generateMaleDoublePushPullLegSplit(sessions, addCardio, exercisesPerDay);
+                break;
+            default:
+                generateMalePushPullLegSplit(sessions, addCardio, exercisesPerDay);
+                break;
+        }
+    }
+
+    private void generateMaleLeanToneWorkout(List<WorkoutSessionEntity> sessions, int exercisesPerDay) {
+        Log.d("GeneratePlan", "Generating male lean_tone/lose_fat workout, " + daysPerWeek + " days");
+
+        switch (daysPerWeek) {
+            case 2:
+                generateMaleUpperLowerSplitWithCardio(sessions, exercisesPerDay);
+                break;
+            case 3:
+                generateMalePushPullLegSplitWithCardio(sessions, exercisesPerDay);
+                break;
+            case 4:
+                generateMalePushPullLegCardioSplit(sessions, exercisesPerDay);
+                break;
+            case 5:
+                generateMalePushPullLegFullBodyCardioSplit(sessions, exercisesPerDay);
+                break;
+            case 6:
+                generateMalePushPullLegCardioFullBodyCardioSplit(sessions, exercisesPerDay);
+                break;
+            default:
+                generateMalePushPullLegSplitWithCardio(sessions, exercisesPerDay);
+                break;
+        }
+    }
+
+    // FEMALE WORKOUT IMPLEMENTATIONS
+    private void generateFemaleImproveShapeWorkout(List<WorkoutSessionEntity> sessions, boolean addCardio, int exercisesPerDay) {
+        Log.d("GeneratePlan", "Generating female improve_shape workout, " + daysPerWeek + " days");
+
+        switch (daysPerWeek) {
+            case 2:
+                generateFemaleUpperLowerSplit(sessions, addCardio, exercisesPerDay);
+                break;
+            case 3:
+                generateFemaleLegPullPushSplit(sessions, addCardio, exercisesPerDay);
+                break;
+            case 4:
+                generateFemaleLegPullPushCardioSplit(sessions, exercisesPerDay);
+                break;
+            case 5:
+                generateFemaleLegPullPushCardioLowerSplit(sessions, exercisesPerDay);
+                break;
+            default:
+                generateFemaleLegPullPushSplit(sessions, addCardio, exercisesPerDay);
+                break;
+        }
+    }
+
+    private void generateFemaleLeanToneWorkout(List<WorkoutSessionEntity> sessions, int exercisesPerDay) {
+        Log.d("GeneratePlan", "Generating female lean_tone/lose_fat workout, " + daysPerWeek + " days");
+
+        switch (daysPerWeek) {
+            case 2:
+                generateFemaleUpperLowerSplitWithCardio(sessions, exercisesPerDay);
+                break;
+            case 3:
+                generateFemaleLegPullPushSplitWithCardio(sessions, exercisesPerDay);
+                break;
+            case 4:
+                generateFemaleLegPullPushCardioSplit(sessions, exercisesPerDay);
+                break;
+            case 5:
+                generateFemaleLegPullPushCardioLowerSplit(sessions, exercisesPerDay);
+                break;
+            default:
+                generateFemaleLegPullPushSplitWithCardio(sessions, exercisesPerDay);
+                break;
+        }
+    }
+
+    // MALE WORKOUT SPLIT IMPLEMENTATIONS
+    private void generateMaleUpperLowerSplit(List<WorkoutSessionEntity> sessions, boolean addCardio, int exercisesPerDay) {
+        for (int i = 0; i < sessions.size(); i++) {
+            WorkoutSessionEntity session = sessions.get(i);
+            List<ExerciseEntity> exercises = new ArrayList<>();
+
+            if (i % 2 == 0) { // Upper day
+                exercises.addAll(getRandomExercisesOfParent(CHEST, 2));
+                exercises.addAll(getRandomExercisesOfParent(BACK, 2));
+                exercises.addAll(getRandomExercisesOfParent(SHOULDERS, 1));
+                exercises.addAll(getRandomExercisesOfParent(BICEPS, 1));
+            } else { // Lower day
+                exercises.addAll(getRandomExercisesOfParent(QUADS, 3));
+                exercises.addAll(getRandomExercisesOfParent(GLUTES, 3));
+            }
+
+            if (addCardio) {
+                exercises.addAll(getRandomExercisesOfParent(CARDIO, 1));
+            }
+
+            adjustExerciseCount(exercises, exercisesPerDay);
+            addExercisesToSession(session, exercises);
+        }
+    }
+
+    private void generateMaleUpperLowerSplitWithCardio(List<WorkoutSessionEntity> sessions, int exercisesPerDay) {
+        for (int i = 0; i < sessions.size(); i++) {
+            WorkoutSessionEntity session = sessions.get(i);
+            List<ExerciseEntity> exercises = new ArrayList<>();
+
+            if (i % 2 == 0) { // Upper day + Cardio
+                exercises.addAll(getRandomExercisesOfParent(CHEST, 2));
+                exercises.addAll(getRandomExercisesOfParent(BACK, 2));
+                exercises.addAll(getRandomExercisesOfParent(SHOULDERS, 1));
+                exercises.addAll(getRandomExercisesOfParent(CARDIO, 1));
+            } else { // Lower day + Cardio
+                exercises.addAll(getRandomExercisesOfParent(QUADS, 2));
+                exercises.addAll(getRandomExercisesOfParent(GLUTES, 2));
+                exercises.addAll(getRandomExercisesOfParent(CARDIO, 1));
+            }
+
+            adjustExerciseCount(exercises, exercisesPerDay);
+            addExercisesToSession(session, exercises);
+        }
+    }
+
+    private void generateMalePushPullLegSplit(List<WorkoutSessionEntity> sessions, boolean addCardio, int exercisesPerDay) {
+        for (int i = 0; i < sessions.size(); i++) {
+            WorkoutSessionEntity session = sessions.get(i);
+            List<ExerciseEntity> exercises = new ArrayList<>();
+
+            int dayType = i % 3;
+            switch (dayType) {
+                case 0: // Push
+                    exercises.addAll(getRandomExercisesOfParent(CHEST, 2));
+                    exercises.addAll(getRandomExercisesOfParent(SHOULDERS, 2));
+                    exercises.addAll(getRandomExercisesOfParent(TRICEPS, 2));
+                    break;
+                case 1: // Pull
+                    exercises.addAll(getRandomExercisesOfParent(BACK, 3));
+                    exercises.addAll(getRandomExercisesOfParent(BICEPS, 3));
+                    break;
+                case 2: // Leg
+                    exercises.addAll(getRandomExercisesOfParent(QUADS, 3));
+                    exercises.addAll(getRandomExercisesOfParent(GLUTES, 3));
+                    break;
+            }
+
+            if (addCardio) {
+                exercises.addAll(getRandomExercisesOfParent(CARDIO, 1));
+            }
+
+            adjustExerciseCount(exercises, exercisesPerDay);
+            addExercisesToSession(session, exercises);
+        }
+    }
+
+    private void generateMalePushPullLegSplitWithCardio(List<WorkoutSessionEntity> sessions, int exercisesPerDay) {
+        for (int i = 0; i < sessions.size(); i++) {
+            WorkoutSessionEntity session = sessions.get(i);
+            List<ExerciseEntity> exercises = new ArrayList<>();
+
+            int dayType = i % 3;
+            switch (dayType) {
+                case 0: // Push + Cardio
+                    exercises.addAll(getRandomExercisesOfParent(CHEST, 2));
+                    exercises.addAll(getRandomExercisesOfParent(SHOULDERS, 2));
+                    exercises.addAll(getRandomExercisesOfParent(TRICEPS, 1));
+                    exercises.addAll(getRandomExercisesOfParent(CARDIO, 1));
+                    break;
+                case 1: // Pull + Cardio
+                    exercises.addAll(getRandomExercisesOfParent(BACK, 2));
+                    exercises.addAll(getRandomExercisesOfParent(BICEPS, 2));
+                    exercises.addAll(getRandomExercisesOfParent(CARDIO, 1));
+                    break;
+                case 2: // Leg + Cardio
+                    exercises.addAll(getRandomExercisesOfParent(QUADS, 2));
+                    exercises.addAll(getRandomExercisesOfParent(GLUTES, 2));
+                    exercises.addAll(getRandomExercisesOfParent(CARDIO, 1));
+                    break;
+            }
+
+            adjustExerciseCount(exercises, exercisesPerDay);
+            addExercisesToSession(session, exercises);
+        }
+    }
+
+    private void generateMalePushPullLegFullBodySplit(List<WorkoutSessionEntity> sessions, boolean addCardio, int exercisesPerDay) {
+        for (int i = 0; i < sessions.size(); i++) {
+            WorkoutSessionEntity session = sessions.get(i);
+            List<ExerciseEntity> exercises = new ArrayList<>();
+
+            switch (i) {
+                case 0: // Push
+                    exercises.addAll(getRandomExercisesOfParent(CHEST, 2));
+                    exercises.addAll(getRandomExercisesOfParent(SHOULDERS, 2));
+                    exercises.addAll(getRandomExercisesOfParent(TRICEPS, 2));
+                    break;
+                case 1: // Pull
+                    exercises.addAll(getRandomExercisesOfParent(BACK, 3));
+                    exercises.addAll(getRandomExercisesOfParent(BICEPS, 3));
+                    break;
+                case 2: // Leg
+                    exercises.addAll(getRandomExercisesOfParent(QUADS, 3));
+                    exercises.addAll(getRandomExercisesOfParent(GLUTES, 3));
+                    break;
+                case 3: // Full Body
+                    exercises.addAll(getRandomExercisesOfParent(CHEST, 2));
+                    exercises.addAll(getRandomExercisesOfParent(BACK, 2));
+                    exercises.addAll(getRandomExercisesOfParent(QUADS, 2));
+                    break;
+            }
+
+            if (addCardio) {
+                exercises.addAll(getRandomExercisesOfParent(CARDIO, 1));
+            }
+
+            adjustExerciseCount(exercises, exercisesPerDay);
+            addExercisesToSession(session, exercises);
+        }
+    }
+
+    private void generateMalePushPullLegUpperLowerSplit(List<WorkoutSessionEntity> sessions, boolean addCardio, int exercisesPerDay) {
+        for (int i = 0; i < sessions.size(); i++) {
+            WorkoutSessionEntity session = sessions.get(i);
+            List<ExerciseEntity> exercises = new ArrayList<>();
+
+            switch (i) {
+                case 0: // Push
+                    exercises.addAll(getRandomExercisesOfParent(CHEST, 2));
+                    exercises.addAll(getRandomExercisesOfParent(SHOULDERS, 2));
+                    exercises.addAll(getRandomExercisesOfParent(TRICEPS, 2));
+                    break;
+                case 1: // Pull
+                    exercises.addAll(getRandomExercisesOfParent(BACK, 3));
+                    exercises.addAll(getRandomExercisesOfParent(BICEPS, 3));
+                    break;
+                case 2: // Leg
+                    exercises.addAll(getRandomExercisesOfParent(QUADS, 3));
+                    exercises.addAll(getRandomExercisesOfParent(GLUTES, 3));
+                    break;
+                case 3: // Upper
+                    exercises.addAll(getRandomExercisesOfParent(CHEST, 1));
+                    exercises.addAll(getRandomExercisesOfParent(BACK, 2));
+                    exercises.addAll(getRandomExercisesOfParent(SHOULDERS, 1));
+                    exercises.addAll(getRandomExercisesOfParent(BICEPS, 1));
+                    exercises.addAll(getRandomExercisesOfParent(TRICEPS, 1));
+                    break;
+                case 4: // Lower
+                    exercises.addAll(getRandomExercisesOfParent(QUADS, 3));
+                    exercises.addAll(getRandomExercisesOfParent(GLUTES, 3));
+                    break;
+            }
+
+            if (addCardio) {
+                exercises.addAll(getRandomExercisesOfParent(CARDIO, 1));
+            }
+
+            adjustExerciseCount(exercises, exercisesPerDay);
+            addExercisesToSession(session, exercises);
+        }
+    }
+
+    private void generateMaleDoublePushPullLegSplit(List<WorkoutSessionEntity> sessions, boolean addCardio, int exercisesPerDay) {
+        for (int i = 0; i < sessions.size(); i++) {
+            WorkoutSessionEntity session = sessions.get(i);
+            List<ExerciseEntity> exercises = new ArrayList<>();
+
+            int dayType = i % 3;
+            switch (dayType) {
+                case 0: // Push
+                    exercises.addAll(getRandomExercisesOfParent(CHEST, 2));
+                    exercises.addAll(getRandomExercisesOfParent(SHOULDERS, 2));
+                    exercises.addAll(getRandomExercisesOfParent(TRICEPS, 2));
+                    break;
+                case 1: // Pull
+                    exercises.addAll(getRandomExercisesOfParent(BACK, 3));
+                    exercises.addAll(getRandomExercisesOfParent(BICEPS, 3));
+                    break;
+                case 2: // Leg
+                    exercises.addAll(getRandomExercisesOfParent(QUADS, 3));
+                    exercises.addAll(getRandomExercisesOfParent(GLUTES, 3));
+                    break;
+            }
+
+            if (addCardio) {
+                exercises.addAll(getRandomExercisesOfParent(CARDIO, 1));
+            }
+
+            adjustExerciseCount(exercises, exercisesPerDay);
+            addExercisesToSession(session, exercises);
+        }
+    }
+
+    private void generateMalePushPullLegCardioSplit(List<WorkoutSessionEntity> sessions, int exercisesPerDay) {
+        for (int i = 0; i < sessions.size(); i++) {
+            WorkoutSessionEntity session = sessions.get(i);
+            List<ExerciseEntity> exercises = new ArrayList<>();
+
+            switch (i) {
+                case 0: // Push
+                    exercises.addAll(getRandomExercisesOfParent(CHEST, 2));
+                    exercises.addAll(getRandomExercisesOfParent(SHOULDERS, 2));
+                    exercises.addAll(getRandomExercisesOfParent(TRICEPS, 2));
+                    break;
+                case 1: // Pull
+                    exercises.addAll(getRandomExercisesOfParent(BACK, 3));
+                    exercises.addAll(getRandomExercisesOfParent(BICEPS, 3));
+                    break;
+                case 2: // Leg
+                    exercises.addAll(getRandomExercisesOfParent(QUADS, 3));
+                    exercises.addAll(getRandomExercisesOfParent(GLUTES, 3));
+                    break;
+                case 3: // Cardio
+                    exercises.addAll(getRandomExercisesOfParent(CARDIO, exercisesPerDay));
+                    break;
+            }
+
+            adjustExerciseCount(exercises, exercisesPerDay);
+            addExercisesToSession(session, exercises);
+        }
+    }
+
+    private void generateMalePushPullLegFullBodyCardioSplit(List<WorkoutSessionEntity> sessions, int exercisesPerDay) {
+        for (int i = 0; i < sessions.size(); i++) {
+            WorkoutSessionEntity session = sessions.get(i);
+            List<ExerciseEntity> exercises = new ArrayList<>();
+
+            switch (i) {
+                case 0: // Push
+                    exercises.addAll(getRandomExercisesOfParent(CHEST, 2));
+                    exercises.addAll(getRandomExercisesOfParent(SHOULDERS, 2));
+                    exercises.addAll(getRandomExercisesOfParent(TRICEPS, 2));
+                    break;
+                case 1: // Pull
+                    exercises.addAll(getRandomExercisesOfParent(BACK, 3));
+                    exercises.addAll(getRandomExercisesOfParent(BICEPS, 3));
+                    break;
+                case 2: // Leg
+                    exercises.addAll(getRandomExercisesOfParent(QUADS, 3));
+                    exercises.addAll(getRandomExercisesOfParent(GLUTES, 3));
+                    break;
+                case 3: // Full Body
+                    exercises.addAll(getRandomExercisesOfParent(CHEST, 2));
+                    exercises.addAll(getRandomExercisesOfParent(BACK, 2));
+                    exercises.addAll(getRandomExercisesOfParent(QUADS, 2));
+                    break;
+                case 4: // Cardio
+                    exercises.addAll(getRandomExercisesOfParent(CARDIO, exercisesPerDay));
+                    break;
+            }
+
+            adjustExerciseCount(exercises, exercisesPerDay);
+            addExercisesToSession(session, exercises);
+        }
+    }
+
+    private void generateMalePushPullLegCardioFullBodyCardioSplit(List<WorkoutSessionEntity> sessions, int exercisesPerDay) {
+        for (int i = 0; i < sessions.size(); i++) {
+            WorkoutSessionEntity session = sessions.get(i);
+            List<ExerciseEntity> exercises = new ArrayList<>();
+
+            switch (i) {
+                case 0: // Push
+                    exercises.addAll(getRandomExercisesOfParent(CHEST, 2));
+                    exercises.addAll(getRandomExercisesOfParent(SHOULDERS, 2));
+                    exercises.addAll(getRandomExercisesOfParent(TRICEPS, 2));
+                    break;
+                case 1: // Pull
+                    exercises.addAll(getRandomExercisesOfParent(BACK, 3));
+                    exercises.addAll(getRandomExercisesOfParent(BICEPS, 3));
+                    break;
+                case 2: // Leg
+                    exercises.addAll(getRandomExercisesOfParent(QUADS, 3));
+                    exercises.addAll(getRandomExercisesOfParent(GLUTES, 3));
+                    break;
+                case 3: // Cardio
+                    exercises.addAll(getRandomExercisesOfParent(CARDIO, exercisesPerDay));
+                    break;
+                case 4: // Full Body
+                    exercises.addAll(getRandomExercisesOfParent(CHEST, 2));
+                    exercises.addAll(getRandomExercisesOfParent(BACK, 2));
+                    exercises.addAll(getRandomExercisesOfParent(QUADS, 2));
+                    break;
+                case 5: // Cardio
+                    exercises.addAll(getRandomExercisesOfParent(CARDIO, exercisesPerDay));
+                    break;
+            }
+
+            adjustExerciseCount(exercises, exercisesPerDay);
+            addExercisesToSession(session, exercises);
+        }
+    }
+
+    // FEMALE WORKOUT SPLIT IMPLEMENTATIONS
+    private void generateFemaleUpperLowerSplit(List<WorkoutSessionEntity> sessions, boolean addCardio, int exercisesPerDay) {
+        for (int i = 0; i < sessions.size(); i++) {
+            WorkoutSessionEntity session = sessions.get(i);
+            List<ExerciseEntity> exercises = new ArrayList<>();
+
+            if (i % 2 == 0) { // Upper day
+                exercises.addAll(getRandomExercisesOfParent(CHEST, 1));
+                exercises.addAll(getRandomExercisesOfParent(BACK, 2));
+                exercises.addAll(getRandomExercisesOfParent(SHOULDERS, 1));
+                exercises.addAll(getRandomExercisesOfParent(BICEPS, 1));
+            } else { // Lower day
+                exercises.addAll(getRandomExercisesOfParent(QUADS, 2));
+                exercises.addAll(getRandomExercisesOfParent(GLUTES, 3));
+            }
+
+            if (addCardio) {
+                exercises.addAll(getRandomExercisesOfParent(CARDIO, 1));
+            }
+
+            adjustExerciseCount(exercises, exercisesPerDay);
+            addExercisesToSession(session, exercises);
+        }
+    }
+
+    private void generateFemaleUpperLowerSplitWithCardio(List<WorkoutSessionEntity> sessions, int exercisesPerDay) {
+        for (int i = 0; i < sessions.size(); i++) {
+            WorkoutSessionEntity session = sessions.get(i);
+            List<ExerciseEntity> exercises = new ArrayList<>();
+
+            if (i % 2 == 0) { // Upper day + Cardio
+                exercises.addAll(getRandomExercisesOfParent(CHEST, 1));
+                exercises.addAll(getRandomExercisesOfParent(BACK, 2));
+                exercises.addAll(getRandomExercisesOfParent(SHOULDERS, 1));
+                exercises.addAll(getRandomExercisesOfParent(CARDIO, 1));
+            } else { // Lower day + Cardio
+                exercises.addAll(getRandomExercisesOfParent(QUADS, 2));
+                exercises.addAll(getRandomExercisesOfParent(GLUTES, 2));
+                exercises.addAll(getRandomExercisesOfParent(CARDIO, 1));
+            }
+
+            adjustExerciseCount(exercises, exercisesPerDay);
+            addExercisesToSession(session, exercises);
+        }
+    }
+
+    private void generateFemaleLegPullPushSplit(List<WorkoutSessionEntity> sessions, boolean addCardio, int exercisesPerDay) {
+        for (int i = 0; i < sessions.size(); i++) {
+            WorkoutSessionEntity session = sessions.get(i);
+            List<ExerciseEntity> exercises = new ArrayList<>();
+
+            int dayType = i % 3;
+            switch (dayType) {
+                case 0: // Leg (priority for females)
+                    exercises.addAll(getRandomExercisesOfParent(QUADS, 2));
+                    exercises.addAll(getRandomExercisesOfParent(GLUTES, 3));
+                    break;
+                case 1: // Pull
+                    exercises.addAll(getRandomExercisesOfParent(BACK, 3));
+                    exercises.addAll(getRandomExercisesOfParent(BICEPS, 2));
+                    break;
+                case 2: // Push
+                    exercises.addAll(getRandomExercisesOfParent(CHEST, 2));
+                    exercises.addAll(getRandomExercisesOfParent(SHOULDERS, 2));
+                    exercises.addAll(getRandomExercisesOfParent(TRICEPS, 1));
+                    break;
+            }
+
+            if (addCardio) {
+                exercises.addAll(getRandomExercisesOfParent(CARDIO, 1));
+            }
+
+            adjustExerciseCount(exercises, exercisesPerDay);
+            addExercisesToSession(session, exercises);
+        }
+    }
+
+    private void generateFemaleLegPullPushSplitWithCardio(List<WorkoutSessionEntity> sessions, int exercisesPerDay) {
+        for (int i = 0; i < sessions.size(); i++) {
+            WorkoutSessionEntity session = sessions.get(i);
+            List<ExerciseEntity> exercises = new ArrayList<>();
+
+            int dayType = i % 3;
+            switch (dayType) {
+                case 0: // Leg + Cardio
+                    exercises.addAll(getRandomExercisesOfParent(QUADS, 2));
+                    exercises.addAll(getRandomExercisesOfParent(GLUTES, 2));
+                    exercises.addAll(getRandomExercisesOfParent(CARDIO, 1));
+                    break;
+                case 1: // Pull + Cardio
+                    exercises.addAll(getRandomExercisesOfParent(BACK, 2));
+                    exercises.addAll(getRandomExercisesOfParent(BICEPS, 2));
+                    exercises.addAll(getRandomExercisesOfParent(CARDIO, 1));
+                    break;
+                case 2: // Push + Cardio
+                    exercises.addAll(getRandomExercisesOfParent(CHEST, 1));
+                    exercises.addAll(getRandomExercisesOfParent(SHOULDERS, 2));
+                    exercises.addAll(getRandomExercisesOfParent(TRICEPS, 1));
+                    exercises.addAll(getRandomExercisesOfParent(CARDIO, 1));
+                    break;
+            }
+
+            adjustExerciseCount(exercises, exercisesPerDay);
+            addExercisesToSession(session, exercises);
+        }
+    }
+
+    private void generateFemaleLegPullPushCardioSplit(List<WorkoutSessionEntity> sessions, int exercisesPerDay) {
+        for (int i = 0; i < sessions.size(); i++) {
+            WorkoutSessionEntity session = sessions.get(i);
+            List<ExerciseEntity> exercises = new ArrayList<>();
+
+            switch (i) {
+                case 0: // Leg
+                    exercises.addAll(getRandomExercisesOfParent(QUADS, 2));
+                    exercises.addAll(getRandomExercisesOfParent(GLUTES, 3));
+                    break;
+                case 1: // Pull
+                    exercises.addAll(getRandomExercisesOfParent(BACK, 3));
+                    exercises.addAll(getRandomExercisesOfParent(BICEPS, 2));
+                    break;
+                case 2: // Push
+                    exercises.addAll(getRandomExercisesOfParent(CHEST, 2));
+                    exercises.addAll(getRandomExercisesOfParent(SHOULDERS, 2));
+                    exercises.addAll(getRandomExercisesOfParent(TRICEPS, 1));
+                    break;
+                case 3: // Cardio
+                    exercises.addAll(getRandomExercisesOfParent(CARDIO, exercisesPerDay));
+                    break;
+            }
+
+            adjustExerciseCount(exercises, exercisesPerDay);
+            addExercisesToSession(session, exercises);
+        }
+    }
+
+    private void generateFemaleLegPullPushCardioLowerSplit(List<WorkoutSessionEntity> sessions, int exercisesPerDay) {
+        for (int i = 0; i < sessions.size(); i++) {
+            WorkoutSessionEntity session = sessions.get(i);
+            List<ExerciseEntity> exercises = new ArrayList<>();
+
+            switch (i) {
+                case 0: // Leg
+                    exercises.addAll(getRandomExercisesOfParent(QUADS, 2));
+                    exercises.addAll(getRandomExercisesOfParent(GLUTES, 3));
+                    break;
+                case 1: // Pull
+                    exercises.addAll(getRandomExercisesOfParent(BACK, 3));
+                    exercises.addAll(getRandomExercisesOfParent(BICEPS, 2));
+                    break;
+                case 2: // Push
+                    exercises.addAll(getRandomExercisesOfParent(CHEST, 2));
+                    exercises.addAll(getRandomExercisesOfParent(SHOULDERS, 2));
+                    exercises.addAll(getRandomExercisesOfParent(TRICEPS, 1));
+                    break;
+                case 3: // Cardio
+                    exercises.addAll(getRandomExercisesOfParent(CARDIO, exercisesPerDay));
+                    break;
+                case 4: // Lower (light)
+                    exercises.addAll(getRandomExercisesOfParent(QUADS, 2));
+                    exercises.addAll(getRandomExercisesOfParent(GLUTES, 3));
+                    break;
+            }
+
+            adjustExerciseCount(exercises, exercisesPerDay);
+            addExercisesToSession(session, exercises);
+        }
+    }
+
+    // UTILITY METHODS
+    private Map<Integer, List<ExerciseEntity>> groupExercisesByParent() {
         List<ExerciseEntity> exercises = exerciseRepository.getAllExercises();
         List<MuscleGroupEntity> allMuscles = muscleGroupRepository.getListMuscleGroup();
         Map<Integer, List<ExerciseEntity>> groupedByParent = new HashMap<>();
@@ -102,473 +798,160 @@ public class GeneratePlan {
         return groupedByParent;
     }
 
-    List<ExerciseEntity> getRandomExercisesOfParent(int parentId, int count) {
+    private List<ExerciseEntity> getRandomExercisesOfParent(int parentId, int count) {
         Map<Integer, List<ExerciseEntity>> grouped = groupExercisesByParent();
         List<ExerciseEntity> list = grouped.getOrDefault(parentId, new ArrayList<>());
-        if (list.size() <= count) return new ArrayList<>(list);
+
+        if (list.isEmpty()) {
+            Log.w("GeneratePlan", "No exercises found for muscle group: " + parentId);
+            return new ArrayList<>();
+        }
+
+        if (list.size() <= count) {
+            Log.d("GeneratePlan", "Returning all " + list.size() + " exercises for muscle group: " + parentId);
+            return new ArrayList<>(list);
+        }
 
         Collections.shuffle(list);
-        return new ArrayList<>(list.subList(0, count));
-    }
-    public int getRandomNumberFromList (List < Integer > numbers) {
-        if (numbers == null || numbers.isEmpty()) {
-            throw new IllegalArgumentException("Danh sách rỗng!");
-        }
-
-        Random random = new Random();
-        return numbers.get(random.nextInt(numbers.size()));
+        List<ExerciseEntity> result = new ArrayList<>(list.subList(0, count));
+        Log.d("GeneratePlan", "Selected " + result.size() + " exercises from " + list.size() + " available for muscle group: " + parentId);
+        return result;
     }
 
-        void insertExerciseCase1() {
-
-        List<ExerciseEntity> pushExercises1 = getRandomExercisesOfParent(1, 2);
-        List<ExerciseEntity> pushExercises2 = getRandomExercisesOfParent(2, 2);
-        List<ExerciseEntity> pushExercises3 = getRandomExercisesOfParent(5, 2);
-        List<ExerciseEntity> pushExercises4 = getRandomExercisesOfParent(1, 2);
-        List<ExerciseEntity> pushExercises5 = getRandomExercisesOfParent(2, 2);
-        List<ExerciseEntity> pushExercises6 = getRandomExercisesOfParent(5, 2);
-
-
-
-        List<ExerciseEntity> pullExercises1 = getRandomExercisesOfParent(3, 3);
-        List<ExerciseEntity> pullExercises2 = getRandomExercisesOfParent(4, 3);
-        List<ExerciseEntity> pullExercises3 = getRandomExercisesOfParent(3, 3);
-        List<ExerciseEntity> pullExercises4 = getRandomExercisesOfParent(4, 3);
-
-        List<ExerciseEntity> legExercise1 = getRandomExercisesOfParent(6, 3);
-        List<ExerciseEntity> legExercise2 = getRandomExercisesOfParent(7, 3);
-        List<ExerciseEntity> legExercise3 = getRandomExercisesOfParent(6, 3);
-        List<ExerciseEntity> legExercise4 = getRandomExercisesOfParent(7, 3);
-
-        //upper
-        List<Integer> optionsPush = Arrays.asList(1, 2, 5);
-        List<Integer> optionsPull = Arrays.asList(3, 4);
-        int randomNumberPush = getRandomNumberFromList(optionsPush);
-        int randomNumberPull = getRandomNumberFromList(optionsPull);
-
-        List<ExerciseEntity> upperExercises1 = getRandomExercisesOfParent(randomNumberPush, 3);
-        List<ExerciseEntity> upperExercises2 = getRandomExercisesOfParent(randomNumberPull, 3);
-
-        //FullBody
-        List<Integer> optionsPushFullBody = Arrays.asList(1, 2, 5);
-        List<Integer> optionsPullFullBody = Arrays.asList(3, 4);
-        List<Integer> optionsLegFullBody = Arrays.asList(6, 7);
-        int randomNumberPushFB = getRandomNumberFromList(optionsPushFullBody);
-        int randomNumberPullFB = getRandomNumberFromList(optionsPullFullBody);
-        int randomNumberLegFB = getRandomNumberFromList(optionsLegFullBody);
-        List<ExerciseEntity> fullBodyExercises1 = getRandomExercisesOfParent(randomNumberPushFB, 2);
-        List<ExerciseEntity> fullBodyExercises2 = getRandomExercisesOfParent(randomNumberPullFB, 2);
-        List<ExerciseEntity> fullBodyExercises3 = getRandomExercisesOfParent(randomNumberLegFB, 2);
-
-
-        List<WorkoutSessionEntity> workoutSessions = workoutSessionRepository.getWorkoutSessionsByPlanId(planId);
-        for (WorkoutSessionEntity wS : workoutSessions) {
-            if (wS.getDate().equals("Ngày 1")) {
-                for (ExerciseEntity ex : pushExercises1) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-                for (ExerciseEntity ex : pushExercises2) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-                for (ExerciseEntity ex : pushExercises3) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-
-            } else if (wS.getDate().equals("Ngày 2")) {
-                for (ExerciseEntity ex : pullExercises1) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-                for (ExerciseEntity ex : pullExercises2) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-            } else if (wS.getDate().equals("Ngày 3")) {
-                for (ExerciseEntity ex : legExercise1) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-                for (ExerciseEntity ex : legExercise2) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-            } else if ("Ngày 4".equals(wS.getDate()) && daysPerWeek == 6) {
-                for (ExerciseEntity ex : pushExercises4) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-                for (ExerciseEntity ex : pushExercises5) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-                for (ExerciseEntity ex : pushExercises6) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-            } else if ("Ngày 4".equals(wS.getDate()) && daysPerWeek == 5) {
-                for (ExerciseEntity ex : upperExercises1) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-                for (ExerciseEntity ex : upperExercises2) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-            } else if ("Ngày 4".equals(wS.getDate()) && daysPerWeek == 4) {
-                for (ExerciseEntity ex : fullBodyExercises1) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-                for (ExerciseEntity ex : fullBodyExercises2) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-                for (ExerciseEntity ex : fullBodyExercises3) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-            } else if ("Ngày 5".equals(wS.getDate()) && daysPerWeek == 6) {
-                for (ExerciseEntity ex : pullExercises3) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-                for (ExerciseEntity ex : pullExercises4) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-            } else if ("Ngày 5".equals(wS.getDate()) && daysPerWeek == 5) {
-                for (ExerciseEntity ex : legExercise3) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-                for (ExerciseEntity ex : legExercise4) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-
-            } else if ("Ngày 6".equals(wS.getDate()) && daysPerWeek == 6) {
-                for (ExerciseEntity ex : legExercise3) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-                for (ExerciseEntity ex : legExercise4) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
+    private void adjustExerciseCount(List<ExerciseEntity> exercises, int targetCount) {
+        // Remove duplicates first
+        List<ExerciseEntity> uniqueExercises = new ArrayList<>();
+        for (ExerciseEntity exercise : exercises) {
+            boolean exists = false;
+            for (ExerciseEntity unique : uniqueExercises) {
+                if (unique.getExerciseId() == exercise.getExerciseId()) {
+                    exists = true;
+                    break;
                 }
             }
+            if (!exists) {
+                uniqueExercises.add(exercise);
+            }
+        }
+        exercises.clear();
+        exercises.addAll(uniqueExercises);
+
+        // Add more exercises if needed
+        while (exercises.size() < targetCount) {
+            List<Integer> muscleGroups = Arrays.asList(CHEST, SHOULDERS, BACK, BICEPS, TRICEPS, QUADS, GLUTES);
+            int randomMuscle = muscleGroups.get(new Random().nextInt(muscleGroups.size()));
+            List<ExerciseEntity> additional = getRandomExercisesOfParent(randomMuscle, 1);
+            if (!additional.isEmpty()) {
+                ExerciseEntity newExercise = additional.get(0);
+                boolean exists = false;
+                for (ExerciseEntity existing : exercises) {
+                    if (existing.getExerciseId() == newExercise.getExerciseId()) {
+                        exists = true;
+                        break;
+                    }
+                }
+                if (!exists) {
+                    exercises.add(newExercise);
+                }
+            }
+        }
+
+        // Remove excess exercises if needed
+        while (exercises.size() > targetCount) {
+            exercises.remove(exercises.size() - 1);
+        }
+
+        Log.d("GeneratePlan", "Adjusted exercise count to: " + exercises.size() + " (target: " + targetCount + ")");
+    }
+
+    private void addExercisesToSession(WorkoutSessionEntity session, List<ExerciseEntity> exercises) {
+        Log.d("GeneratePlan", "Adding " + exercises.size() + " exercises to session: " + session.getDate());
+
+        for (int i = 0; i < exercises.size(); i++) {
+            ExerciseEntity exercise = exercises.get(i);
+            SessionExerciseEntity sessionExercise = new SessionExerciseEntity(
+                    session.getSessionId(),
+                    exercise.getExerciseId(),
+                    i + 1, // order
+                    "60s", // rest time
+                    getSetsForBMI(), // sets based on BMI
+                    getRepsForBMI(), // reps based on BMI
+                    false, // completed
+                    false // skipped
+            );
+            sessionExerciseRepository.insertSessionExercise(sessionExercise);
         }
     }
 
-
-
-        void insertExerciseCase2 () {
-
-            List<ExerciseEntity> pushExercises1 = getRandomExercisesOfParent(1, 2);
-            List<ExerciseEntity> pushExercises2 = getRandomExercisesOfParent(2, 2);
-            List<ExerciseEntity> pushExercises3 = getRandomExercisesOfParent(5, 2);
-            List<ExerciseEntity> pushExercises7;
-            List<ExerciseEntity> pushExercises8 ;
-            List<ExerciseEntity> pushExercises9;
-
-            List<ExerciseEntity> pullExercises1 = getRandomExercisesOfParent(3, 3);
-            List<ExerciseEntity> pullExercises2 = getRandomExercisesOfParent(4, 3);
-            List<ExerciseEntity> pullExercises3 = getRandomExercisesOfParent(3, 2);
-            List<ExerciseEntity> pullExercises4 = getRandomExercisesOfParent(4, 2);
-
-            List<ExerciseEntity> legExercise1 = getRandomExercisesOfParent(6, 3);
-            List<ExerciseEntity> legExercise2 = getRandomExercisesOfParent(7, 3);
-            List<ExerciseEntity> legExercise3 = getRandomExercisesOfParent(6, 2);
-            List<ExerciseEntity> legExercise4 = getRandomExercisesOfParent(7, 2);
-
-            // 5 bài + 1 cardio
-            List<ExerciseEntity> cardioExercisesRd = getRandomExercisesOfParent(29, 1);
-            List<ExerciseEntity> cardioExercisesRd2 = getRandomExercisesOfParent(29, 1);
-            List<ExerciseEntity> cardioExercisesRd3 = getRandomExercisesOfParent(29, 1);
-
-            List<Integer> optionsPushRd = Arrays.asList(1, 2, 5);
-            int randomNumberPushRd = getRandomNumberFromList(optionsPushRd);
-             pushExercises7 = getRandomExercisesOfParent(randomNumberPushRd, 1);
-            if (randomNumberPushRd == 1){
-                 pushExercises8 = getRandomExercisesOfParent(2, 2);
-                 pushExercises9 = getRandomExercisesOfParent(5, 2);
-
-            } else if (randomNumberPushRd == 2) {
-                pushExercises8 = getRandomExercisesOfParent(1, 2);
-                pushExercises9 = getRandomExercisesOfParent(5, 2);
-
-            }else{
-                pushExercises8 = getRandomExercisesOfParent(1, 2);
-                pushExercises9 = getRandomExercisesOfParent(2, 2);
-            }
-            //cardio
-            List<ExerciseEntity> cardioExercises = getRandomExercisesOfParent(29, 6);
-
-
-            //FullBody
-            List<Integer> optionsPushFullBody = Arrays.asList(1, 2, 5);
-            List<Integer> optionsPullFullBody = Arrays.asList(3, 4);
-            List<Integer> optionsLegFullBody = Arrays.asList(6, 7);
-            int randomNumberPushFB = getRandomNumberFromList(optionsPushFullBody);
-            int randomNumberPullFB = getRandomNumberFromList(optionsPullFullBody);
-            int randomNumberLegFB = getRandomNumberFromList(optionsLegFullBody);
-            List<ExerciseEntity> fullBodyExercises1 = getRandomExercisesOfParent(randomNumberPushFB, 2);
-            List<ExerciseEntity> fullBodyExercises2 = getRandomExercisesOfParent(randomNumberPullFB, 2);
-            List<ExerciseEntity> fullBodyExercises3 = getRandomExercisesOfParent(randomNumberLegFB, 2);
-
-
-            List<WorkoutSessionEntity> workoutSessions = workoutSessionRepository.getWorkoutSessionsByPlanId(planId);
-            for (WorkoutSessionEntity wS : workoutSessions) {
-                if (wS.getDate().equals("Ngày 1")) {
-                    for (ExerciseEntity ex : pushExercises1) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-                    for (ExerciseEntity ex : pushExercises2) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-                    for (ExerciseEntity ex : pushExercises3) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-
-                } else if ("Ngày 1".equals(wS.getDate())&& daysPerWeek == 3) {
-                    for (ExerciseEntity ex : pushExercises7) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-                    for (ExerciseEntity ex : pushExercises8) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-                    for (ExerciseEntity ex : pushExercises9) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-                    for (ExerciseEntity ex : cardioExercisesRd) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-                } else if (wS.getDate().equals("Ngày 2")) {
-                    for (ExerciseEntity ex : pullExercises1) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-                    for (ExerciseEntity ex : pullExercises2) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-                } else if ("Ngày 2".equals(wS.getDate())&& daysPerWeek == 3) {
-                    for (ExerciseEntity ex : pullExercises3) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-                    for (ExerciseEntity ex : pullExercises4) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-                    for (ExerciseEntity ex : cardioExercisesRd2) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-                } else if (wS.getDate().equals("Ngày 3")) {
-                    for (ExerciseEntity ex : legExercise1) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-                    for (ExerciseEntity ex : legExercise2) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-
-                } else if ("Ngày 3".equals(wS.getDate()) && daysPerWeek == 3){
-                    for (ExerciseEntity ex : legExercise3) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-                    for (ExerciseEntity ex : legExercise4) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-                    for (ExerciseEntity ex : cardioExercisesRd3) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-                } else if ("Ngày 4".equals(wS.getDate()) && daysPerWeek == 6) {
-                    for (ExerciseEntity ex : cardioExercises) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-
-                } else if ("Ngày 4".equals(wS.getDate()) && daysPerWeek == 5) {
-                    for (ExerciseEntity ex : fullBodyExercises1) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-                    for (ExerciseEntity ex : fullBodyExercises2) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-                    for (ExerciseEntity ex : fullBodyExercises3) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-
-                } else if ("Ngày 4".equals(wS.getDate()) && daysPerWeek == 4) {
-                    for (ExerciseEntity ex : cardioExercises) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-                } else if ("Ngày 5".equals(wS.getDate()) && daysPerWeek == 6) {
-                    for (ExerciseEntity ex : fullBodyExercises1) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-                    for (ExerciseEntity ex : fullBodyExercises2) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-                    for (ExerciseEntity ex : fullBodyExercises3) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-                }  else if ("Ngày 5".equals(wS.getDate()) && daysPerWeek == 5) {
-                    for (ExerciseEntity ex : cardioExercises) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-                }
-                else if ("Ngày 6".equals(wS.getDate()) && daysPerWeek == 6) {
-                    for (ExerciseEntity ex : cardioExercises) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-                }
-            }
-        }
-
-
-
-        void insertExerciseCase4 () {
-
-        List<ExerciseEntity> pushExercises1 = getRandomExercisesOfParent(1, 2);
-        List<ExerciseEntity> pushExercises2 = getRandomExercisesOfParent(2, 2);
-        List<ExerciseEntity> pushExercises3 = getRandomExercisesOfParent(5, 2);
-      
-
-        List<ExerciseEntity> pullExercises1 = getRandomExercisesOfParent(3, 3);
-        List<ExerciseEntity> pullExercises2 = getRandomExercisesOfParent(4, 3);
-        
-        List<ExerciseEntity> legExercise1 = getRandomExercisesOfParent(6, 3);
-        List<ExerciseEntity> legExercise2 = getRandomExercisesOfParent(7, 3);
-        List<ExerciseEntity> legExercise3 = getRandomExercisesOfParent(6, 3);
-        List<ExerciseEntity> legExercise4 = getRandomExercisesOfParent(7, 3);
-
-        
-        //cardio
-        List<ExerciseEntity> cardioExercises = getRandomExercisesOfParent(29, 6);
-        
-        
-        List<WorkoutSessionEntity> workoutSessions = workoutSessionRepository.getWorkoutSessionsByPlanId(planId);
-        for (WorkoutSessionEntity wS : workoutSessions) {
-            if (wS.getDate().equals("Ngày 1")) {
-                for (ExerciseEntity ex : legExercise1) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-                for (ExerciseEntity ex : legExercise2) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-
-
-            }  else if (wS.getDate().equals("Ngày 2")) {
-                for (ExerciseEntity ex : pullExercises1) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-                for (ExerciseEntity ex : pullExercises2) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-            } else if (wS.getDate().equals("Ngày 3")) {
-                for (ExerciseEntity ex : pushExercises1) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-                for (ExerciseEntity ex : pushExercises2) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-                for (ExerciseEntity ex : pushExercises3) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-
-            }else if ("Ngày 4".equals(wS.getDate())) {
-                for (ExerciseEntity ex : cardioExercises) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-
-            }
-             else if ("Ngày 5".equals(wS.getDate())) {
-                for (ExerciseEntity ex : legExercise3) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                } 
-                for (ExerciseEntity ex : legExercise4) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-            }
-
+    private int getSetsForBMI() {
+        BMICategory category = getBMICategory();
+        switch (category) {
+            case UNDERWEIGHT:
+                return 4; // More sets for muscle building
+            case NORMAL:
+                return 3;
+            case OVERWEIGHT:
+                return 3;
+            case OBESE:
+                return 2; // Fewer sets, focus on movement
+            default:
+                return 3;
         }
     }
 
-        void insertExerciseCaseSpecCase1Case4 () {
-            //upper
-            List<Integer> optionsPush = Arrays.asList(1, 2, 5);
-            List<Integer> optionsPull = Arrays.asList(3, 4);
-            int randomNumberPush = getRandomNumberFromList(optionsPush);
-            int randomNumberPull = getRandomNumberFromList(optionsPull);
-
-            List<ExerciseEntity> upperExercises1 = getRandomExercisesOfParent(randomNumberPush, 3);
-            List<ExerciseEntity> upperExercises2 = getRandomExercisesOfParent(randomNumberPull, 3);
-
-            List<ExerciseEntity> legExercise1 = getRandomExercisesOfParent(6, 3);
-            List<ExerciseEntity> legExercise2 = getRandomExercisesOfParent(7, 3);
-
-            List<WorkoutSessionEntity> workoutSessions = workoutSessionRepository.getWorkoutSessionsByPlanId(planId);
-            for (WorkoutSessionEntity wS : workoutSessions) {
-                if (wS.getDate().equals("Ngày 1")) {
-                    for (ExerciseEntity ex : upperExercises1) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-                    for (ExerciseEntity ex : upperExercises2) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-                } else if ("Ngày 2".equals(wS.getDate())) {
-                    for (ExerciseEntity ex : legExercise1) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-                    for (ExerciseEntity ex : legExercise2) {
-                        sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                    }
-                }
-            }
-        }
-
-        void insertExerciseCaseSpecCase2Case3 () {
-        //upper
-        List<Integer> optionsPush = Arrays.asList(1, 2, 5);
-        List<Integer> optionsPull = Arrays.asList(3, 4);
-        int randomNumberPush = getRandomNumberFromList(optionsPush);
-        int randomNumberPull = getRandomNumberFromList(optionsPull);
-            List<ExerciseEntity> upperExercises1;
-            List<ExerciseEntity> upperExercises2;
-        int rd = getRandomNumberFromList(new ArrayList<>(Arrays.asList(randomNumberPush,randomNumberPull)));
-        if(rd == randomNumberPush){
-             upperExercises1 = getRandomExercisesOfParent(randomNumberPush, 2);
-             upperExercises2 = getRandomExercisesOfParent(randomNumberPull, 3);
-
-        }else{
-             upperExercises1 = getRandomExercisesOfParent(randomNumberPull, 3);
-             upperExercises2 = getRandomExercisesOfParent(randomNumberPush, 2);
-        }
-
-
-            List<Integer> optionsLeg = Arrays.asList(6, 7);
-            List<ExerciseEntity> legExercise1;
-            List<ExerciseEntity> legExercise2;
-            int randomNumberLeg = getRandomNumberFromList(optionsLeg);
-            if (randomNumberLeg == 6){
-                 legExercise1 = getRandomExercisesOfParent(6, 2);
-                 legExercise2 = getRandomExercisesOfParent(7, 3);
-
-            }else{
-                 legExercise1 = getRandomExercisesOfParent(6, 3);
-                 legExercise2 = getRandomExercisesOfParent(7, 2);
-            }
-
-
-
-        List<ExerciseEntity> cardioExercisesRd = getRandomExercisesOfParent(29, 1);
-        List<ExerciseEntity> cardioExercisesRd2 = getRandomExercisesOfParent(29, 1);
-
-
-
-        List<WorkoutSessionEntity> workoutSessions = workoutSessionRepository.getWorkoutSessionsByPlanId(planId);
-        for (WorkoutSessionEntity wS : workoutSessions) {
-            if (wS.getDate().equals("Ngày 1")) {
-                for (ExerciseEntity ex : upperExercises1) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-                for (ExerciseEntity ex : upperExercises2) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-                for (ExerciseEntity ex : cardioExercisesRd) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-            } else if ("Ngày 2".equals(wS.getDate())) {
-                for (ExerciseEntity ex : legExercise1) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-                for (ExerciseEntity ex : legExercise2) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-                for (ExerciseEntity ex : cardioExercisesRd2) {
-                    sessionExerciseRepository.insertSessionExercise(new SessionExerciseEntity(wS.getSessionId(), ex.getExerciseId(), 1, "60s", 3, 10, false, false));
-                }
-            }
+    private int getRepsForBMI() {
+        BMICategory category = getBMICategory();
+        switch (category) {
+            case UNDERWEIGHT:
+                return 8; // Lower reps, higher weight for muscle building
+            case NORMAL:
+                return 10;
+            case OVERWEIGHT:
+                return 12; // Higher reps for fat burning
+            case OBESE:
+                return 10; // Moderate reps
+            default:
+                return 10;
         }
     }
 
+    private void addSpecialNotes() {
+        WorkoutPlanEntity workoutPlan = workoutPlanRepository.getWorkoutPlanById(planId);
+        if (workoutPlan == null) {
+            Log.w("GeneratePlan", "Workout plan not found for ID: " + planId);
+            return;
+        }
+
+        String note = "";
+        BMICategory category = getBMICategory();
+
+        switch (category) {
+            case UNDERWEIGHT:
+                note = "Tạ nhẹ - Tập trung tăng cơ, không nên tập quá nặng. Ăn nhiều protein và carb để tăng cân.";
+                break;
+            case OVERWEIGHT:
+                note = "Tăng cường cardio 2-3 lần mỗi tuần. Kết hợp chế độ ăn cân bằng để giảm cân hiệu quả.";
+                break;
+            case OBESE:
+                note = "Tập trung giảm cân, bảo vệ khớp. Ưu tiên máy tập thay vì tạ tự do. Kết hợp chế độ ăn thâm hụt calo và cardio nhẹ nhàng.";
+                break;
+            default:
+                if ("lose_fat".equals(goal)) {
+                    note = "Chế độ ăn nên nạp nhiều protein, ít carb và hạn chế đồ dầu mỡ nhé";
+                } else if ("lean_tone".equals(goal)) {
+                    note = "Kết hợp tập luyện với cardio để có thân hình săn chắc, cân đối";
+                }
+                break;
+        }
+
+        if (!note.isEmpty()) {
+            workoutPlan.setNote(note);
+            workoutPlanRepository.updateWorkoutPlan(workoutPlan);
+            Log.d("GeneratePlan", "Added special note: " + note);
+        }
     }
 
-
+    private enum BMICategory {
+        UNDERWEIGHT, NORMAL, OVERWEIGHT, OBESE
+    }
+}
