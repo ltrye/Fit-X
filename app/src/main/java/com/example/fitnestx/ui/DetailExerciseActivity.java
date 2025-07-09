@@ -34,6 +34,8 @@ import com.example.fitnestx.data.entity.SessionExerciseEntity;
 import com.example.fitnestx.data.repository.ExerciseRepository;
 import com.example.fitnestx.data.repository.SessionExerciseRepository;
 import com.example.fitnestx.viewmodel.ExerciseWithSessionStatus;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -67,14 +69,16 @@ public class DetailExerciseActivity extends AppCompatActivity {
         Intent intent = getIntent();
         currentIndex = intent.getIntExtra("currentIndex", 0);
         exerciseList = (List<ExerciseWithSessionStatus>) intent.getSerializableExtra("exerciseList");
+
+
         // Khởi tạo views
         initViews();
-
+        // Thiết lập UI và sự kiện
+        setupUI();
         // Thiết lập ExoPlayer
         setupPlayer();
 
-        // Thiết lập UI và sự kiện
-        setupUI();
+
 
     }
 
@@ -96,12 +100,29 @@ public class DetailExerciseActivity extends AppCompatActivity {
 
         // Tải video từ tài nguyên
         try {
-            MediaItem mediaItem = MediaItem.fromUri("android.resource://" + getPackageName() + "/" + R.raw.tiktok);
-            player.setMediaItem(mediaItem);
-            player.prepare();
-            player.play();
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference videoRef = storage.getReference().child(exerciseEntity.getVideoURL());
+
+            // 👇 LẤY URL HTTP TỪ FIREBASE
+            videoRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                MediaItem mediaItem = MediaItem.fromUri(uri);
+                player.setMediaItem(mediaItem);
+                player.prepare();
+                player.play();
+            }).addOnFailureListener(e -> {
+                Log.e(TAG, "Lỗi lấy video URL từ Firebase: " + e.getMessage());
+                Log.d("haha",exerciseEntity.getName());
+                Log.d("haha",exerciseEntity.getImageUrl());
+                Toast.makeText(this, "Không thể phát video", Toast.LENGTH_SHORT).show();
+            });
+//            MediaItem mediaItem = MediaItem.fromUri(String.valueOf(videoRef));
+//            player.setMediaItem(mediaItem);
+//            player.prepare();
+//            player.play();
             playerView.setShowFastForwardButton(true);
             playerView.setShowRewindButton(true);
+
+
 
 
             playerView.setFullscreenButtonClickListener(isFullscreen -> {
@@ -127,6 +148,10 @@ public class DetailExerciseActivity extends AppCompatActivity {
         player.addListener(new Player.Listener() {
             @Override
             public void onPlaybackStateChanged(int state) {
+                if (state == Player.STATE_READY) {
+                    long duration = player.getDuration();
+                    Log.d("EXOPLAYER", "Duration: " + duration); // duration phải > 0
+                }
                 if (state == Player.STATE_ENDED) {
                     runOnUiThread(() -> {
                         nextButton.setEnabled(true);

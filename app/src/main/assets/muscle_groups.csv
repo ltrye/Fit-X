@@ -1,11 +1,11 @@
 muscleGroupId,name,recoveryTimeInHours,parentId,image,spec
-1,Ngực,0.0,,,Push
-2,Vai,0.0,,,Push
-3,Lưng,0.0,,,Pull
-4,Tay trước,0.0,,,Pull
-5,Tay sau,0.0,,,Push
-6,Cơ mông,0.0,,,Lower
-7,Chân,0.0,,,Lower
+1,Ngực,0.0,,nguc,Push
+2,Vai,0.0,,vai,Push
+3,Lưng,0.0,,lung,Pull
+4,Tay trước,0.0,,taytrc,Pull
+5,Tay sau,0.0,,taysau,Push
+6,Cơ mông,0.0,,mong,Lower
+7,Chân,0.0,,chan,Lower
 8,Ngực dưới,0.0,1,,Push
 9,Ngực giữa,0.0,1,,Push
 10,Ngực trên,0.0,1,,Push
@@ -27,4 +27,4 @@ muscleGroupId,name,recoveryTimeInHours,parentId,image,spec
 26,Đùi trước,0.0,7,,Lower
 27,Đùi ngoài,0.0,7,,Lower
 28,Đùi trong,0.0,7,,Lower
-29,Cardio,0.0,,,Cardio
+29,Cardio,0.0,,cardio,Cardio
