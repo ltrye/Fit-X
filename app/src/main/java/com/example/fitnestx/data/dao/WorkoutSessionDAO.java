@@ -32,6 +32,9 @@ public interface WorkoutSessionDAO {
     @Query("SELECT * FROM WORKOUT_SESSION WHERE planId = :planId")
     List<WorkoutSessionEntity> getWorkoutSessionsByPlanIdList(int planId);
 
+
+    @Query("DELETE FROM WORKOUT_SESSION WHERE planId =:planId")
+    void deleteAllWorkoutSessionsForPlan(int planId);
     @Query("DELETE FROM WORKOUT_SESSION")
     void deleteAllWorkoutSessions();
 
