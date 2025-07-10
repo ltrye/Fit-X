@@ -18,13 +18,16 @@ public class ExerciseRepository {
         AppDatabase appDatabase = AppDatabase.getInstance(context);
         exerciseDAO = appDatabase.exerciseDAO();
     }
+    public String GetDesByExId(int exerciseId){
+        return exerciseDAO.GetDesByExId(exerciseId);
+    }
 
     public void insertExercise(ExerciseEntity exercise) {
         new Thread(() -> exerciseDAO.insertExercise(exercise)).start();
     }
 
-    public LiveData<List<ExerciseEntity>> getAllExercises() {
-        return exerciseDAO.getAllExercises();
+    public List<ExerciseEntity> getAllExercises() {
+        return exerciseDAO.getListOfExercises();
     }
 
     public ExerciseEntity getExerciseById(int exerciseId) {

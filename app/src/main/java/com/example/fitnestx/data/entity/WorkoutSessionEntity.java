@@ -3,6 +3,7 @@ package com.example.fitnestx.data.entity;
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import com.example.fitnestx.data.model.WorkoutSession;
@@ -21,6 +22,13 @@ public class WorkoutSessionEntity implements WorkoutSession {
 
     public WorkoutSessionEntity(int sessionId, int planId, String date, int intensity, boolean isCompleted) {
         this.sessionId = sessionId;
+        this.planId = planId;
+        this.date = date;
+        this.intensity = intensity;
+        this.isCompleted = isCompleted;
+    }
+    @Ignore
+    public WorkoutSessionEntity(int planId, String date, int intensity, boolean isCompleted) {
         this.planId = planId;
         this.date = date;
         this.intensity = intensity;

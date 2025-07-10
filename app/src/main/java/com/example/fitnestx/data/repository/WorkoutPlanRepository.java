@@ -31,8 +31,8 @@ public class WorkoutPlanRepository {
         return workoutPlanDAO.getWorkoutPlanById(planId);
     }
 
-    public LiveData<List<WorkoutPlanEntity>> getWorkoutPlansByUserId(int userId) {
-        return workoutPlanDAO.getWorkoutPlansByUserId(userId);
+    public WorkoutPlanEntity getWorkoutPlansByUserId(int userId) {
+        return workoutPlanDAO.getWorkoutPlanEntityByUserId(userId);
     }
 
     public void updateWorkoutPlan(WorkoutPlanEntity plan) {

@@ -16,13 +16,18 @@ import java.util.List;
 public interface SessionExerciseDAO {
     @Query("SELECT * FROM SESSION_EXERCISE")
     LiveData<List<SessionExerciseEntity>> getAllSessionExercises();
+    @Query("SELECT exerciseId FROM SESSION_EXERCISE WHERE sessionId = :sessionId")
+    List<Integer> GetListIdExercsieBySessionId(int sessionId);
 
     @Query("SELECT * FROM SESSION_EXERCISE WHERE sessionId = :sessionId AND exerciseId = :exerciseId")
     SessionExerciseEntity getSessionExercise(int sessionId, int exerciseId);
 
     @Query("SELECT * FROM SESSION_EXERCISE WHERE sessionId = :sessionId")
     LiveData<List<SessionExerciseEntity>> getExercisesBySessionId(int sessionId);
-
+    @Query("SELECT * FROM SESSION_EXERCISE WHERE sessionId = :sessionId")
+    List<SessionExerciseEntity> getExercisesListBySessionId(int sessionId);
+    @Query("SELECT COUNT(*) FROM SESSION_EXERCISE WHERE sessionId = :sessionId")
+    int TotalSessionExercise(int sessionId);
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertSessionExercise(SessionExerciseEntity sessionExercise);
 
@@ -34,4 +39,6 @@ public interface SessionExerciseDAO {
 
     @Query("DELETE FROM SESSION_EXERCISE")
     void deleteAllSessionExercises();
+
+
 }

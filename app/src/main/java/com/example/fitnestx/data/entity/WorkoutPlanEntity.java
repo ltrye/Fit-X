@@ -17,14 +17,24 @@ public class WorkoutPlanEntity implements WorkoutPlan {
     private String durationInWeeks;
     private int daysPerWeek;
     private boolean isActive;
+    private String note;
 
-    public WorkoutPlanEntity(int planId, int userId, String startDate, String durationInWeeks, int daysPerWeek, boolean isActive) {
+    public WorkoutPlanEntity(int planId, int userId, String startDate, String durationInWeeks, int daysPerWeek, boolean isActive, String note) {
         this.planId = planId;
         this.userId = userId;
         this.startDate = startDate;
         this.durationInWeeks = durationInWeeks;
         this.daysPerWeek = daysPerWeek;
         this.isActive = isActive;
+        this.note = note;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 
     public void setPlanId(int planId) {

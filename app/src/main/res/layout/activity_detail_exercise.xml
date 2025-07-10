@@ -4,12 +4,19 @@
     android:layout_height="match_parent"
     android:background="@color/background_color">
 
+    <!-- Top Menu Fragment -->
+    <FrameLayout
+        android:id="@+id/fragment_top_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true" />
+
     <!-- Close button -->
     <ImageView
         android:id="@+id/close_button"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/fragment_top_menu"
         android:layout_alignParentStart="true"
         android:layout_margin="16dp"
         android:src="@drawable/ic_close"
@@ -35,7 +42,7 @@
         app:show_buffering="when_playing"
         app:show_vr_button="true"
         />
-<!--    android:background="@drawable/rounded_background"-->
+    <!--    android:background="@drawable/rounded_background"-->
     <!-- Content below video -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -55,15 +62,6 @@
             android:textStyle="bold"
             android:textColor="@color/text_primary"
             android:layout_marginBottom="8dp" />
-
-        <!-- Subtitle -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Nhảy cơ"
-            android:textSize="16sp"
-            android:textColor="@color/text_secondary"
-            android:layout_marginBottom="20dp" />
 
         <!-- Descriptions label -->
         <TextView
