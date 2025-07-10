@@ -10,4 +10,21 @@
     <color name="text_primary">#333333</color>
     <color name="text_secondary">#666666</color>
     <color name="accent_color">#6366F1</color>
+
+    <!-- Màu chính (Primary Color) -->
+    <color name="colorPrimary">#1976D2</color> <!-- Blue 700 -->
+    <color name="colorPrimaryDark">#1565C0</color> <!-- Blue 800 -->
+    <color name="colorAccent">#64B5F6</color> <!-- Blue 300 -->
+
+
+
+    <!-- Màu cảnh báo -->
+    <color name="warning_background">#FFF3F3</color>
+    <color name="warning_text">#D32F2F</color> <!-- Red 700 -->
+
+    <!-- Màu nút (trắng) -->
+    <color name="button_text_color">#FFFFFF</color>
+
+    <!-- Màu đường viền nhẹ -->
+    <color name="divider">#E0E0E0</color>
 </resources>

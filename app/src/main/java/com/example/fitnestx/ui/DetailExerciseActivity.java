@@ -32,8 +32,12 @@ import androidx.media3.ui.PlayerView;
 import com.example.fitnestx.R;
 import com.example.fitnestx.data.entity.ExerciseEntity;
 import com.example.fitnestx.data.entity.SessionExerciseEntity;
+import com.example.fitnestx.data.entity.WorkoutPlanEntity;
+import com.example.fitnestx.data.entity.WorkoutSessionEntity;
 import com.example.fitnestx.data.repository.ExerciseRepository;
 import com.example.fitnestx.data.repository.SessionExerciseRepository;
+import com.example.fitnestx.data.repository.WorkoutPlanRepository;
+import com.example.fitnestx.data.repository.WorkoutSessionRepository;
 import com.example.fitnestx.fragments.TopMenuFragment;
 import com.example.fitnestx.viewmodel.ExerciseWithSessionStatus;
 import com.google.firebase.storage.FirebaseStorage;
@@ -56,10 +60,12 @@ public class DetailExerciseActivity extends AppCompatActivity {
     private ImageView closeButton;
     private Button skipButton,nextButton;
     private  ExerciseEntity exerciseEntity;
-    private TextView exerciseTitle, exerciseDescription;
+    private TextView exerciseTitle, exerciseDescription,note;
     private ExerciseRepository exerciseRepository;
     private SessionExerciseRepository sessionExerciseRepository;
     private SessionExerciseEntity sessionExerciseEntity;
+    private WorkoutPlanRepository workoutPlanRepository;
+    private WorkoutSessionRepository workoutSessionRepository;
 
     @OptIn(markerClass = UnstableApi.class)
     @Override
@@ -68,6 +74,9 @@ public class DetailExerciseActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail_exercise);
         exerciseRepository = new ExerciseRepository(this);
         sessionExerciseRepository = new SessionExerciseRepository(this);
+        workoutPlanRepository = new WorkoutPlanRepository(this);
+        workoutSessionRepository = new WorkoutSessionRepository(this);
+        // Lấy dữ liệu từ Intent
         Intent intent = getIntent();
         currentIndex = intent.getIntExtra("currentIndex", 0);
         exerciseList = (List<ExerciseWithSessionStatus>) intent.getSerializableExtra("exerciseList");
@@ -94,6 +103,7 @@ public class DetailExerciseActivity extends AppCompatActivity {
         closeButton = findViewById(R.id.close_button);
         skipButton = findViewById(R.id.skip_button);
         nextButton = findViewById(R.id.next_button);
+        note = findViewById(R.id.exercise_note);
 
     }
 
@@ -186,11 +196,21 @@ public class DetailExerciseActivity extends AppCompatActivity {
         executor.execute(() -> {
             exerciseEntity = exerciseRepository.getExerciseById(exerciseId);
             String des = exerciseRepository.GetDesByExId(exerciseId);
+            WorkoutSessionEntity workoutSessionEntity = workoutSessionRepository.getWorkoutSessionById(sessionId);
+            WorkoutPlanEntity workoutPlanEntity = workoutPlanRepository.getWorkoutPlanById(workoutSessionEntity.getPlanId());
             if (exerciseEntity != null) {
                 runOnUiThread(() -> {
                     // Cập nhật UI ở đây
                     exerciseTitle.setText(exerciseEntity != null ? exerciseEntity.getName() : "Tên bài tập (Exercise)");
                     exerciseDescription.setText(des);
+                    String noteText = workoutPlanEntity.getNote();
+                    if (noteText == null || noteText.isEmpty()) {
+                        note.setText(""); // hoặc "Không có ghi chú"
+                        note.setBackground(null); // Xóa background nếu cần
+                    } else {
+                        note.setText(noteText);
+
+                    }
 
                 });
             }
