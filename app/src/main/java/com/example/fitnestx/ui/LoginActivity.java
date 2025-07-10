@@ -96,11 +96,13 @@ public class LoginActivity extends AppCompatActivity {
                 return;
             }
 
+
             try {
                 userRepository.login(email, password, user -> {
                     if (isFinishing() || isDestroyed()) {
                         Log.d("LoginActivity", "Activity is finishing, skipping UI update");
                         return;
+
                     }
 
                     runOnUiThread(() -> {

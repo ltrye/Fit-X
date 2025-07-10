@@ -18,7 +18,15 @@ public class SessionExerciseRepository {
         AppDatabase appDatabase = AppDatabase.getInstance(context);
         sessionExerciseDAO = appDatabase.sessionExerciseDAO();
     }
-
+    public List<Integer> GetListIdExercsieBySessionId(int sessionId) {
+        return sessionExerciseDAO.GetListIdExercsieBySessionId(sessionId);
+    }
+    public List<SessionExerciseEntity> getExercisesListBySessionId(int sessionId) {
+        return sessionExerciseDAO.getExercisesListBySessionId(sessionId);
+    }
+    public int TotalSessionExerciseById(int sessionId) {
+        return sessionExerciseDAO.TotalSessionExercise(sessionId);
+    }
     public void insertSessionExercise(SessionExerciseEntity sessionExercise) {
         new Thread(() -> sessionExerciseDAO.insertSessionExercise(sessionExercise)).start();
     }

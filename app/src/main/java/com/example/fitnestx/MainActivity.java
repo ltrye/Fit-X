@@ -16,6 +16,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.fitnestx.data.repository.UserMetricsRepository;
 import com.example.fitnestx.data.repository.WorkoutPlanRepository;
 import com.example.fitnestx.ui.LoginActivity;
+import com.example.fitnestx.ui.PlanActivity;
 import com.example.fitnestx.ui.UserSurveyActivity;
 import com.example.fitnestx.ui.WorkoutFrequencyActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -75,11 +76,14 @@ public class MainActivity extends AppCompatActivity {
             if (!hasWorkoutPlan) {
                 Log.d("MainActivity", "User #" + userId + " has no active plan. Redirecting to WorkoutFrequency.");
                 redirectTo(WorkoutFrequencyActivity.class);
-                return;
+
+            }else{
+                redirectTo(PlanActivity.class);
+
             }
 
             // If all checks pass, the user is fully onboarded. Load the main activity UI.
-            runOnUiThread(this::setupMainActivityUI);
+
         });
     }
 
