@@ -1,5 +1,6 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_color">
@@ -7,32 +8,33 @@
     <!-- Top Menu Fragment -->
     <FrameLayout
         android:id="@+id/fragment_top_menu"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Close button -->
     <ImageView
         android:id="@+id/close_button"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:layout_below="@id/fragment_top_menu"
-        android:layout_alignParentStart="true"
         android:layout_margin="16dp"
+        android:padding="8dp"
         android:src="@drawable/ic_close"
         android:background="?android:attr/selectableItemBackgroundBorderless"
-        android:padding="8dp" />
+        android:contentDescription="Đóng màn hình"
+        app:layout_constraintTop_toBottomOf="@id/fragment_top_menu"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <!-- PlayerView (video) -->
     <androidx.media3.ui.PlayerView
         android:id="@+id/player_view"
-        android:layout_width="match_parent"
-        android:layout_height="240dp"
-        android:layout_below="@id/close_button"
-        android:layout_marginTop="20dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_centerInParent="true"
+        android:layout_marginTop="12dp"
         android:focusable="true"
         android:keepScreenOn="true"
         app:resize_mode="fill"
@@ -41,42 +43,63 @@
         app:show_shuffle_button="true"
         app:show_buffering="when_playing"
         app:show_vr_button="true"
-        />
-    <!--    android:background="@drawable/rounded_background"-->
-    <!-- Content below video -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/player_view"
-        android:layout_above="@+id/button_container"
-        android:orientation="vertical"
-        android:padding="24dp">
+        app:layout_constraintTop_toBottomOf="@id/close_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintDimensionRatio="16:9" />
 
-        <!-- Exercise title -->
-        <TextView
-            android:id="@+id/exercise_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tên bài tập (Exercise)"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="@color/text_primary"
-            android:layout_marginBottom="8dp" />
+    <!-- Scrollable content -->
+    <ScrollView
+        android:id="@+id/scroll_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/player_view"
+        app:layout_constraintBottom_toTopOf="@id/button_container"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Descriptions label -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Descriptions"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="@color/text_primary"
-            android:layout_marginBottom="12dp" />
-
-        <!-- Description content -->
-        <ScrollView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <!-- Title -->
+            <TextView
+                android:id="@+id/exercise_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tên bài tập (Exercise)"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Note -->
+            <TextView
+                android:id="@+id/exercise_note"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Lưu ý: Không nên tập khi đang chấn thương vai."
+                android:textSize="14sp"
+                android:textColor="@android:color/holo_red_dark"
+                android:lineSpacingExtra="4dp"
+                android:padding="8dp"
+                android:background="#FFF3F3"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Description label -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Descriptions"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Description text -->
             <TextView
                 android:id="@+id/exercise_description"
                 android:layout_width="match_parent"
@@ -85,39 +108,41 @@
                 android:textSize="14sp"
                 android:textColor="@color/text_secondary"
                 android:lineSpacingExtra="4dp" />
-        </ScrollView>
-    </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 
     <!-- Buttons -->
     <LinearLayout
         android:id="@+id/button_container"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_margin="24dp"
         android:orientation="horizontal"
-        android:weightSum="2">
+        android:weightSum="2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/skip_button"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
-            android:background="@drawable/button_background"
+            android:backgroundTint="@color/purple_500"
             android:text="Skip"
             android:textColor="@android:color/white"
             android:textSize="16sp"
             android:textStyle="bold"
             android:elevation="4dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/next_button"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_weight="1"
             android:layout_marginStart="8dp"
-            android:background="@drawable/button_background"
+            android:backgroundTint="@color/purple_500"
             android:text="Next"
             android:textColor="@android:color/white"
             android:textSize="16sp"
@@ -125,4 +150,4 @@
             android:elevation="4dp" />
     </LinearLayout>
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
