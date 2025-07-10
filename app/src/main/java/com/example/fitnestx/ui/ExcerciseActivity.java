@@ -1,10 +1,15 @@
 package com.example.fitnestx.ui;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,124 +20,214 @@ import com.example.fitnestx.adapters.ImageExerciseAdapter;
 import com.example.fitnestx.adapters.SectionExerciseAdapter;
 import com.example.fitnestx.data.entity.ExerciseEntity;
 import com.example.fitnestx.data.entity.MuscleGroupEntity;
+import com.example.fitnestx.data.entity.SessionExerciseEntity;
+import com.example.fitnestx.data.repository.ExerciseRepository;
+import com.example.fitnestx.data.repository.MuscleGroupRepository;
+import com.example.fitnestx.data.repository.SessionExerciseRepository;
+import com.example.fitnestx.data.repository.WorkoutSessionRepository;
+import com.example.fitnestx.fragments.TopMenuFragment;
+import com.example.fitnestx.viewmodel.ExerciseWithSessionStatus;
 
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Executors;
 
 public class ExcerciseActivity extends AppCompatActivity {
     private SectionExerciseAdapter sectionExerciseAdapter;
     private RecyclerView recyclerView;
     ImageButton btnBack;
+    TextView Spec, Date,exerciseCount;
+    private ExerciseRepository exerciseRepository;
+    private SessionExerciseRepository sessionExerciseRepository;
+    private SessionExerciseEntity sessionExerciseEntity;
+    private ExerciseWithSessionStatus exerciseWithSessionStatus;
+    private MuscleGroupRepository muscleGroupRepository;
+    private WorkoutSessionRepository workoutSessionRepository;
+
+    String spec, date;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_exercises);
 
+        exerciseRepository = new ExerciseRepository(this);
+        sessionExerciseRepository = new SessionExerciseRepository(this);
+        muscleGroupRepository = new MuscleGroupRepository(this);
+        workoutSessionRepository = new WorkoutSessionRepository(this);
+
         recyclerView = findViewById(R.id.recyclerViewExercises);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        exerciseCount = findViewById(R.id.ExerciseCount);
+
         btnBack = findViewById(R.id.btn_back);
-        btnBack.setOnClickListener(v -> finish());
+        btnBack.setOnClickListener(v -> {
+            Intent resultIntent = new Intent();
+            Intent intent = getIntent();
+            int sessionId = intent.getIntExtra("sessionId", -1);
+            resultIntent.putExtra("sessionId", sessionId);  // sessionId bạn đã có sẵn
+            setResult(Activity.RESULT_OK, resultIntent);
 
-        //Grid image Exercise
-        setupActionRecyclerView();
-        // Danh sách mẫu (bạn có thể lấy từ DB nếu cần)
-        List<ExerciseEntity> exercises = new ArrayList<>();
-        exercises.add(new ExerciseEntity(1, "Warm Up", "Khởi động cơ thể", "", 1, false, 1, "Ngực", false));
-        exercises.add(new ExerciseEntity(2, "Jumping Jack", "Nhảy tại chỗ", "", 1, false, 2, "Ngực", false));
-        exercises.add(new ExerciseEntity(3, "Skipping", "Nhảy dây", "", 1, false, 2, "Ngực", false));
-        exercises.add(new ExerciseEntity(4, "Incline Push-Ups", "Hít đất nghiêng", "", 2, false, 2, "Ngực", false));
-        exercises.add(new ExerciseEntity(5, "Push-Ups", "Hít đất thường", "", 2, false, 3, "Ngực", false));
-        exercises.add(new ExerciseEntity(6, "Shoulder Tap", "Chạm vai", "", 1, false, 3, "Vai", false));
-        exercises.add(new ExerciseEntity(7, "Lateral Raise", "Nâng vai ngang", "", 2, false, 3, "Vai", false));
-
-        // Giả dữ liệu nhóm cơ
-        List<MuscleGroupEntity> muscleGroups = new ArrayList<>();
-        muscleGroups.add(new MuscleGroupEntity(1, "Ngực", 24, null));
-        muscleGroups.add(new MuscleGroupEntity(2, "Vai", 24, null));
-
-        // Tạo section từ bài tập theo parent group
-        List<SectionItem> sectionItems = groupExercisesByParentGroup(exercises, muscleGroups);
-
-
-        // Adapter
-        sectionExerciseAdapter = new SectionExerciseAdapter(sectionItems, new SectionExerciseAdapter.OnItemClickListener() {
-            @Override
-            public void onExerciseClick(int position, ExerciseEntity exercise) {
-                // Mở màn hình hướng dẫn video
-                Intent intent = new Intent(ExcerciseActivity.this, DetailExerciseActivity.class);
-                intent.putExtra(DetailExerciseActivity.EXTRA_EXERCISE, String.valueOf(exercise));
-                startActivity(intent);
-
-                // Tùy chọn: vẫn toggle status nếu muốn đánh dấu đã xem
-                sectionExerciseAdapter.toggleExerciseStatus(position);
-            }
+            finish();
         });
 
-        recyclerView.setAdapter(sectionExerciseAdapter);
-    }
-    private List<SectionItem> groupExercisesByParentGroup(List<ExerciseEntity> exercises, List<MuscleGroupEntity> muscleGroups) {
-        // Tạo map id -> MuscleGroupEntity
-        Map<Integer, MuscleGroupEntity> groupMap = new HashMap<>();
-        for (MuscleGroupEntity group : muscleGroups) {
-            groupMap.put(group.getMuscleGroupId(), group);
-        }
 
-        // Group bài tập theo parent group id
-        Map<Integer, List<ExerciseEntity>> grouped = new HashMap<>();
-        for (ExerciseEntity ex : exercises) {
-            MuscleGroupEntity group = groupMap.get(ex.getMuscleGroupId());
-            int parentId = (group != null && group.getParentId() != null)
-                    ? group.getParentId()
-                    : ex.getMuscleGroupId();
+        Spec = findViewById(R.id.Spec);
+        Date = findViewById(R.id.Date);
 
-            if (!grouped.containsKey(parentId)) {
-                grouped.put(parentId, new ArrayList<>());
-            }
-            grouped.get(parentId).add(ex);
-        }
+//        setupActionRecyclerView();
+        reloadExercises();
 
-        // Tạo list SectionItem
-        List<SectionItem> sectionItems = new ArrayList<>();
-        for (Map.Entry<Integer, List<ExerciseEntity>> entry : grouped.entrySet()) {
-            String groupName = groupMap.containsKey(entry.getKey())
-                    ? groupMap.get(entry.getKey()).getName()
-                    : "Nhóm khác";
-
-            sectionItems.add(new SectionItem(groupName)); // Header
-            for (ExerciseEntity ex : entry.getValue()) {
-                sectionItems.add(new SectionItem(ex));
-            }
-        }
-
-        return sectionItems;
-    }
-    private void setupActionRecyclerView() {
-        RecyclerView recyclerView = findViewById(R.id.recycler_view_imageExercise);
-
-        // Tạo danh sách icons
-        List<Integer> icons = Arrays.asList(
-                R.drawable.ic_refresh,
-                R.drawable.ic_share
-        );
-
-        // Setup GridLayoutManager với 2 cột ngang
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 2,
-                GridLayoutManager.HORIZONTAL, false);
-        recyclerView.setLayoutManager(layoutManager);
-
-        // Setup adapter
-        ImageExerciseAdapter adapter = new ImageExerciseAdapter(icons, new ImageExerciseAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position, int iconRes) {
-//                handleActionClick(position, iconRes);
-            }
+        // Thêm nút để truy cập danh sách bài tập đơn lẻ
+        Button btnIndividualExercises = findViewById(R.id.btn_individual_exercises);
+        btnIndividualExercises.setOnClickListener(v -> {
+            Intent intent = new Intent(ExcerciseActivity.this, MuscleGroupListActivity.class);
+            startActivity(intent);
         });
 
-        recyclerView.setAdapter(adapter);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_top_menu, new TopMenuFragment());
+        transaction.commit();
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        reloadExercises(); // Tạo thêm hàm này để tái nạp danh sách từ DB
+    }
+    private void reloadExercises() {
+        Intent intent = getIntent();
+        int sessionId = intent.getIntExtra("sessionId", -1);
+        int total = intent.getIntExtra("totalDay", -1);
+
+        Executors.newSingleThreadExecutor().execute(() -> {
+            date = workoutSessionRepository.getWorkoutSessionById(sessionId).getDate();
+            List<Integer> exerciseIds = sessionExerciseRepository.GetListIdExercsieBySessionId(sessionId);
+            List<ExerciseEntity> exercises = new ArrayList<>();
+            for (int id : exerciseIds) {
+                ExerciseEntity ex = exerciseRepository.getExerciseById(id);
+                if (ex != null) exercises.add(ex);
+            }
+
+            List<MuscleGroupEntity> allMuscles = muscleGroupRepository.getListMuscleGroup();
+            Map<Integer, MuscleGroupEntity> idToGroup = new HashMap<>();
+            Map<Integer, Integer> childToParentMap = new HashMap<>();
+
+            for (MuscleGroupEntity mg : allMuscles) {
+                idToGroup.put(mg.getMuscleGroupId(), mg);
+                if (mg.getParentId() != null) {
+                    childToParentMap.put(mg.getMuscleGroupId(), mg.getParentId());
+                }
+            }
+
+            Map<Integer, List<ExerciseEntity>> groupedByParent = new HashMap<>();
+            Set<Integer> usedParentIds = new HashSet<>();
+            Set<String> usedSpecs = new HashSet<>();
+            for (ExerciseEntity ex : exercises) {
+                int childId = ex.getMuscleGroupId();
+                Integer parentId = childToParentMap.get(childId);
+                if (parentId != null) {
+                    groupedByParent.computeIfAbsent(parentId, k -> new ArrayList<>()).add(ex);
+                    usedParentIds.add(parentId);
+                } else {
+                    groupedByParent.computeIfAbsent(childId, k -> new ArrayList<>()).add(ex);
+                    usedParentIds.add(childId);
+                }
+            }
+            StringBuilder specBuilder = new StringBuilder();
+            for (Integer parentId : usedParentIds) {
+                MuscleGroupEntity muscleGroupEntity = muscleGroupRepository.getMuscleGroupById(parentId);
+                String spec = muscleGroupEntity.getSpec();
+                if (usedSpecs.add(spec)) { // chỉ thêm nếu chưa tồn tại
+                    specBuilder.append(spec).append(" And ");
+                }
+            }
+
+            spec = specBuilder.toString();
+            spec = spec.substring(0, spec.length() - 5); // xóa " And " cuối cùng
+
+            List<SectionItem> sectionItems = new ArrayList<>();
+            for (Integer parentId : groupedByParent.keySet()) {
+                MuscleGroupEntity group = idToGroup.get(parentId);
+                String title = (group != null) ? group.getName() : "Nhóm khác";
+
+                sectionItems.add(new SectionItem(title)); // Header
+                for (ExerciseEntity ex : groupedByParent.get(parentId)) {
+                    sessionExerciseEntity = sessionExerciseRepository.getSessionExercise(sessionId,ex.getExerciseId());
+                    exerciseWithSessionStatus = new ExerciseWithSessionStatus(ex,sessionExerciseEntity.isMarked());
+                    sectionItems.add(new SectionItem(exerciseWithSessionStatus));
+                }
+            }
+
+            List<ExerciseWithSessionStatus> exerciseItems = new ArrayList<>();
+            for (SectionItem item : sectionItems) {
+                if (item.getType() == SectionItem.TYPE_ITEM) {
+                    exerciseItems.add(item.getExerciseWithStatus());
+                }
+            }
+
+            runOnUiThread(() -> {
+                Spec.setText(spec);
+                Date.setText(date);
+                exerciseCount.setText(total+" Exercises");
+                if (sectionExerciseAdapter == null) {
+                    // Adapter chưa được tạo, tạo mới và gán vào RecyclerView
+                    sectionExerciseAdapter = new SectionExerciseAdapter(sectionItems, new SectionExerciseAdapter.OnItemClickListener() {
+                        @Override
+                        public void onExerciseClick(int position, ExerciseEntity exercise) {
+                            int actualIndex = -1;
+                            for (int i = 0; i < exerciseItems.size(); i++) {
+                                if (exerciseItems.get(i).getExercise().getExerciseId() == exercise.getExerciseId()) {
+                                    actualIndex = i;
+                                    break;
+                                }
+                            }
+                            if (actualIndex != -1) {
+                                Intent detailIntent = new Intent(ExcerciseActivity.this, DetailExerciseActivity.class);
+                                detailIntent.putExtra("sessionId", sessionId);
+                                detailIntent.putExtra("currentIndex", actualIndex);
+                                detailIntent.putExtra("exerciseList", new ArrayList<>(exerciseItems)); // must be Serializable
+                                startActivity(detailIntent);
+                            }
+                        }
+                    });
+                    recyclerView.setAdapter(sectionExerciseAdapter);
+                } else {
+                    // Adapter đã có, chỉ cần update dữ liệu
+                    sectionExerciseAdapter.updateData(sectionItems);
+                }
+            });
+        });
+    }
+
+//     private void setupActionRecyclerView() {
+//        RecyclerView recyclerView = findViewById(R.id.recycler_view_imageExercise);
+//
+//        // Tạo danh sách icons
+//        List<Integer> icons = Arrays.asList(
+//                R.drawable.ic_refresh,
+//                R.drawable.ic_share
+//        );
+//
+//        // Setup GridLayoutManager với 2 cột ngang
+//        GridLayoutManager layoutManager = new GridLayoutManager(this, 2,
+//                GridLayoutManager.HORIZONTAL, false);
+//        recyclerView.setLayoutManager(layoutManager);
+//
+//        // Setup adapter
+//        ImageExerciseAdapter adapter = new ImageExerciseAdapter(icons, new ImageExerciseAdapter.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(int position, int iconRes) {
+////                handleActionClick(position, iconRes);
+//            }
+//        });
+//
+//        recyclerView.setAdapter(adapter);
+//    }
 
 }

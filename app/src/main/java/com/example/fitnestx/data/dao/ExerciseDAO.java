@@ -17,11 +17,20 @@ public interface ExerciseDAO {
     @Query("SELECT * FROM EXERCISE")
     LiveData<List<ExerciseEntity>> getAllExercises();
 
+    @Query("SELECT * FROM EXERCISE")
+    List<ExerciseEntity> getListOfExercises();
+
+
+
     @Query("SELECT * FROM EXERCISE WHERE exerciseId = :exerciseId")
     ExerciseEntity getExerciseById(int exerciseId);
 
     @Query("SELECT * FROM EXERCISE WHERE muscleGroupId = :muscleGroupId")
     LiveData<List<ExerciseEntity>> getExercisesByMuscleGroupId(int muscleGroupId);
+
+    @Query("SELECT description FROM EXERCISE WHERE exerciseId = :exerciseId")
+    String GetDesByExId(int exerciseId);
+
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertExercise(ExerciseEntity exercise);

@@ -18,8 +18,9 @@ public class SessionExerciseEntity implements SessionExercise {
     private int sets;
     private int reps;
     private boolean isOptional;
+    private boolean isMarked;
 
-    public SessionExerciseEntity(int sessionId, int exerciseId, int order, String restTime, int sets, int reps, boolean isOptional) {
+    public SessionExerciseEntity(int sessionId, int exerciseId, int order, String restTime, int sets, int reps, boolean isOptional, boolean isMarked) {
         this.sessionId = sessionId;
         this.exerciseId = exerciseId;
         this.order = order;
@@ -27,6 +28,16 @@ public class SessionExerciseEntity implements SessionExercise {
         this.sets = sets;
         this.reps = reps;
         this.isOptional = isOptional;
+        this.isMarked = isMarked;
+
+    }
+
+    public boolean isMarked() {
+        return isMarked;
+    }
+
+    public void setMarked(boolean marked) {
+        isMarked = marked;
     }
 
     public void setSessionId(int sessionId) {

@@ -4,7 +4,11 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#F5F5F5">
-
+    <!-- Top Menu Fragment -->
+    <FrameLayout
+        android:id="@+id/fragment_top_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
     <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -12,6 +16,8 @@
         android:orientation="horizontal"
         android:padding="16dp"
         android:gravity="center_vertical">
+
+
 
         <ImageButton
             android:id="@+id/btn_back"
@@ -30,6 +36,7 @@
             android:layout_marginStart="16dp">
 
             <TextView
+                android:id="@+id/Spec"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tên buổi tập: Push"
@@ -38,20 +45,34 @@
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/ExerciseCount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="11 Exercises"
+                android:text=""
                 android:textSize="14sp"
                 android:textColor="#666666"
                 android:layout_marginTop="2dp" />
 
             <TextView
+                android:id="@+id/Date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Buổi tập 1"
                 android:textSize="14sp"
                 android:textColor="#666666"
                 android:layout_marginTop="2dp" />
+
+            <!-- Button for Individual Exercises -->
+            <Button
+                android:id="@+id/btn_individual_exercises"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:text="Xem bài tập đơn lẻ"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/button_rounded"
+                android:textSize="16sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
@@ -60,10 +81,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp" />
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_share" />
+      
     </LinearLayout>
 
     <!-- Exercises Section -->
@@ -91,12 +109,12 @@
                 android:textColor="#000000"
                 android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="5 Sets"
-                android:textSize="14sp"
-                android:textColor="#666666" />
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="5 Sets"-->
+<!--                android:textSize="14sp"-->
+<!--                android:textColor="#666666" />-->
         </LinearLayout>
 
         <!-- Exercise Categories -->

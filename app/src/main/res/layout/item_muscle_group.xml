@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="16dp"
+    android:gravity="center_vertical"
+    android:background="?android:attr/selectableItemBackground">
+
+    <!-- Hình ảnh nhóm cơ -->
+    <ImageView
+        android:id="@+id/ivMuscleGroupImage"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:background="@drawable/exercise_image_background"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_exercise_placeholder" />
+
+    <!-- Thông tin nhóm cơ -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_marginStart="16dp">
+
+        <!-- Tên nhóm cơ -->
+        <TextView
+            android:id="@+id/tvMuscleGroupName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Muscle Group Name"
+            android:textSize="16sp"
+            android:textColor="#000000"
+            android:textStyle="bold" />
+
+        <!-- Mô tả nhóm cơ -->
+        <TextView
+            android:id="@+id/tvMuscleGroupSpec"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Muscle Group Spec"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:layout_marginTop="4dp" />
+
+    </LinearLayout>
+
+    <!-- Icon mũi tên -->
+    <ImageView
+        android:id="@+id/ivArrowIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_arrow_right"
+        android:layout_marginEnd="8dp" />
+
+</LinearLayout>

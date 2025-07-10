@@ -45,7 +45,9 @@ import java.util.concurrent.Executors;
         NotificationEntity.class,
         UserMetricsEntity.class,
         AuthProviderEntity.class
-}, version = 7, exportSchema = false)
+
+}, version = 8, exportSchema = false)
+
 @TypeConverters(DateConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract UserDAO userDAO();
@@ -90,18 +92,20 @@ public abstract class AppDatabase extends RoomDatabase {
             database.execSQL("ALTER TABLE EXERCISE ADD COLUMN isMarked INTEGER NOT NULL DEFAULT 0");
         }
     };
-
     static final Migration MIGRATION_4_5 = new Migration(4, 5) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
-            // Skip this migration as it was causing issues
+
+            database.execSQL("ALTER TABLE MuscleGroup ADD COLUMN image TEXT");
+            database.execSQL("ALTER TABLE MuscleGroup ADD COLUMN spec TEXT");
         }
     };
+
 
     static final Migration MIGRATION_5_6 = new Migration(5, 6) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
-            database.execSQL("ALTER TABLE MUSCLE_GROUP ADD COLUMN parentId INTEGER");
+            //database.execSQL("ALTER TABLE MUSCLE_GROUP ADD COLUMN parentId INTEGER");
             database.execSQL("CREATE INDEX IF NOT EXISTS index_MUSCLE_GROUP_parentId ON MUSCLE_GROUP(parentId)");
         }
     };
@@ -112,13 +116,22 @@ public abstract class AppDatabase extends RoomDatabase {
             database.execSQL("DROP INDEX IF EXISTS index_WORKOUT_SESSION_planId");
         }
     };
+    static final Migration MIGRATION_7_8 = new Migration(7, 8) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE SESSION_EXERCISE ADD COLUMN isMarked INTEGER NOT NULL DEFAULT 0");
+        }
+    };
+
 
     public static synchronized AppDatabase getInstance(final Context context) {
         if (sInstance == null) {
             sAppContext = context.getApplicationContext();
             sInstance = Room.databaseBuilder(sAppContext, AppDatabase.class, DB_NAME)
+
                     .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
                     .fallbackToDestructiveMigration()
+
                     .addCallback(roomCallback)
                     .build();
         }
