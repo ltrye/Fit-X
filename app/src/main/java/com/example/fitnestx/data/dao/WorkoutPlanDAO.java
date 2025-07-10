@@ -20,6 +20,7 @@ public interface WorkoutPlanDAO {
     @Query("SELECT * FROM WORKOUT_PLAN WHERE planId = :planId")
     WorkoutPlanEntity getWorkoutPlanById(int planId);
 
+
     @Query("SELECT * FROM WORKOUT_PLAN WHERE userId = :userId")
     LiveData<List<WorkoutPlanEntity>> getWorkoutPlansByUserId(int userId);
 

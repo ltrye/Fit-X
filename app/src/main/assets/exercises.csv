@@ -1,71 +1,71 @@
-exerciseId,name,description,videoURL,muscleGroupId,equipmentRequired,difficulty,imageUrl,isMarked
-1,Decline bench press,Decline Bench Press là bài tập đẩy ngực sử dụng ghế nghiêng xuống để tập trung vào phần ngực dưới,GymVideo/Chest/LowerChest/Decline_Barbell_Bench_Press.mp4,8,False,2,,False
-2,Chest dip,,GymVideo/Chest/LowerChest/Chest_Dip_Technique.mp4,8,False,2,,False
-3,Decline push-up,,GymVideo/Chest/LowerChest/Decline_Push_Up.mp4,8,False,2,,False
-4,Flat bench press,,GymVideo/Chest/MiddleChest/Flat_Barbell_Bench_Press.mp4,9,False,2,,False
-5,Dumbbell bench press,,GymVideo/Chest/MiddleChest/Dumbbell_Bench_Press.mp4,9,False,2,,False
-6,Push-ups,,GymVideo/Chest/MiddleChest/PUSH_UP.mp4,9,False,2,,False
-7,Incline bench press,,GymVideo/Chest/UpperChest/incline_barbell_bench_press.mp4,10,False,2,,False
-8,Incline dumbbell fly,,GymVideo/Chest/UpperChest/Dumbbell_Fly.mp4,10,False,2,,False
-9,Incline push-up,,GymVideo/Chest/UpperChest/incline_push_up.mp4,10,False,2,,False
-10,Lateral raise,,GymVideo/Shoulder/Middle_Shoulder/standing_dumbbell_lateral_raise.mp4,11,False,2,,False
-11,Dumbbell upright row,,GymVideo/Shoulder/Middle_Shoulder/Barbell_Upright_Row.mp4,11,False,2,,False
-12,Cable lateral raise,,GymVideo/Shoulder/Middle_Shoulder/cable_lateral_raise.mp4,11,False,2,,False
-13,Reverse fly,,GymVideo/Shoulder/Lower_Shoulder/Dumbbell_Reverse_Fly.mp4,12,False,2,,False
-14,Face pull,,GymVideo/Shoulder/Lower_Shoulder/Face_Pull.mp4,12,False,2,,False
-15,Rear delt row,,GymVideo/Shoulder/Lower_Shoulder/Barbell_Rear_Delt_Row.mp4,12,False,2,,False
-16,Front raise,,GymVideo/Shoulder/Upper_Shoulder/Dumbbell_Front_Raise.mp4,13,False,2,,False
-17,Overhead press,,GymVideo/Shoulder/Upper_Shoulder/Barbell_Overhead_Press.mp4,13,False,2,,False
-18,Arnold press,,GymVideo/Shoulder/Upper_Shoulder/Standing_dumbbell_arnold_press.mp4,13,False,2,,False
-19,Pull-up,,GymVideo/Back/Lat/Wide_pull_up.mp4,14,False,2,,False
-20,Lat pulldown,,GymVideo/Back/Lat/Lat_pull_Down.mp4,14,False,2,,False
-21,One-arm dumbbell row,,GymVideo/Back/Lat/One_Arm_Dumbbell_Rowl.mp4,14,False,2,,False
-22,Deadlift,,GymVideo/Back/Lower_Back/Sumo_deadlift.mp4,15,False,2,,False
-23,Back extension,,GymVideo/Back/Lower_Back/Back_Extension.mp4,15,False,2,,False
-24,Good morning,,GymVideo/Back/Lower_Back/Good_Morning.mp4,15,False,2,,False
-25,Barbell row,,GymVideo/Back/Middle_Back/Bent_Over_Dumbbell_Row.mp4,16,False,2,,False
-26,Seated cable row,,GymVideo/Back/Middle_Back/Seated_Row_to_Waist.mp4,16,False,2,,False
-27,Face pull,,GymVideo/Back/Middle_Back/Face_Pull.mp4,16,False,2,,False
-28,Barbell shrug,,GymVideo/Back/Upper_Trap/Standing_Barbell_Shrug.mp4,17,False,2,,False
-29,Dumbbell shrug,,GymVideo/Back/Upper_Trap/Dumbbell_Shrugs.mp4,17,False,2,,False
-30,Upright row,,GymVideo/Back/Upper_Trap/Barbell_Upright_Row.mp4,17,False,2,,False
-31,Barbell curl,,GymVideo/Bicepts/Bycepts/Barbell_Curl.mp4,18,False,2,,False
-32,Dumbbell curl,,GymVideo/Bicepts/Bycepts/Dumbbell_Curl.mp4,18,False,2,,False
-33,Hammer curl,,GymVideo/Bicepts/Bycepts/Dumbbell_Hammer_Curls.mp4,18,False,2,,False
-34,Reverse curl,,GymVideo/Bicepts/Bycepts/Standing_Low_pulley_Handle_Reverse_Curl.mp4,18,False,2,,False
-35,Triceps pushdown,,GymVideo/Tricepts/Outter_Head/Triceps_Push_Down.mp4,19,False,2,,False
-36,Kickbacks,,GymVideo/Tricepts/Outter_Head/Dumbbell_Kickback.mp4,19,False,2,,False
-37,Dips,,GymVideo/Tricepts/Outter_Head/Tricep_Bench_Dip.mp4,19,False,2,,False
-38,Overhead triceps extension,,GymVideo/Tricepts/Long_Head/Overhead_Cable_Tricep_Extension.mp4,20,False,2,,False
-39,Close-grip bench press,,GymVideo/Tricepts/Long_Head/Close_Grip_Barbell_Bench_Press.mp4,20,False,2,,False
-40,Skull crusher,,GymVideo/Tricepts/Long_Head/Skull_Crushers.mp4,20,False,2,,False
-41,Diamond push-up,,GymVideo/Tricepts/Inner_Head/DIAMOND_PUSH_UP.mp4,21,False,2,,False
-42,Reverse-grip pushdown,,GymVideo/Tricepts/Inner_Head/Reverse_Grip_Triceps_Pushdown.mp4,21,False,2,,False
-43,One-arm cable pushdown,,GymVideo/Tricepts/Inner_Head/Triceps_Push_Down.mp4,21,False,2,,False
-44,Hip thrust,,GymVideo/Glut/Big_Glut/Hip_Thrust.mp4,22,False,2,,False
-45,Barbell squat,,GymVideo/Glut/Big_Glut/Bulgarian_Split_Squat.mp4,22,False,2,,False
-46,Deadlift,,GymVideo/Glut/Big_Glut/Dumbbell_Romanian_Deadlift.mp4,22,False,2,,False
-47,Side-lying leg raise,,GymVideo/Glut/Middle_Glut/Side_Lying_Leg_Lifts.mp4,23,False,2,,False
-48,Band walks,,GymVideo/Glut/Middle_Glut/Monster_Walk.mp4,23,False,2,,False
-49,Clamshell,,GymVideo/Glut/Middle_Glut/Clamshell.mp4,23,False,2,,False
-50,Cable kickback,,GymVideo/Glut/Small_Glut/Glute_Kickback.mp4,24,False,2,,False
-51,Single-leg glute bridge,,GymVideo/Glut/Small_Glut/Glute_Bridge.mp4,24,False,2,,False
-52,Side-lying abduction,,GymVideo/Glut/Small_Glut/Banded_Sidelying_Hip_Abduction.mp4,24,False,2,,False
-53,Romanian deadlift,,GymVideo/Legs/hamstrings/Romanian_Deadlift.mp4,25,False,2,,False
-54,Leg curl,,GymVideo/Legs/hamstrings/Lying_Leg_Curl.mp4,25,False,2,,False
-55,Glute-ham raise,,GymVideo/Legs/hamstrings/Glute_Ham_Raise_trimmed.mp4,25,False,2,,False
-56,Squats,,GymVideo/Legs/Quads/Hack_squat.mp4,26,False,2,,False
-57,Leg press,,GymVideo/Legs/Quads/Incline_Leg_Press.mp4,26,False,2,,False
-58,Leg extension,,GymVideo/Legs/Quads/Leg_Extension.mp4,26,False,2,,False
-59,Band walks,,GymVideo/Legs/outer_thigh/Band_Walk.mp4,27,False,2,,False
-60,Hip abduction cable,,GymVideo/Legs/outer_thigh/Hip_Abduction_Cable.mp4,27,False,2,,False
-61,Side step-up,,GymVideo/Legs/outer_thigh/Side_Dumbbell_Step_up.mp4,27,False,2,,False
-62,Sumo squat,,GymVideo/Legs/Inner_thigh/Sumo_Squats.mp4,28,False,2,,False
-63,Adductor machine,,GymVideo/Legs/Inner_thigh/Hip_Abductor_Machine.mp4,28,False,2,,False
-64,Side lunge,,GymVideo/Legs/Inner_thigh/SIDE_LUNGES.mp4,28,False,2,,False
-65,Jumping jacks,,GymVideo/cardio/Jumping_Jack.mp4,29,False,2,,False
-66,Burpees,,GymVideo/cardio/Burpees.mp4,29,False,2,,False
-67,Incline walking,,GymVideo/cardio/Incline_Walking.mp4,29,False,2,,False
-68,High knees,,GymVideo/cardio/High_Knee.mp4,29,False,2,,False
-69,Running,,GymVideo/cardio/Running.mp4,29,False,2,,False
-70,Jump squat,,GymVideo/cardio/Squat_Jumps.mp4,29,False,2,,False
+exerciseId,name,description,videoURL,muscleGroupId,equipmentRequired,difficulty,imageUrl,isMarked,guideLine
+1,Decline bench press,Decline Bench Press là bài tập đẩy ngực sử dụng ghế nghiêng xuống để tập trung vào phần ngực dưới,GymVideo/Chest/LowerChest/Decline_Barbell_Bench_Press.mp4,8,False,2,Chest_Lower Chest_Decline_Bench_Press.jpeg,False,
+2,Chest dip,Chest Dip là bài tập trọng lượng cơ thể tập trung vào cơ ngực dưới cơ tay sau (triceps) và cơ vai trước. Khi thực hiện động tác hạ thân người xuống và đẩy lên cơ ngực được kéo giãn mạnh giúp phát triển độ dày và độ nét cho phần ngực dưới hiệu quả.,GymVideo/Chest/LowerChest/Chest_Dip_Technique.mp4,8,False,2,Chest_Lower_Chest_Dip.jpeg,False,
+3,Decline push-up,Decline Push-Up là phiên bản nâng cao của hít đất trong đó chân được đặt cao hơn tay. Bài tập này tác động chủ yếu vào phần ngực dưới và cơ tay sau giúp tăng cường sức mạnh và cải thiện hình dáng cơ ngực dưới.,GymVideo/Chest/LowerChest/Decline_Push_Up.mp4,8,False,2,Chest_Lower_Decline_Push-up.jpeg,False,
+4,Flat bench press,Flat Bench Press là một trong những bài tập ngực kinh điển với thanh tạ đòn tập trung phát triển toàn bộ vùng cơ ngực đặc biệt là phần giữa. Bài tập này còn hỗ trợ phát triển cơ vai và cơ tay sau đồng thời cải thiện khả năng đẩy và sức mạnh tổng thể.,GymVideo/Chest/MiddleChest/Flat_Barbell_Bench_Press.mp4,9,False,2,Chest_Middle_Flat_Bench_Press.jpeg,False,
+5,Dumbbell bench press,Dumbbell Bench Press là bài tập ngực sử dụng tạ đơn cho phép phạm vi chuyển động lớn hơn so với thanh tạ. Nhờ vậy cơ ngực được kích thích sâu hơn và phát triển đều hai bên đồng thời cải thiện khả năng cân bằng và phối hợp cơ bắp.,GymVideo/Chest/MiddleChest/Dumbbell_Bench_Press.mp4,9,False,2,Chest_Middle_Dumbbell_Bench_Press.jpeg,False,
+6,Push-ups,Push-Up là bài tập không cần dụng cụ sử dụng trọng lượng cơ thể để rèn luyện ngực vai và tay sau. Đây là bài tập nền tảng giúp xây dựng sức mạnh sức bền và cải thiện tư thế thân trên phù hợp với mọi cấp độ người tập.,GymVideo/Chest/MiddleChest/PUSH_UP.mp4,9,False,2,Chest_Middle_Push_Up.jpeg,False,
+7,Incline bench press,Incline Bench Press là bài tập đẩy ngực với ghế nghiêng lên khoảng 30–45 độ nhằm tập trung phát triển cơ ngực trên và vai trước. Bài tập giúp nâng cao khối lượng cơ ngực phần trên tạo dáng ngực đầy đặn và cân đối.,GymVideo/Chest/UpperChest/incline_barbell_bench_press.mp4,10,False,2,Chest_Upper_Incline_Bench_Press.jpeg,False,
+8,Incline dumbbell fly,Incline Dumbbell Fly là bài tập dang tạ đơn với ghế nghiêng giúp kéo giãn và siết chặt phần ngực trên. Động tác này tăng độ linh hoạt và cải thiện hình dáng của cơ ngực đồng thời hỗ trợ phát triển vùng vai trước.,GymVideo/Chest/UpperChest/Dumbbell_Fly.mp4,10,False,2,Chest_Upper_Incline_Dumbbell_Fly.jpeg,False,
+9,Incline push-up,Incline Push-Up là biến thể hít đất với tay đặt cao hơn chân giúp giảm áp lực và dễ thực hiện hơn cho người mới. Bài tập chủ yếu tác động vào ngực trên vai và tay sau giúp xây dựng nền tảng sức mạnh thân trên hiệu quả.,GymVideo/Chest/UpperChest/incline_push_up.mp4,10,False,2,Chest_Upper_Incline push-up.jpeg,False,
+10,Lateral raise,Lateral Raise là bài tập chuyên biệt để phát triển cơ vai ngoài (cơ delta giữa). Bài tập giúp mở rộng chiều ngang của vai tạo vóc dáng thể thao và mạnh mẽ. Khi thực hiện đúng kỹ thuật vai sẽ được tác động tối đa mà không cần dùng tạ nặng.,GymVideo/Shoulder/Middle_Shoulder/standing_dumbbell_lateral_raise.mp4,11,False,2,Shoulders_Middle_Cable_Lateral_Raise.jpeg,False,
+11,Dumbbell upright row,Dumbbell Upright Row là bài tập kéo tạ từ dưới lên trước ngực giúp phát triển cơ vai giữa và cơ cầu vai. Khi kéo tạ lên khuỷu tay luôn hướng ra ngoài và cao hơn cổ tay để tối ưu hóa tác động vào vùng vai giữa.,GymVideo/Shoulder/Middle_Shoulder/Barbell_Upright_Row.mp4,11,False,2,Shoulders_Middle_Dumbbell_Upright_Row.jpeg,False,
+12,Cable lateral raise,Cable Lateral Raise là biến thể dùng dây cáp của bài tập dang tay ngang giúp duy trì lực căng liên tục lên cơ vai ngoài. Bài tập này giúp phát triển độ rộng của vai và cải thiện tư thế phần thân trên.,GymVideo/Shoulder/Middle_Shoulder/cable_lateral_raise.mp4,11,False,2,Shoulders_Middle_Cable_Lateral_Raise.jpeg,False,
+13,Reverse fly,Reverse Fly là bài tập dang tay ngược với tạ đơn hoặc máy giúp kích hoạt cơ vai sau. Đây là bài quan trọng để xây dựng phần vai cân đối hỗ trợ tốt cho các bài đẩy và giảm nguy cơ chấn thương vai.,GymVideo/Shoulder/Lower_Shoulder/Dumbbell_Reverse_Fly.mp4,12,False,2,Shoulders_Rear_Reverse_Fly.jpeg,False,
+14,Face pull,Face Pull là bài kéo dây cáp về gần mặt giúp phát triển cơ vai sau và phần lưng trên. Đây là bài tập hỗ trợ cải thiện tư thế tăng cường độ ổn định cho khớp vai và giảm nguy cơ chấn thương vai khi tập nặng.,GymVideo/Shoulder/Lower_Shoulder/Face_Pull.mp4,12,False,2,Shoulders_Rear_Face_Pull.jpeg,False,
+15,Rear delt row,Rear Delt Row là biến thể của bài kéo lưng nhấn mạnh vào phần vai sau. Động tác này giúp phát triển sự cân đối của cơ vai cải thiện tư thế và hỗ trợ các bài đẩy ngực hiệu quả hơn.,GymVideo/Shoulder/Lower_Shoulder/Barbell_Rear_Delt_Row.mp4,12,False,2,Shoulders_Rear_Rear-delt-row.jpeg,False,
+16,Front raise,Front Raise là bài tập đơn giản dùng tạ đơn nâng thẳng tay về phía trước để phát triển cơ vai trước. Bài tập giúp tăng kích thước cơ vai trước tạo bờ vai rõ nét và tăng hiệu quả cho các bài đẩy.,GymVideo/Shoulder/Upper_Shoulder/Dumbbell_Front_Raise.mp4,13,False,2,Shoulders_Front_Front_Raise.jpeg,False,
+17,Overhead press,Overhead Press là bài tập đẩy thanh tạ hoặc tạ đơn qua đầu giúp phát triển toàn diện nhóm cơ vai đặc biệt là phần vai trước và giữa. Đây là bài tập nền tảng trong các chương trình tập vai sức mạnh.,GymVideo/Shoulder/Upper_Shoulder/Barbell_Overhead_Press.mp4,13,False,2,Shoulders_Front_Overhead_Press.jpeg,False,
+18,Arnold press,Arnold Press là biến thể của bài đẩy vai với chuyển động xoay cổ tay giúp kích hoạt toàn bộ nhóm cơ vai một cách toàn diện. Bài tập giúp tăng chiều sâu và độ đầy đặn cho vùng vai trước và giữa.,GymVideo/Shoulder/Upper_Shoulder/Standing_dumbbell_arnold_press.mp4,13,False,2,Shoulders_Front_Arnold_Press.jpeg,False,
+19,Pull-up,Pull-Up là bài tập sử dụng trọng lượng cơ thể để kéo người lên xà nhắm vào nhóm cơ xô cơ tay trước và lưng trên. Đây là bài tập tuyệt vời để phát triển sức mạnh lưng và cải thiện hình thể chữ V.,GymVideo/Back/Lat/Wide_pull_up.mp4,14,False,2,Back_Lats_Pull_Up.jpeg,False,
+20,Lat pulldown,Lat Pulldown là bài tập kéo cáp từ trên xuống trước ngực giúp phát triển nhóm cơ xô và lưng trên. Bài này phù hợp cho cả người mới bắt đầu và người tập lâu năm nhằm xây dựng cơ lưng dày và rộng.,GymVideo/Back/Lat/Lat_pull_Down.mp4,14,False,2,Back_Lats_Lat pulldown.jpeg,False,
+21,One-arm dumbbell row,One-Arm Dumbbell Row là bài tập kéo tạ đơn từng tay giúp phát triển cơ lưng giữa và cơ xô một cách tập trung. Động tác này cũng hỗ trợ cải thiện sự cân bằng cơ bắp giữa hai bên cơ thể và tăng độ dày cho vùng lưng.,GymVideo/Back/Lat/One_Arm_Dumbbell_Rowl.mp4,14,False,2,Back_Lats_One-arm_Dumbbel_Row.jpeg,False,
+22,Deadlift,Deadlift là bài tập tổng hợp tác động mạnh lên cơ lưng dưới mông đùi và cả cơ lõi. Bài tập này giúp xây dựng sức mạnh toàn thân cải thiện khả năng nâng vật nặng và tăng cường độ ổn định cho cột sống.,GymVideo/Back/Lower_Back/Sumo_deadlift.mp4,15,False,2,Back_Lower_Dreadlift.jpeg,False,
+23,Back extension,Back Extension là bài tập cô lập cơ lưng dưới thường thực hiện với máy hoặc ghế Roman. Bài này giúp tăng sức mạnh và độ bền cho vùng thắt lưng hỗ trợ tốt cho các bài tập nặng như squat hay deadlift.,GymVideo/Back/Lower_Back/Back_Extension.mp4,15,False,2,Back_Lower_Extension.jpeg,False,
+24,Good morning,Good Morning là bài tập nghiêng người về phía trước giữ lưng thẳng nhằm tác động sâu đến cơ lưng dưới và gân kheo. Đây là bài tập hiệu quả để tăng cường sức mạnh cơ lưng sau và cải thiện tư thế.,GymVideo/Back/Lower_Back/Good_Morning.mp4,15,False,2,Back_Lower_Good_Morning.jpeg,False,
+25,Barbell row,Good Morning là bài tập nghiêng người về phía trước giữ lưng thẳng nhằm tác động sâu đến cơ lưng dưới và gân kheo. Đây là bài tập hiệu quả để tăng cường sức mạnh cơ lưng sau và cải thiện tư thế.,GymVideo/Back/Middle_Back/Bent_Over_Dumbbell_Row.mp4,16,False,2,Back_Mid_Barbell_Row.jpeg,False,
+26,Seated cable row,Seated Cable Row là bài tập kéo dây cáp khi ngồi nhằm phát triển cơ lưng giữa và xô. Động tác này giữ lực căng liên tục trong suốt quá trình di chuyển giúp kích thích cơ tốt và cải thiện tư thế lưng.,GymVideo/Back/Middle_Back/Seated_Row_to_Waist.mp4,16,False,2,Back_Mid_Seated_Cable_Row.jpeg,False,
+27,Face pull,Face Pull là bài tập kéo dây cáp về gần mặt giúp tăng cường cơ vai sau và cơ lưng trên. Đây là bài tập quan trọng để cải thiện độ ổn định vai và hạn chế mất cân bằng cơ bắp ở phần thân trên.,GymVideo/Back/Middle_Back/Face_Pull.mp4,16,False,2,Back_Mid_Face_Pull.jpeg,False,
+28,Barbell shrug,Barbell Shrug là bài tập nhún vai với thanh tạ giúp phát triển nhóm cơ cầu vai làm vai trông dày và cao hơn. Động tác đơn giản nhưng rất hiệu quả để tăng cường kích thước phần vai trên.,GymVideo/Back/Upper_Trap/Standing_Barbell_Shrug.mp4,17,False,2,Back_Upper_Barbell_Shrug.jpeg,False,
+29,Dumbbell shrug,Dumbbell Shrug là phiên bản sử dụng tạ đơn của bài nhún vai giúp tập trung phát triển cơ cầu vai. Bài tập này dễ thực hiện và có thể linh hoạt điều chỉnh phạm vi chuyển động hơn so với dùng thanh tạ.,GymVideo/Back/Upper_Trap/Dumbbell_Shrugs.mp4,17,False,2,Back_Upper_Dumbbell_Shrug.jpeg,False,
+30,Upright row,Upright Row là bài tập kéo thanh tạ từ dưới lên ngực với khuỷu tay hướng ra ngoài nhằm phát triển cơ vai giữa và cơ cầu vai. Đây là bài tập hiệu quả để xây dựng độ dày cho vai và cải thiện sức mạnh phần trên cơ thể.,GymVideo/Back/Upper_Trap/Barbell_Upright_Row.mp4,17,False,2,Back_Upper_Upright_Row.jpeg,False,
+31,Barbell curl,,GymVideo/Bicepts/Bycepts/Barbell_Curl.mp4,18,False,2,Biceps_Barbell_Curl.jpeg,False,
+32,Dumbbell curl,,GymVideo/Bicepts/Bycepts/Dumbbell_Curl.mp4,18,False,2,Biceps_Dumbbel_Url.jpeg,False,
+33,Hammer curl,,GymVideo/Bicepts/Bycepts/Dumbbell_Hammer_Curls.mp4,18,False,2,Biceps_Hammer_Curl.jpeg,False,
+34,Reverse curl,,GymVideo/Bicepts/Bycepts/Standing_Low_pulley_Handle_Reverse_Curl.mp4,18,False,2,Biceps_Reverse_Curl.jpeg,False,
+35,Triceps pushdown,,GymVideo/Tricepts/Outter_Head/Triceps_Push_Down.mp4,19,False,2,Triceps_Lateral_Trceps_Pushdown.jpeg,False,
+36,Kickbacks,,GymVideo/Tricepts/Outter_Head/Dumbbell_Kickback.mp4,19,False,2,Triceps_Lateral_Kickbacks.jpeg,False,
+37,Dips,,GymVideo/Tricepts/Outter_Head/Tricep_Bench_Dip.mp4,19,False,2,Triceps_Lateral_Head_Dips.jpeg,False,
+38,Overhead triceps extension,,GymVideo/Tricepts/Long_Head/Overhead_Cable_Tricep_Extension.mp4,20,False,2,Triceps_Long_Overhead_Triceps_Extention.jpeg,False,
+39,Close-grip bench press,,GymVideo/Tricepts/Long_Head/Close_Grip_Barbell_Bench_Press.mp4,20,False,2,Triceps_Long_Close-grip_Bench_Press.jpeg,False,
+40,Skull crusher,,GymVideo/Tricepts/Long_Head/Skull_Crushers.mp4,20,False,2,Triceps_Long_Skull_Crusher.jpeg,False,
+41,Diamond push-up,,GymVideo/Tricepts/Inner_Head/DIAMOND_PUSH_UP.mp4,21,False,2,Triceps_Medial_Diamond_Push_Up.jpeg,False,
+42,Reverse-grip pushdown,,GymVideo/Tricepts/Inner_Head/Reverse_Grip_Triceps_Pushdown.mp4,21,False,2,Triceps_Medial_Reverse-grip_Pushdown.jpeg,False,
+43,One-arm cable pushdown,,GymVideo/Tricepts/Inner_Head/Triceps_Push_Down.mp4,21,False,2,Triceps_Medial_One-arm_Cable_Pushdown.jpeg,False,
+44,Hip thrust,,GymVideo/Glut/Big_Glut/Hip_Thrust.mp4,22,False,2,Glutes_Maximus_Hip_Thrust.jpeg,False,
+45,Barbell squat,,GymVideo/Glut/Big_Glut/Bulgarian_Split_Squat.mp4,22,False,2,Glutes_Maximus_Barbell_Squat.jpeg,False,
+46,Deadlift,,GymVideo/Glut/Big_Glut/Dumbbell_Romanian_Deadlift.mp4,22,False,2,Glutes_Maximus_Deadlift.jpeg,False,
+47,Side-lying leg raise,,GymVideo/Glut/Middle_Glut/Side_Lying_Leg_Lifts.mp4,23,False,2,Glutes_Medius_Side-lying_Leg_Raise.jpeg,False,
+48,Band walks,,GymVideo/Glut/Middle_Glut/Monster_Walk.mp4,23,False,2,Glutes_Medius_Band_Walks.jpeg,False,
+49,Clamshell,,GymVideo/Glut/Middle_Glut/Clamshell.mp4,23,False,2,Glutes_Medius_Clamshell.jpeg,False,
+50,Cable kickback,,GymVideo/Glut/Small_Glut/Glute_Kickback.mp4,24,False,2,Glutes_Minimus_Cable_Kickback.jpeg,False,
+51,Single-leg glute bridge,,GymVideo/Glut/Small_Glut/Glute_Bridge.mp4,24,False,2,Glutes_Minimus_Single-leg_Glute_Bridge.jpeg,False,
+52,Side-lying abduction,,GymVideo/Glut/Small_Glut/Banded_Sidelying_Hip_Abduction.mp4,24,False,2,Glutes_Minimus_Side-lying_Abduction.jpeg,False,
+53,Romanian deadlift,,GymVideo/Legs/hamstrings/Romanian_Deadlift.mp4,25,False,2,Legs_Hamstring_Romanian_Deadlift.jpeg,False,
+54,Leg curl,,GymVideo/Legs/hamstrings/Lying_Leg_Curl.mp4,25,False,2,Legs_Hamstring_Leg_Curl.jpeg,False,
+55,Glute-ham raise,,GymVideo/Legs/hamstrings/Glute_Ham_Raise_trimmed.mp4,25,False,2,Legs_Hamstring_Glute-ham_Raise.jpeg,False,
+56,Squats,,GymVideo/Legs/Quads/Hack_squat.mp4,26,False,2,Legs_Quadriceps_Squat.jpeg,False,
+57,Leg press,,GymVideo/Legs/Quads/Incline_Leg_Press.mp4,26,False,2,Legs_Quadriceps_Leg_Press.jpeg,False,
+58,Leg extension,,GymVideo/Legs/Quads/Leg_Extension.mp4,26,False,2,Legs_Quadriceps_Leg_Extension.jpeg,False,
+59,Band walks,,GymVideo/Legs/outer_thigh/Band_Walk.mp4,27,False,2,Legs_Outer_Band_Walks.jpeg,False,
+60,Hip abduction cable,,GymVideo/Legs/outer_thigh/Hip_Abduction_Cable.mp4,27,False,2,Legs_Outer_Hip_Abduction.jpeg,False,
+61,Side step-up,,GymVideo/Legs/outer_thigh/Side_Dumbbell_Step_up.mp4,27,False,2,Legs_Outer_Side_Step_Up.jpeg,False,
+62,Sumo squat,,GymVideo/Legs/Inner_thigh/Sumo_Squats.mp4,28,False,2,Legs_Inner_Sumo_Squat.jpeg,False,
+63,Adductor machine,,GymVideo/Legs/Inner_thigh/Hip_Abductor_Machine.mp4,28,False,2,Legs_Inner_Adductor_Machine.jpeg,False,
+64,Side lunge,,GymVideo/Legs/Inner_thigh/SIDE_LUNGES.mp4,28,False,2,Legs_Inner_Side_Lunge.jpeg,False,
+65,Jumping jacks,,GymVideo/cardio/Jumping_Jack.mp4,29,False,2,Jumping_Jacks.jpeg,False,
+66,Burpees,,GymVideo/cardio/Burpees.mp4,29,False,2,Burpees.jpeg,False,
+67,Incline walking,,GymVideo/cardio/Incline_Walking.mp4,29,False,2,Incline_Walking.jpeg,False,
+68,High knees,,GymVideo/cardio/High_Knee.mp4,29,False,2,High_Knees.jpeg,False,
+69,Running,,GymVideo/cardio/Running.mp4,29,False,2,Running.jpeg,False,
+70,Jump squat,,GymVideo/cardio/Squat_Jumps.mp4,29,False,2,Jump_Squat.jpeg,False,

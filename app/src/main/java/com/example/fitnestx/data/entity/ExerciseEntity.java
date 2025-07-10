@@ -20,10 +20,11 @@ public class ExerciseEntity implements Exercise  {
     private int difficulty;
     private String imageUrl;
     private boolean isMarked;
+    private String guideLine;
 
     public ExerciseEntity(int exerciseId, String name, String description, String videoURL,
                           int muscleGroupId, boolean equipmentRequired, int difficulty,
-                          String imageUrl, boolean isMarked) {
+                          String imageUrl, boolean isMarked, String guideLine) {
         this.exerciseId = exerciseId;
         this.name = name;
         this.description = description;
@@ -33,9 +34,19 @@ public class ExerciseEntity implements Exercise  {
         this.difficulty = difficulty;
         this.imageUrl = imageUrl;
         this.isMarked = isMarked;
+        this.guideLine = guideLine;
+
     }
     public boolean isMarked() {
         return isMarked;
+    }
+
+    public String getGuideLine() {
+        return guideLine;
+    }
+
+    public void setGuideLine(String guideLine) {
+        this.guideLine = guideLine;
     }
 
     public void setMarked(boolean marked) {
