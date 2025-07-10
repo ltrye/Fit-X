@@ -24,6 +24,8 @@ public interface SessionExerciseDAO {
 
     @Query("SELECT * FROM SESSION_EXERCISE WHERE sessionId = :sessionId")
     LiveData<List<SessionExerciseEntity>> getExercisesBySessionId(int sessionId);
+    @Query("SELECT * FROM SESSION_EXERCISE WHERE sessionId = :sessionId")
+    List<SessionExerciseEntity> getExercisesListBySessionId(int sessionId);
     @Query("SELECT COUNT(*) FROM SESSION_EXERCISE WHERE sessionId = :sessionId")
     int TotalSessionExercise(int sessionId);
     @Insert(onConflict = OnConflictStrategy.REPLACE)

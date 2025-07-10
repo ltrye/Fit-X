@@ -42,7 +42,7 @@ public class SectionExerciseAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     public static class ExerciseViewHolder extends RecyclerView.ViewHolder {
         ImageView exerciseImage;
         TextView exerciseName;
-        TextView exerciseDescription;
+
         TextView exerciseDifficulty;
         ImageView statusIcon;
 
@@ -50,7 +50,6 @@ public class SectionExerciseAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             super(itemView);
             exerciseImage = itemView.findViewById(R.id.ivExerciseImage);
             exerciseName = itemView.findViewById(R.id.tvExerciseName);
-            //exerciseDescription = itemView.findViewById(R.id.tvExerciseDescription);
             exerciseDifficulty = itemView.findViewById(R.id.tvExerciseDifficulty);
             statusIcon = itemView.findViewById(R.id.ivStatusIcon);
         }
@@ -87,7 +86,7 @@ public class SectionExerciseAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             ExerciseViewHolder viewHolder = (ExerciseViewHolder) holder;
 
             viewHolder.exerciseName.setText(exercise.getName());
-            //viewHolder.exerciseDescription.setText(exercise.getDescription());
+
 
             String difficultyText = getDifficultyText(exercise.getDifficulty());
             viewHolder.exerciseDifficulty.setText(difficultyText);
@@ -132,14 +131,5 @@ public class SectionExerciseAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         notifyDataSetChanged();
     }
 
-    public void toggleExerciseStatus(int position) {
-        if (position >= 0 && position < items.size()) {
-            SectionItem item = items.get(position);
-            if (item.getType() == SectionItem.TYPE_ITEM) {
-                ExerciseEntity exercise = item.getExercise();
-                exercise.setMarked(exercise.isMarked() ? false : true);
-                notifyItemChanged(position);
-            }
-        }
-    }
+
 }

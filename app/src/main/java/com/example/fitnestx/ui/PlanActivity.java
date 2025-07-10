@@ -1,11 +1,13 @@
 package com.example.fitnestx.ui;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -40,6 +42,7 @@ public class PlanActivity extends AppCompatActivity {
     private UserMetricsRepository userMetricsRepository;
     private WorkoutPlanRepository workoutPlanRepository;
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
+    public static final int REQUEST_CODE_EXERCISE = 1001; // Bất kỳ số nào bạn chọn
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +59,39 @@ public class PlanActivity extends AppCompatActivity {
         initViews();
         setupRecyclerView();
 
+    }
+
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        setupRecyclerView(); // Luôn reload dữ liệu khi màn hình được resume
+//    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_EXERCISE && resultCode == RESULT_OK && data != null) {
+            int sessionId = data.getIntExtra("sessionId", -1);
+            if (sessionId != -1) {
+                updateSingleSession(sessionId);
+            }
+        }
+    }
+    private void updateSingleSession(int sessionId) {
+        executorService.execute(() -> {
+            WorkoutSessionEntity updatedSession = workoutSessionRepository.getWorkoutSessionById(sessionId);
+            if (updatedSession == null) return;
+
+            runOnUiThread(() -> {
+                for (int i = 0; i < goalAdapter.getItemCount(); i++) {
+                    WorkoutSessionEntity session = goalAdapter.getItem(i);
+                    if (session.getSessionId() == sessionId) {
+                        goalAdapter.updateItem(i, updatedSession);
+                        break;
+                    }
+                }
+            });
+        });
     }
 
     private void initViews() {
@@ -107,16 +143,23 @@ public class PlanActivity extends AppCompatActivity {
             }
 
             List<WorkoutSessionEntity> sessions = workoutSessionRepository.getWorkoutSessionsByPlanId(planId);
+
             sessions.sort((s1, s2) -> {
                 int day1 = extractDayNumber(s1.getDate());
                 int day2 = extractDayNumber(s2.getDate());
                 return Integer.compare(day1, day2);
             });
 
+
+
             runOnUiThread(() -> {
-                goalAdapter = new GoalAdapter(sessions, this, sessionExerciseRepository);
-                recyclerView.setLayoutManager(new LinearLayoutManager(this));
-                recyclerView.setAdapter(goalAdapter);
+                if (goalAdapter == null) {
+                    goalAdapter = new GoalAdapter(sessions, this, sessionExerciseRepository);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(this));
+                    recyclerView.setAdapter(goalAdapter);
+                } else {
+                    goalAdapter.updateData(sessions); // ← Sử dụng được vì bạn đã thêm hàm này
+                }
             });
         });
     }
@@ -131,13 +174,15 @@ public class PlanActivity extends AppCompatActivity {
         }
         return userId;
     }
-    private int extractDayNumber(String label) {
-        // Giả sử format luôn là "Ngày <số>"
+    private int extractDayNumber(String date) {
+        if (date == null) return 0;
         try {
-            return Integer.parseInt(label.replaceAll("[^0-9]", "").trim());
+            date = date.trim().toLowerCase().replace("ngày", "").trim();
+            return Integer.parseInt(date);
         } catch (NumberFormatException e) {
-            return 0; // fallback nếu có lỗi
+            return 0;
         }
     }
+
 
 }
