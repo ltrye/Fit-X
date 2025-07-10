@@ -35,6 +35,9 @@ public class WorkoutSessionRepository {
         return workoutSessionDAO.getWorkoutSessionsByPlanIdList(planId);
     }
 
+    public void deleteAllWorkoutSessionForPlanId(int planId){
+         workoutSessionDAO.deleteAllWorkoutSessionsForPlan(planId);
+    }
     public void updateWorkoutSession(WorkoutSessionEntity session) {
         workoutSessionDAO.updateWorkoutSession(session);
     }
