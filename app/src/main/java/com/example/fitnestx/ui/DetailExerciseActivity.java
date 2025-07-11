@@ -263,88 +263,95 @@ public class DetailExerciseActivity extends AppCompatActivity {
             ExecutorService executorSkip = Executors.newSingleThreadExecutor();
 
             executorSkip.execute(() -> {
-                // Cập nhật isMarked = true trong DB
-                sessionExerciseEntity = sessionExerciseRepository.getSessionExercise(sessionId, exerciseId);
+                    if (sessionExerciseRepository.IsCurrentLastExercise(sessionId, exerciseId)) {
+                        runOnUiThread(() -> showMetricsUpdateDialog());
+                    }else {
 
-                sessionExerciseEntity.setMarked(true);
-                sessionExerciseRepository.updateSessionExercise(sessionExerciseEntity);
-                List<Integer> exerciseIds = sessionExerciseRepository.GetListIdExercsieBySessionId(sessionId);
-                List<ExerciseEntity> exercises = new ArrayList<>();
-                for (int id : exerciseIds) {
-                    ExerciseEntity ex = exerciseRepository.getExerciseById(id);
-                    if (ex != null)
-                        exercises.add(ex);
-                }
 
-                List<MuscleGroupEntity> allMuscles = muscleGroupRepository.getListMuscleGroup();
-                Map<Integer, MuscleGroupEntity> idToGroup = new HashMap<>();
-                Map<Integer, Integer> childToParentMap = new HashMap<>();
+                        // Cập nhật isMarked = true trong DB
+                        sessionExerciseEntity = sessionExerciseRepository.getSessionExercise(sessionId, exerciseId);
 
-                for (MuscleGroupEntity mg : allMuscles) {
-                    idToGroup.put(mg.getMuscleGroupId(), mg);
-                    if (mg.getParentId() != null) {
-                        childToParentMap.put(mg.getMuscleGroupId(), mg.getParentId());
+                        sessionExerciseEntity.setMarked(true);
+                        sessionExerciseRepository.updateSessionExercise(sessionExerciseEntity);
+                        List<Integer> exerciseIds = sessionExerciseRepository.GetListIdExercsieBySessionId(sessionId);
+                        List<ExerciseEntity> exercises = new ArrayList<>();
+                        for (int id : exerciseIds) {
+                            ExerciseEntity ex = exerciseRepository.getExerciseById(id);
+                            if (ex != null)
+                                exercises.add(ex);
+                        }
+
+                        List<MuscleGroupEntity> allMuscles = muscleGroupRepository.getListMuscleGroup();
+                        Map<Integer, MuscleGroupEntity> idToGroup = new HashMap<>();
+                        Map<Integer, Integer> childToParentMap = new HashMap<>();
+
+                        for (MuscleGroupEntity mg : allMuscles) {
+                            idToGroup.put(mg.getMuscleGroupId(), mg);
+                            if (mg.getParentId() != null) {
+                                childToParentMap.put(mg.getMuscleGroupId(), mg.getParentId());
+                            }
+                        }
+
+                        Map<Integer, List<ExerciseEntity>> groupedByParent = new HashMap<>();
+                        Set<Integer> usedParentIds = new HashSet<>();
+
+                        for (ExerciseEntity ex : exercises) {
+                            int childId = ex.getMuscleGroupId();
+                            Integer parentId = childToParentMap.get(childId);
+                            if (parentId != null) {
+                                groupedByParent.computeIfAbsent(parentId, k -> new ArrayList<>()).add(ex);
+                                usedParentIds.add(parentId);
+                            } else {
+                                groupedByParent.computeIfAbsent(childId, k -> new ArrayList<>()).add(ex);
+                                usedParentIds.add(childId);
+                            }
+                        }
+                        List<SectionItem> sectionItems = new ArrayList<>();
+                        for (Integer parentId : groupedByParent.keySet()) {
+                            MuscleGroupEntity group = idToGroup.get(parentId);
+                            String title = (group != null) ? group.getName() : "Nhóm khác";
+
+                            sectionItems.add(new SectionItem(title)); // Header
+                            for (ExerciseEntity ex : groupedByParent.get(parentId)) {
+                                sessionExerciseEntity = sessionExerciseRepository.getSessionExercise(sessionId,
+                                        ex.getExerciseId());
+                                ExerciseWithSessionStatus exerciseWithSessionStatus = new ExerciseWithSessionStatus(ex,
+                                        sessionExerciseEntity.isMarked());
+                                sectionItems.add(new SectionItem(exerciseWithSessionStatus));
+                            }
+                        }
+
+                        List<ExerciseWithSessionStatus> exerciseItems = new ArrayList<>();
+                        for (SectionItem item : sectionItems) {
+                            if (item.getType() == SectionItem.TYPE_ITEM) {
+                                exerciseItems.add(item.getExerciseWithStatus());
+                            }
+                        }
+
+                        boolean allMarked = true;
+                        for (ExerciseWithSessionStatus item : exerciseItems) {
+                            if (!item.isMarked()) {
+                                allMarked = false;
+                                break;
+                            }
+                        }
+
+                        finalAllMarked = allMarked;
+                        // Trở lại UI thread để kết thúc activity
+                        runOnUiThread(() -> {
+                            int userId = getCurrentUserId(); // hoặc bạn lấy userId từ đâu đó
+
+                            if (finalAllMarked && !hasShownNotification(userId, sessionId)) {
+                                showCompletionNotification();
+                                markNotificationAsShown(userId, sessionId);
+                            }
+
+                            Toast.makeText(this, "Đã đánh dấu hoàn thành", Toast.LENGTH_SHORT).show();
+                            finish(); // Quay lại màn hình trước
+                        });
                     }
-                }
-
-                Map<Integer, List<ExerciseEntity>> groupedByParent = new HashMap<>();
-                Set<Integer> usedParentIds = new HashSet<>();
-
-                for (ExerciseEntity ex : exercises) {
-                    int childId = ex.getMuscleGroupId();
-                    Integer parentId = childToParentMap.get(childId);
-                    if (parentId != null) {
-                        groupedByParent.computeIfAbsent(parentId, k -> new ArrayList<>()).add(ex);
-                        usedParentIds.add(parentId);
-                    } else {
-                        groupedByParent.computeIfAbsent(childId, k -> new ArrayList<>()).add(ex);
-                        usedParentIds.add(childId);
-                    }
-                }
-                List<SectionItem> sectionItems = new ArrayList<>();
-                for (Integer parentId : groupedByParent.keySet()) {
-                    MuscleGroupEntity group = idToGroup.get(parentId);
-                    String title = (group != null) ? group.getName() : "Nhóm khác";
-
-                    sectionItems.add(new SectionItem(title)); // Header
-                    for (ExerciseEntity ex : groupedByParent.get(parentId)) {
-                        sessionExerciseEntity = sessionExerciseRepository.getSessionExercise(sessionId,
-                                ex.getExerciseId());
-                        ExerciseWithSessionStatus exerciseWithSessionStatus = new ExerciseWithSessionStatus(ex,
-                                sessionExerciseEntity.isMarked());
-                        sectionItems.add(new SectionItem(exerciseWithSessionStatus));
-                    }
-                }
-
-                List<ExerciseWithSessionStatus> exerciseItems = new ArrayList<>();
-                for (SectionItem item : sectionItems) {
-                    if (item.getType() == SectionItem.TYPE_ITEM) {
-                        exerciseItems.add(item.getExerciseWithStatus());
-                    }
-                }
-
-                boolean allMarked = true;
-                for (ExerciseWithSessionStatus item : exerciseItems) {
-                    if (!item.isMarked()) {
-                        allMarked = false;
-                        break;
-                    }
-                }
-
-                finalAllMarked = allMarked;
-                // Trở lại UI thread để kết thúc activity
-                runOnUiThread(() -> {
-                    int userId = getCurrentUserId(); // hoặc bạn lấy userId từ đâu đó
-
-                    if (finalAllMarked && !hasShownNotification(userId, sessionId)) {
-                        showCompletionNotification();
-                        markNotificationAsShown(userId, sessionId);
-                    }
-
-                    Toast.makeText(this, "Đã đánh dấu hoàn thành", Toast.LENGTH_SHORT).show();
-                    finish(); // Quay lại màn hình trước
-                });
             });
+
         });
         nextButton.setOnClickListener(v -> {
             // Only show metrics update dialog if this is the last exercise
