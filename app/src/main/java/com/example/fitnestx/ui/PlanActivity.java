@@ -62,6 +62,14 @@ public class PlanActivity extends AppCompatActivity {
         userRepository = new UserRepository(this);
         userMetricsRepository = new UserMetricsRepository(this);
 
+
+        // Thêm nút để truy cập danh sách bài tập đơn lẻ
+        Button btnIndividualExercises = findViewById(R.id.btn_individual_exercises);
+        btnIndividualExercises.setOnClickListener(v -> {
+            Intent intent = new Intent(PlanActivity.this, MuscleGroupListActivity.class);
+            startActivity(intent);
+        });
+
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_top_menu, new TopMenuFragment());
         transaction.commit();
