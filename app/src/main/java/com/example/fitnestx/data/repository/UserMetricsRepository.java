@@ -21,7 +21,11 @@ public class UserMetricsRepository {
     }
 
     public UserMetricsEntity getUserMetricByUserId(int userId) {
-        return userMetricsDAO.getUserMetricByUserId(userId);
+        return userMetricsDAO.getLatestUserMetricByUserId(userId);
+    }
+
+    public List<UserMetricsEntity> getAllUserMetric(int userId) {
+        return userMetricsDAO.getAllUserMetricsByUserId(userId);
     }
 
     public void insertUserMetric(UserMetricsEntity metric) {
@@ -45,6 +49,10 @@ public class UserMetricsRepository {
 
     public LiveData<List<UserMetricsEntity>> getUserMetricsByUserId(int userId) {
         return userMetricsDAO.getUserMetricsByUserId(userId);
+    }
+
+    public List<UserMetricsEntity> getAllUserMetricsByUserId(int userId) {
+        return userMetricsDAO.getAllUserMetricsByUserId(userId);
     }
 
     public void updateUserMetric(UserMetricsEntity metric) {
