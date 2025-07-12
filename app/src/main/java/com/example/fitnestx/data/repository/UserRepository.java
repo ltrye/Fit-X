@@ -50,6 +50,7 @@ public class UserRepository {
     public void updateUser(UserEntity userEntity) {
         new Thread(() -> {
             try {
+
                 userDAO.updateUser(userEntity);
                 Log.d("UserRepository", "Successfully updated user with ID: " + userEntity.getUserId());
             } catch (Exception e) {
@@ -58,6 +59,16 @@ public class UserRepository {
         }).start();
     }
 
+    public void updateUserWithMailCheck(UserEntity userEntity,int userId){
+                //
+                UserEntity check = userDAO.getUserByEmail(userEntity.getEmail());
+                if(check != null && check.getUserId() != userId){
+                    throw new IllegalArgumentException("Email đã tồn tại");
+                }
+
+                userDAO.updateUser(userEntity);
+                Log.d("UserRepository", "Successfully updated user with ID: " + userEntity.getUserId());
+    }
     public void deleteUser(UserEntity user) {
         new Thread(() -> {
             try {

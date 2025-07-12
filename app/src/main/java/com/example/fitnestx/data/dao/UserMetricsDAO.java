@@ -23,6 +23,11 @@ public interface UserMetricsDAO {
     UserMetricsEntity getUserMetricByUserId(int userId);
 
     @Query("SELECT * FROM USER_METRICS WHERE userId = :userId")
+    List<UserMetricsEntity> getAllUserMetricsByUserId(int userId);
+    @Query("SELECT * FROM USER_METRICS WHERE userId = :userId ORDER BY timestamp DESC LIMIT 1")
+    UserMetricsEntity getLatestUserMetricByUserId(int userId);
+
+    @Query("SELECT * FROM USER_METRICS WHERE userId = :userId")
     LiveData<List<UserMetricsEntity>> getUserMetricsByUserId(int userId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
