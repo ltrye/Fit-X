@@ -1,5 +1,7 @@
 package com.example.fitnestx.adapters;
 
+import android.app.Activity;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -97,12 +99,30 @@ public class SectionExerciseAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             StorageReference storageRef = storage.getReference().child("Exercise/" + exercise.getImageUrl());
 
             storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                Glide.with(holder.itemView.getContext())
-                        .load(uri.toString())
-                        .placeholder(R.drawable.ic_exercise_placeholder)
-                        .into(((ExerciseViewHolder) holder).exerciseImage);
+                if (holder.getBindingAdapterPosition() != RecyclerView.NO_POSITION) {
+                    Context context = holder.itemView.getContext();
+                    if (context instanceof Activity) {
+                        Activity activity = (Activity) context;
+                        if (activity.isDestroyed() || activity.isFinishing()) {
+                            return;
+                        }
+                    }
+                    Glide.with(context)
+                            .load(uri.toString())
+                            .placeholder(R.drawable.ic_exercise_placeholder)
+                            .into(viewHolder.exerciseImage);
+                }
             }).addOnFailureListener(e -> {
-                ((ExerciseViewHolder) holder).exerciseImage.setImageResource(R.drawable.ic_exercise_placeholder);
+                if (holder.getBindingAdapterPosition() != RecyclerView.NO_POSITION) {
+                    Context context = holder.itemView.getContext();
+                    if (context instanceof Activity) {
+                        Activity activity = (Activity) context;
+                        if (activity.isDestroyed() || activity.isFinishing()) {
+                            return;
+                        }
+                    }
+                    viewHolder.exerciseImage.setImageResource(R.drawable.ic_exercise_placeholder);
+                }
             });
 
 
