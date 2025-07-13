@@ -39,6 +39,7 @@ public class IndividualExerciseDetailActivity extends AppCompatActivity {
     private ImageView closeButton;
     private ExerciseEntity exerciseEntity;
     private TextView exerciseTitle, exerciseDescription;
+    private TextView exerciseGuideline;
     private ExerciseRepository exerciseRepository;
 
     @OptIn(markerClass = UnstableApi.class)
@@ -69,6 +70,7 @@ public class IndividualExerciseDetailActivity extends AppCompatActivity {
         exerciseTitle = findViewById(R.id.exercise_title);
         exerciseDescription = findViewById(R.id.exercise_description);
         closeButton = findViewById(R.id.close_button);
+        exerciseGuideline = findViewById(R.id.exercise_guideline);
     }
 
     @OptIn(markerClass = UnstableApi.class)
@@ -154,11 +156,18 @@ public class IndividualExerciseDetailActivity extends AppCompatActivity {
         executor.execute(() -> {
             exerciseEntity = exerciseRepository.getExerciseById(exerciseId);
             String description = exerciseRepository.GetDesByExId(exerciseId);
+            String guideline = exerciseRepository.GetGuideByExId(exerciseId);
 
             if (exerciseEntity != null) {
                 runOnUiThread(() -> {
                     exerciseTitle.setText(exerciseEntity.getName());
                     exerciseDescription.setText(description);
+                    if (guideline != null && !guideline.isEmpty()) {
+                        String formattedGuideline = guideline.replaceAll(" (?=\\d+\\.)", "\n");
+                        exerciseGuideline.setText(formattedGuideline);
+                    } else {
+                        exerciseGuideline.setText("");
+                    }
                 });
             } else {
                 runOnUiThread(() -> {

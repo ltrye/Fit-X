@@ -16,6 +16,8 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.List;
 
+import android.app.Activity;
+
 public class ExerciseListAdapter extends RecyclerView.Adapter<ExerciseListAdapter.ViewHolder> {
 
     private List<ExerciseEntity> exercises;
@@ -64,12 +66,23 @@ public class ExerciseListAdapter extends RecyclerView.Adapter<ExerciseListAdapte
         StorageReference storageRef = storage.getReference().child("Exercise/" + exercise.getImageUrl());
         // Load image using Glide
         storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+            if (holder.getBindingAdapterPosition() == RecyclerView.NO_POSITION) {
+                return;
+            }
+            if (holder.itemView.getContext() instanceof Activity) {
+                Activity activity = (Activity) holder.itemView.getContext();
+                if (activity.isDestroyed() || activity.isFinishing()) {
+                    return;
+                }
+            }
             Glide.with(holder.itemView.getContext())
                     .load(uri.toString())
                     .placeholder(R.drawable.ic_exercise_placeholder)
                     .into(holder.exerciseImage);
         }).addOnFailureListener(e -> {
-            holder.exerciseImage.setImageResource(R.drawable.ic_exercise_placeholder);
+            if (holder.getBindingAdapterPosition() != RecyclerView.NO_POSITION) {
+                holder.exerciseImage.setImageResource(R.drawable.ic_exercise_placeholder);
+            }
         });
 
         holder.itemView.setOnClickListener(v -> {

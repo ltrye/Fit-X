@@ -82,7 +82,7 @@ public class UserSurveyActivity extends AppCompatActivity {
     }
 
     private void setupGenderSpinner() {
-        String[] genderOptions = {"Choose Gender", "Male", "Female", "Other"};
+        String[] genderOptions = {"Choose Gender", "Male", "Female"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, genderOptions);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
