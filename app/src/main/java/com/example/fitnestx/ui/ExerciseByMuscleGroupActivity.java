@@ -62,9 +62,9 @@ public class ExerciseByMuscleGroupActivity extends AppCompatActivity {
         adapter = new ExerciseListAdapter(new ArrayList<>(), new ExerciseListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(ExerciseEntity exercise) {
-                Intent intent = new Intent(ExerciseByMuscleGroupActivity.this, DetailExerciseActivity.class);
-                intent.putExtra(DetailExerciseActivity.EXTRA_EXERCISE_ID, exercise.getExerciseId());
-                // Không truyền sessionId vì đây là xem bài tập đơn lẻ
+                // Chuyển sang IndividualExerciseDetailActivity thay vì DetailExerciseActivity
+                Intent intent = new Intent(ExerciseByMuscleGroupActivity.this, IndividualExerciseDetailActivity.class);
+                intent.putExtra(IndividualExerciseDetailActivity.EXTRA_EXERCISE_ID, exercise.getExerciseId());
                 startActivity(intent);
             }
         });
