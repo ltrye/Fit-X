@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,37 +36,36 @@ public class PlanActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private GoalAdapter goalAdapter;
     private List<WorkoutSessionEntity> goalList;
-    private TextView greetingText,goal;
+    private TextView greetingText, goal, tvBMIValue, tvBMIStatus;
+    private LinearLayout bmiCard;
+
     private SessionExerciseRepository sessionExerciseRepository;
     private WorkoutSessionRepository workoutSessionRepository;
     private UserRepository userRepository;
     private UserMetricsRepository userMetricsRepository;
     private WorkoutPlanRepository workoutPlanRepository;
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
-    public static final int REQUEST_CODE_EXERCISE = 1001; // Bất kỳ số nào bạn chọn
+    public static final int REQUEST_CODE_EXERCISE = 1001;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_plan);
+
         sessionExerciseRepository = new SessionExerciseRepository(this);
         workoutSessionRepository = new WorkoutSessionRepository(this);
         workoutPlanRepository = new WorkoutPlanRepository(this);
         goalList = new ArrayList<>();
         userRepository = new UserRepository(this);
         userMetricsRepository = new UserMetricsRepository(this);
+
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_top_menu, new TopMenuFragment());
         transaction.commit();
+
         initViews();
         setupRecyclerView();
-
     }
-
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        setupRecyclerView(); // Luôn reload dữ liệu khi màn hình được resume
-//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -77,6 +77,7 @@ public class PlanActivity extends AppCompatActivity {
             }
         }
     }
+
     private void updateSingleSession(int sessionId) {
         executorService.execute(() -> {
             WorkoutSessionEntity updatedSession = workoutSessionRepository.getWorkoutSessionById(sessionId);
@@ -98,12 +99,23 @@ public class PlanActivity extends AppCompatActivity {
         greetingText = findViewById(R.id.greeting_text);
         recyclerView = findViewById(R.id.recycler_view);
         goal = findViewById(R.id.goal);
+        bmiCard = findViewById(R.id.bmi_card);
+        tvBMIValue = findViewById(R.id.tv_bmi_value);
+        tvBMIStatus = findViewById(R.id.tv_bmi_status);
+
+        // Set click listener cho BMI card
+        bmiCard.setOnClickListener(v -> {
+            Intent intent = new Intent(PlanActivity.this, BMIDetailActivity.class);
+            startActivity(intent);
+        });
+
         int userId = getCurrentUserId();
         if (userId == -1) {
             Toast.makeText(this, "Error: User not logged in", Toast.LENGTH_SHORT).show();
-            Log.e("WorkoutFrequencyActivity", "Invalid userId");
+            Log.e("PlanActivity", "Invalid userId");
             return;
         }
+
         // Chạy trong background thread
         executorService.execute(() -> {
             UserEntity user = userRepository.getUserById(userId);
@@ -112,7 +124,10 @@ public class PlanActivity extends AppCompatActivity {
                 // Update UI trên UI thread
                 runOnUiThread(() -> {
                     greetingText.setText("Hello, " + user.getName());
-                    goal.setText(userMetrics.getGoal());
+                    if (userMetrics != null) {
+                        goal.setText(userMetrics.getGoal());
+                        setupBMICard(userMetrics);
+                    }
                 });
             } else {
                 runOnUiThread(() -> {
@@ -120,6 +135,32 @@ public class PlanActivity extends AppCompatActivity {
                 });
             }
         });
+    }
+
+    private void setupBMICard(UserMetricsEntity userMetrics) {
+        double bmi = userMetrics.getBmi();
+        tvBMIValue.setText(String.format("%.1f", bmi));
+
+        // Xác định trạng thái BMI và màu sắc
+        String status;
+        int statusColor;
+
+        if (bmi < 18.5) {
+            status = "Thiếu cân";
+            statusColor = getResources().getColor(android.R.color.holo_blue_light);
+        } else if (bmi < 25) {
+            status = "Bình thường";
+            statusColor = getResources().getColor(android.R.color.holo_green_light);
+        } else if (bmi < 30) {
+            status = "Thừa cân";
+            statusColor = getResources().getColor(android.R.color.holo_orange_light);
+        } else {
+            status = "Béo phì";
+            statusColor = getResources().getColor(android.R.color.holo_red_light);
+        }
+
+        tvBMIStatus.setText(status);
+        tvBMIStatus.setTextColor(statusColor);
     }
 
     private void setupRecyclerView() {
@@ -136,7 +177,6 @@ public class PlanActivity extends AppCompatActivity {
                 if (plan != null) {
                     planId = plan.getPlanId();
                 } else {
-                    int finalPlanId1 = planId;
                     runOnUiThread(() -> Toast.makeText(this, "No workout plan found", Toast.LENGTH_SHORT).show());
                     return;
                 }
@@ -150,30 +190,27 @@ public class PlanActivity extends AppCompatActivity {
                 return Integer.compare(day1, day2);
             });
 
-
-
             runOnUiThread(() -> {
                 if (goalAdapter == null) {
                     goalAdapter = new GoalAdapter(sessions, this, sessionExerciseRepository);
                     recyclerView.setLayoutManager(new LinearLayoutManager(this));
                     recyclerView.setAdapter(goalAdapter);
                 } else {
-                    goalAdapter.updateData(sessions); // ← Sử dụng được vì bạn đã thêm hàm này
+                    goalAdapter.updateData(sessions);
                 }
             });
         });
     }
 
-
-
     private int getCurrentUserId() {
         SharedPreferences prefs = getSharedPreferences("AuthPrefs", MODE_PRIVATE);
         int userId = prefs.getInt("userId", -1);
         if (userId == -1) {
-            Log.e("WorkoutFrequencyActivity", "No userId found in SharedPreferences");
+            Log.e("PlanActivity", "No userId found in SharedPreferences");
         }
         return userId;
     }
+
     private int extractDayNumber(String date) {
         if (date == null) return 0;
         try {
@@ -184,5 +221,11 @@ public class PlanActivity extends AppCompatActivity {
         }
     }
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (executorService != null && !executorService.isShutdown()) {
+            executorService.shutdown();
+        }
+    }
 }
