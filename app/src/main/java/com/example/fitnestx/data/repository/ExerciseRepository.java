@@ -22,6 +22,10 @@ public class ExerciseRepository {
         return exerciseDAO.GetDesByExId(exerciseId);
     }
 
+    public String GetGuideByExId(int exerciseId){
+        return exerciseDAO.GetGuideByExId(exerciseId);
+    }
+
     public void insertExercise(ExerciseEntity exercise) {
         new Thread(() -> exerciseDAO.insertExercise(exercise)).start();
     }
