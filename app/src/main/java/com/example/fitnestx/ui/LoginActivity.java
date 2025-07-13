@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.text.InputType;
@@ -31,7 +32,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etPassword;
     private Button btnLogin;
     private TextView tvRegister;
-    private Button btnGoogleSignIn;
+    private ImageButton btnGoogleSignIn; //change Button to ImageButton
 
     private UserRepository userRepository;
     private GoogleSignInClient mGoogleSignInClient;
