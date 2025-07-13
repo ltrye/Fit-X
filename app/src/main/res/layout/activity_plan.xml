@@ -1,73 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/plan"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/background_color">
+    android:background="@color/white"
+    tools:context=".ui.PlanActivity">
 
     <FrameLayout
         android:id="@+id/fragment_top_menu"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true" />
+        android:layout_height="wrap_content" />
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/greeting_text"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="16dp"
-                android:layout_marginBottom="16dp"
-                android:background="@drawable/bg_greeting_card"
-                android:elevation="2dp"
-                android:gravity="center_vertical">
+                android:text="Hello, User"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:layout_marginBottom="8dp"/>
 
-                <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:src="@drawable/ic_user"
-                    android:layout_marginEnd="12dp"
-                    android:background="@drawable/circle_background"
-                    android:scaleType="centerCrop" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Welcome back, ready for your workout?"
+                android:textSize="16sp"
+                android:layout_marginBottom="16dp"/>
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/greeting_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Hello, (ten user)"
-                        android:textSize="18sp"
-                        android:textColor="@android:color/white"
-                        android:textStyle="bold"
-                        android:layout_marginBottom="4dp" />
-
-                    <TextView
-                        android:id="@+id/goal"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Mục tiêu: Giảm cân"
-                        android:textSize="14sp"
-                        android:textColor="#EDEDED" />
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <!-- BMI Card -->
             <LinearLayout
                 android:id="@+id/bmi_card"
                 android:layout_width="match_parent"
@@ -76,17 +49,12 @@
                 android:background="@drawable/rounded_background"
                 android:padding="16dp"
                 android:layout_marginBottom="16dp"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?attr/selectableItemBackground">
+                android:gravity="center_vertical">
 
-                <!-- BMI Icon -->
                 <ImageView
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:src="@drawable/ic_height"
-                    android:background="@drawable/rounded_background"
-                    android:padding="12dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_exercise"
                     android:layout_marginEnd="16dp"
                     android:layout_gravity="center_vertical"
                     android:scaleType="centerCrop"
@@ -96,13 +64,12 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_gravity="center_vertical">
+                    android:orientation="vertical">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Chỉ số BMI"
+                        android:text="BMI (Body Mass Index)"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:textColor="@color/text_primary"
@@ -113,12 +80,11 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical">
-
                         <TextView
                             android:id="@+id/tv_bmi_value"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="22.5"
+                            android:text="20.5"
                             android:textSize="20sp"
                             android:textStyle="bold"
                             android:textColor="@color/text_primary"
@@ -145,35 +111,63 @@
 
                 </LinearLayout>
 
-                <!-- Arrow Icon -->
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_arrow_right"
                     android:layout_gravity="center_vertical"
-                    android:tint="@color/icon_color" />
+                    app:tint="@color/icon_color" />
 
             </LinearLayout>
 
-            <!-- Workout Plan Title -->
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Kế hoạch tập luyện"
+                android:text="Your Goal"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:layout_marginBottom="8dp"/>
+
+            <TextView
+                android:id="@+id/goal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Improve Shape"
                 android:textSize="16sp"
+                android:layout_marginBottom="16dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Workout Plan"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="@color/text_primary"
                 android:layout_marginBottom="12dp"
                 android:layout_marginTop="8dp" />
 
-            <!-- Workout Sessions RecyclerView -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false" />
+                android:nestedScrollingEnabled="false"
+                tools:listitem="@layout/item_plan"/>
 
         </LinearLayout>
     </ScrollView>
+
+    <Button
+        android:id="@+id/btn_complete_plan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Hoàn thành kế hoạch"
+        android:background="@drawable/button_rounded"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:padding="12dp"
+        android:layout_margin="16dp"
+        android:enabled="false" /> <!-- Initially disabled -->
 
 </LinearLayout>

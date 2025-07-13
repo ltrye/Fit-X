@@ -28,7 +28,7 @@ public class SessionExerciseRepository {
         return sessionExerciseDAO.TotalSessionExercise(sessionId);
     }
     public void insertSessionExercise(SessionExerciseEntity sessionExercise) {
-        new Thread(() -> sessionExerciseDAO.insertSessionExercise(sessionExercise)).start();
+        sessionExerciseDAO.insertSessionExercise(sessionExercise);
     }
 
     public LiveData<List<SessionExerciseEntity>> getAllSessionExercises() {
@@ -44,14 +44,29 @@ public class SessionExerciseRepository {
     }
 
     public void updateSessionExercise(SessionExerciseEntity sessionExercise) {
-        new Thread(() -> sessionExerciseDAO.updateSessionExercise(sessionExercise)).start();
+        sessionExerciseDAO.updateSessionExercise(sessionExercise);
     }
 
     public void deleteSessionExercise(SessionExerciseEntity sessionExercise) {
-        new Thread(() -> sessionExerciseDAO.deleteSessionExercise(sessionExercise)).start();
+        sessionExerciseDAO.deleteSessionExercise(sessionExercise);
     }
 
     public void deleteAllSessionExercises() {
-        new Thread(() -> sessionExerciseDAO.deleteAllSessionExercises()).start();
+        sessionExerciseDAO.deleteAllSessionExercises();
+    }
+
+    // New method to update all exercises' marked status for a given plan
+    public void updateAllExercisesMarkedStatusForPlan(int planId, boolean isMarked) {
+        sessionExerciseDAO.updateAllExercisesMarkedStatusForPlan(planId, isMarked);
+    }
+
+    // New method to delete all session exercises for a given plan
+    public void deleteAllSessionExercisesForPlan(int planId) {
+        sessionExerciseDAO.deleteAllSessionExercisesForPlan(planId);
+    }
+
+    // New method to delete all session exercises for a specific session
+    public void deleteSessionExercisesBySessionId(int sessionId) {
+        sessionExerciseDAO.deleteSessionExercisesBySessionId(sessionId);
     }
 }

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="24dp"
+    android:background="@color/white">
+
+    <ImageView
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:src="@drawable/ic_check_filled"
+        android:layout_marginBottom="32dp"
+        app:tint="@color/primary_color" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Chúc mừng!"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Bạn đã hoàn thành tất cả các buổi tập trong kế hoạch hiện tại. Giờ là lúc để đặt mục tiêu mới hoặc tiếp tục hành trình của bạn!"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:layout_marginBottom="48dp" />
+
+    <Button
+        android:id="@+id/btn_continue_current_plan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tiếp tục với lịch hiện tại"
+        android:background="@drawable/button_background"
+        android:textColor="@color/white"
+        android:paddingVertical="12dp"
+        android:layout_marginBottom="16dp"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/btn_reset_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Đặt lại trạng thái hoàn thành"
+        android:background="@drawable/button_background"
+        android:textColor="@color/white"
+        android:paddingVertical="12dp"
+        android:layout_marginBottom="16dp"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/btn_regenerate_exercises"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tạo lại bài tập mới"
+        android:background="@drawable/button_background"
+        android:textColor="@color/white"
+        android:paddingVertical="12dp"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+</LinearLayout>
