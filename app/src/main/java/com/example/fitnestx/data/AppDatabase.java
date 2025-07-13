@@ -155,16 +155,8 @@ public abstract class AppDatabase extends RoomDatabase {
             super.onCreate(db);
             Executors.newSingleThreadExecutor().execute(() -> {
                 AppDatabase instance = sInstance;
-                DatabaseGenerator.readUserCSV(sAppContext, "users.csv", instance);
-                DatabaseGenerator.readWorkoutPlanCSV(sAppContext, "workout_plans.csv", instance);
-                DatabaseGenerator.readWorkoutSessionCSV(sAppContext, "workout_sessions.csv", instance);
-                DatabaseGenerator.readSessionExerciseCSV(sAppContext, "session_exercises.csv", instance);
                 DatabaseGenerator.readMuscleGroupCSV(sAppContext, "muscle_groups.csv", instance);
                 DatabaseGenerator.readExerciseCSV(sAppContext, "exercises.csv", instance);
-                DatabaseGenerator.readExerciseFeedbackCSV(sAppContext, "exercise_feedback.csv", instance);
-                DatabaseGenerator.readNotificationCSV(sAppContext, "notifications.csv", instance);
-                DatabaseGenerator.readUserMetricsCSV(sAppContext, "user_metrics.csv", instance);
-                DatabaseGenerator.readAuthProviderCSV(sAppContext, "auth_providers.csv", instance);
             });
         }
 
