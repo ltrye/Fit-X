@@ -97,15 +97,18 @@
         android:layout_marginBottom="16dp" />
 
     <!-- Continue with Google Button -->
-    <Button
+    <ImageButton
+        android:id="@+id/btn_google"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Continue with Google"
-        android:backgroundTint="@android:color/white"
-        android:textColor="@android:color/black"
-        android:drawableStart="@drawable/ic_google"
-        android:drawablePadding="8dp"
-        android:layout_marginBottom="24dp" />
+        android:layout_height="48dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="24dp"
+        android:src="@drawable/google_logo"
+        android:contentDescription="Continue with Google"
+        android:background="@null"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
+        android:layout_marginTop="8dp" />
 
     <!-- Sign In Text -->
     <LinearLayout
