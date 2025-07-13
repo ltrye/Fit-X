@@ -31,6 +31,9 @@ public interface ExerciseDAO {
     @Query("SELECT description FROM EXERCISE WHERE exerciseId = :exerciseId")
     String GetDesByExId(int exerciseId);
 
+    @Query("SELECT guideLine FROM EXERCISE WHERE exerciseId = :exerciseId")
+    String GetGuideByExId(int exerciseId);
+
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertExercise(ExerciseEntity exercise);

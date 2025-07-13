@@ -95,6 +95,27 @@
                 android:textSize="14sp"
                 android:textColor="#666666"
                 android:lineSpacingExtra="4dp" />
+
+            <!-- Guideline label -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Hướng dẫn"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Guideline text -->
+            <TextView
+                android:id="@+id/exercise_guideline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Hướng dẫn chi tiết về bài tập..."
+                android:textSize="14sp"
+                android:textColor="#666666"
+                android:lineSpacingExtra="4dp" />
         </LinearLayout>
     </ScrollView>
 
