@@ -61,6 +61,7 @@ public class DetailExerciseActivity extends AppCompatActivity {
     private Button skipButton,nextButton;
     private  ExerciseEntity exerciseEntity;
     private TextView exerciseTitle, exerciseDescription,note;
+    private TextView exerciseGuideline;
     private ExerciseRepository exerciseRepository;
     private SessionExerciseRepository sessionExerciseRepository;
     private SessionExerciseEntity sessionExerciseEntity;
@@ -104,6 +105,7 @@ public class DetailExerciseActivity extends AppCompatActivity {
         skipButton = findViewById(R.id.skip_button);
         nextButton = findViewById(R.id.next_button);
         note = findViewById(R.id.exercise_note);
+        exerciseGuideline = findViewById(R.id.exercise_guideline);
 
     }
 
@@ -196,6 +198,7 @@ public class DetailExerciseActivity extends AppCompatActivity {
         executor.execute(() -> {
             exerciseEntity = exerciseRepository.getExerciseById(exerciseId);
             String des = exerciseRepository.GetDesByExId(exerciseId);
+            String guideline = exerciseRepository.GetGuideByExId(exerciseId);
             WorkoutSessionEntity workoutSessionEntity = workoutSessionRepository.getWorkoutSessionById(sessionId);
             WorkoutPlanEntity workoutPlanEntity = workoutPlanRepository.getWorkoutPlanById(workoutSessionEntity.getPlanId());
             if (exerciseEntity != null) {
@@ -203,6 +206,12 @@ public class DetailExerciseActivity extends AppCompatActivity {
                     // Cập nhật UI ở đây
                     exerciseTitle.setText(exerciseEntity != null ? exerciseEntity.getName() : "Tên bài tập (Exercise)");
                     exerciseDescription.setText(des);
+                    if (guideline != null && !guideline.isEmpty()) {
+                        String formattedGuideline = guideline.replaceAll(" (?=\\d+\\.)", "\n");
+                        exerciseGuideline.setText(formattedGuideline);
+                    } else {
+                        exerciseGuideline.setText("");
+                    }
                     String noteText = workoutPlanEntity.getNote();
                     if (noteText == null || noteText.isEmpty()) {
                         note.setText(""); // hoặc "Không có ghi chú"
