@@ -2,4 +2,20 @@
     <string name="app_name">FitnestX</string>
     <string name="default_web_client_id">1002813393737-bv8o526hffq960ir1ebft6ca20grook5.apps.googleusercontent.com</string>
     <string name="choose_gender">Choose Gender</string>
+
+    <!-- BMI Result Screen -->
+    <string name="bmi_result_title">Kết quả BMI của bạn</string>
+    <string name="bmi_suggestion_text">Đây là một số bài tập chúng tôi tìm thấy cho bạn</string>
+    <string name="next_button">Tiếp theo</string>
+    <string name="error_missing_data">Lỗi: Thiếu dữ liệu.</string>
+    <string name="error_could_not_load_bmi">Không thể tải dữ liệu BMI của người dùng.</string>
+    <string name="status_underweight">Bạn đang thiếu cân</string>
+    <string name="status_normal_weight">Bạn có cân nặng bình thường</string>
+    <string name="status_overweight">Bạn đang thừa cân</string>
+    <string name="status_obese">Bạn đang béo phì</string>
+    <string name="recommendation_normal">Chúc mừng! Bạn đang ở trong phạm vi cân nặng khỏe mạnh.</string>
+    <string name="recommendation_format">Bạn cần %s %.1fkg để đạt được chỉ số BMI bình thường.</string>
+    <string name="action_gain">tăng</string>
+    <string name="action_lose">giảm</string>
+
 </resources>
