@@ -255,10 +255,10 @@ public class WorkoutFrequencyActivity extends AppCompatActivity {
     }
 
     private void proceedToNextScreen() {
-        // Navigate to PlanActivity
-        Intent intent = new Intent(WorkoutFrequencyActivity.this, PlanActivity.class);
+        // Navigate to BmiResultActivity
+        Intent intent = new Intent(WorkoutFrequencyActivity.this, BmiResultActivity.class);
         intent.putExtra("planId", planId);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.putExtra("userId", getCurrentUserId());
         startActivity(intent);
         finish();
     }
