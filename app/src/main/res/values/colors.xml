@@ -27,4 +27,11 @@
 
     <!-- Màu đường viền nhẹ -->
     <color name="divider">#E0E0E0</color>
+
+    <!-- Màu chữ cho nút khi bị disable -->
+    <color name="gray_disabled">#B0B0B0</color>
+
+    <color name="green_success">#4CAF50</color> <!-- Màu cho trạng thái BMI bình thường -->
+    <color name="gray_hint">#999999</color> <!-- Màu cho mô tả phụ -->
+
 </resources>

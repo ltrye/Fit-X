@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F5F5F5">
+    android:background="@color/background_color">
 
     <FrameLayout
         android:id="@+id/fragment_top_menu"
@@ -22,25 +22,50 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Greeting Section -->
-            <TextView
-                android:id="@+id/greeting_text"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Hello, (ten user)"
-                android:textSize="18sp"
-                android:textColor="#333"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/bg_greeting_card"
+                android:elevation="2dp"
+                android:gravity="center_vertical">
 
-            <TextView
-                android:id="@+id/goal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Mục tiêu: (Goal)"
-                android:textSize="14sp"
-                android:textColor="#666"
-                android:layout_marginBottom="16dp" />
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_user"
+                    android:layout_marginEnd="12dp"
+                    android:background="@drawable/circle_background"
+                    android:scaleType="centerCrop" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/greeting_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Hello, (ten user)"
+                        android:textSize="18sp"
+                        android:textColor="@android:color/white"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="4dp" />
+
+                    <TextView
+                        android:id="@+id/goal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Mục tiêu: Giảm cân"
+                        android:textSize="14sp"
+                        android:textColor="#EDEDED" />
+                </LinearLayout>
+
+            </LinearLayout>
 
             <!-- BMI Card -->
             <LinearLayout
@@ -63,8 +88,9 @@
                     android:background="@drawable/rounded_background"
                     android:padding="12dp"
                     android:layout_marginEnd="16dp"
-                    android:layout_gravity="center_vertical" />
-
+                    android:layout_gravity="center_vertical"
+                    android:scaleType="centerCrop"
+                    android:clipToOutline="true" />
                 <!-- BMI Info -->
                 <LinearLayout
                     android:layout_width="0dp"
@@ -79,7 +105,7 @@
                         android:text="Chỉ số BMI"
                         android:textSize="16sp"
                         android:textStyle="bold"
-                        android:textColor="#333"
+                        android:textColor="@color/text_primary"
                         android:layout_marginBottom="4dp" />
 
                     <LinearLayout
@@ -95,7 +121,7 @@
                             android:text="22.5"
                             android:textSize="20sp"
                             android:textStyle="bold"
-                            android:textColor="#333"
+                            android:textColor="@color/text_primary"
                             android:layout_marginEnd="8dp" />
 
                         <TextView
@@ -105,7 +131,7 @@
                             android:text="Bình thường"
                             android:textSize="14sp"
                             android:textStyle="bold"
-                            android:textColor="#4CAF50" />
+                            android:textColor="@color/green_success" />
 
                     </LinearLayout>
 
@@ -114,7 +140,7 @@
                         android:layout_height="wrap_content"
                         android:text="Nhấn để xem chi tiết"
                         android:textSize="12sp"
-                        android:textColor="#999"
+                        android:textColor="@color/gray_hint"
                         android:layout_marginTop="4dp" />
 
                 </LinearLayout>
@@ -124,7 +150,8 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_arrow_right"
-                    android:layout_gravity="center_vertical" />
+                    android:layout_gravity="center_vertical"
+                    android:tint="@color/icon_color" />
 
             </LinearLayout>
 
@@ -135,8 +162,9 @@
                 android:text="Kế hoạch tập luyện"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="#333"
-                android:layout_marginBottom="12dp" />
+                android:textColor="@color/text_primary"
+                android:layout_marginBottom="12dp"
+                android:layout_marginTop="8dp" />
 
             <!-- Workout Sessions RecyclerView -->
             <androidx.recyclerview.widget.RecyclerView
@@ -146,7 +174,6 @@
                 android:nestedScrollingEnabled="false" />
 
         </LinearLayout>
-
     </ScrollView>
 
 </LinearLayout>
