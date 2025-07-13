@@ -27,4 +27,8 @@
 
     <!-- Màu đường viền nhẹ -->
     <color name="divider">#E0E0E0</color>
+
+    <!-- Màu chữ cho nút khi bị disable -->
+    <color name="gray_disabled">#B0B0B0</color>
+
 </resources>
