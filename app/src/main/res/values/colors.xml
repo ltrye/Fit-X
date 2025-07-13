@@ -34,4 +34,11 @@
     <color name="green_success">#4CAF50</color> <!-- Màu cho trạng thái BMI bình thường -->
     <color name="gray_hint">#999999</color> <!-- Màu cho mô tả phụ -->
 
+
+    <!-- BMI Status Colors -->
+    <color name="underweight">#3498DB</color>      <!-- Blue -->
+    <color name="normal_weight">#2ECC71</color>  <!-- Green -->
+    <color name="overweight">#F39C12</color>     <!-- Orange -->
+    <color name="obese">#E74C3C</color>          <!-- Red -->
+
 </resources>
