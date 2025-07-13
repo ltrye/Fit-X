@@ -14,18 +14,7 @@ import java.util.List;
 
 @Dao
 public interface WorkoutSessionDAO {
-    @Query("SELECT * FROM WORKOUT_SESSION")
-    LiveData<List<WorkoutSessionEntity>> getAllWorkoutSessions();
-
-    @Query("SELECT * FROM WORKOUT_SESSION WHERE sessionId = :sessionId")
-    WorkoutSessionEntity getWorkoutSessionById(int sessionId);
-
-    @Query("SELECT * FROM WORKOUT_SESSION WHERE planId = :planId")
-    LiveData<List<WorkoutSessionEntity>> getWorkoutSessionsByPlanId(int planId);
-
-    @Query("SELECT * FROM WORKOUT_SESSION WHERE planId = :planId")
-    List<WorkoutSessionEntity> getWorkoutSessionsByPlanIdList(int planId);
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE) // Ensure REPLACE strategy for inserts
     void insertWorkoutSession(WorkoutSessionEntity session);
 
     @Update
@@ -34,6 +23,19 @@ public interface WorkoutSessionDAO {
     @Delete
     void deleteWorkoutSession(WorkoutSessionEntity session);
 
+    @Query("SELECT * FROM WORKOUT_SESSION")
+    LiveData<List<WorkoutSessionEntity>> getAllWorkoutSessions();
+
+    @Query("SELECT * FROM WORKOUT_SESSION WHERE sessionId = :sessionId")
+    WorkoutSessionEntity getWorkoutSessionById(int sessionId);
+
+    @Query("SELECT * FROM WORKOUT_SESSION WHERE planId = :planId")
+    List<WorkoutSessionEntity> getWorkoutSessionsByPlanIdList(int planId);
+
     @Query("DELETE FROM WORKOUT_SESSION")
     void deleteAllWorkoutSessions();
+
+    // New method to update all sessions' completion status for a given plan
+    @Query("UPDATE WORKOUT_SESSION SET isCompleted = :isCompleted WHERE planId = :planId")
+    void updateAllSessionsCompletionStatus(int planId, boolean isCompleted);
 }

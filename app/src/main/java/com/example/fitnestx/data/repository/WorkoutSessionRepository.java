@@ -20,7 +20,7 @@ public class WorkoutSessionRepository {
     }
 
     public void insertWorkoutSession(WorkoutSessionEntity session) {
-        new Thread(() -> workoutSessionDAO.insertWorkoutSession(session)).start();
+        workoutSessionDAO.insertWorkoutSession(session);
     }
 
     public LiveData<List<WorkoutSessionEntity>> getAllWorkoutSessions() {
@@ -36,14 +36,19 @@ public class WorkoutSessionRepository {
     }
 
     public void updateWorkoutSession(WorkoutSessionEntity session) {
-        new Thread(() -> workoutSessionDAO.updateWorkoutSession(session)).start();
+        workoutSessionDAO.updateWorkoutSession(session);
     }
 
     public void deleteWorkoutSession(WorkoutSessionEntity session) {
-        new Thread(() -> workoutSessionDAO.deleteWorkoutSession(session)).start();
+        workoutSessionDAO.deleteWorkoutSession(session);
     }
 
     public void deleteAllWorkoutSessions() {
-        new Thread(() -> workoutSessionDAO.deleteAllWorkoutSessions()).start();
+        workoutSessionDAO.deleteAllWorkoutSessions();
+    }
+
+    // New method to update all sessions' completion status for a given plan
+    public void updateAllSessionsCompletionStatus(int planId, boolean isCompleted) {
+        workoutSessionDAO.updateAllSessionsCompletionStatus(planId, isCompleted);
     }
 }

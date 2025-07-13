@@ -44,6 +44,7 @@
         <activity android:name=".ui.ExerciseByMuscleGroupActivity" />
         <activity android:name=".ui.ProfileActivity" />
         <activity android:name=".ui.IndividualExerciseDetailActivity" />
+        <activity android:name=".ui.WorkoutCompletionActivity" />
 
 
         <activity
