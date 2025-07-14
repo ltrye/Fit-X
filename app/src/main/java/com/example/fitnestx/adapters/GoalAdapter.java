@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.fitnestx.R;
 import com.example.fitnestx.data.entity.ExerciseEntity;
 import com.example.fitnestx.data.entity.MuscleGroupEntity;
@@ -27,6 +29,8 @@ import com.example.fitnestx.data.repository.MuscleGroupRepository;
 import com.example.fitnestx.data.repository.SessionExerciseRepository;
 import com.example.fitnestx.data.repository.WorkoutSessionRepository;
 import com.example.fitnestx.ui.ExcerciseActivity;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -159,9 +163,24 @@ public class GoalAdapter extends RecyclerView.Adapter<GoalAdapter.GoalViewHolder
             String finalImage = image;
             new Handler(Looper.getMainLooper()).post(() -> {
                 // CHỈ CẬP NHẬT UI ở đây
+                Log.d("haha","onBindViewHolder:"+ finalImage);
+                StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+                if (finalImage != null && !finalImage.isEmpty()) {
+                    storageRef.child(finalImage).getDownloadUrl()
+                            .addOnSuccessListener(uri -> {
+                                Glide.with(holder.itemView.getContext())
+                                        .load(uri.toString())
+                                        .placeholder(R.drawable.ic_exercise_placeholder)
+                                        .into(holder.iconImage);
+                            })
+                            .addOnFailureListener(exception -> {
+                                // Nếu lỗi, dùng ảnh mặc định
+                                holder.iconImage.setImageResource(R.drawable.ic_exercise_placeholder);
+                            });
+                } else {
+                    holder.iconImage.setImageResource(R.drawable.ic_exercise_placeholder);
+                }
 
-                int resId = context.getResources().getIdentifier(finalImage, "drawable", context.getPackageName());
-                holder.iconImage.setImageResource(resId);
                 holder.descriptionText.setText("Tổng bài tập: " + total);
                 holder.timeText.setText(finalSpec);
                 holder.checkIcon.setImageResource(workoutSession.getIsCompleted() ?

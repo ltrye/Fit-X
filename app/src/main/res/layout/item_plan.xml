@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:background="@drawable/goal_item_background"
-        android:padding="12dp"
+        android:padding="15dp"
         android:gravity="center_vertical">
 
         <ImageView

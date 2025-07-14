@@ -75,7 +75,49 @@ public class PlanActivity extends AppCompatActivity {
         super.onResume();
         // Refresh data when returning to PlanActivity
         setupRecyclerView();
-        updateCompletePlanButtonState(); // Update button state on resume
+        // Delay 200–300ms rồi mới update nút để chờ dữ liệu load xong
+        new android.os.Handler().postDelayed(() -> {
+            updateCompletePlanButtonState();
+        }, 1000);
+    }
+    private void setupRecyclerViewWithCallback(Runnable callback) {
+        int planIdFromIntent = getIntent().getIntExtra("planId", -1);
+        int userId = getCurrentUserId();
+        if (userId == -1) return;
+
+        executorService.execute(() -> {
+            int planId = planIdFromIntent;
+            if (planId == -1) {
+                WorkoutPlanEntity plan = workoutPlanRepository.getWorkoutPlansByUserId(userId);
+                if (plan != null) {
+                    planId = plan.getPlanId();
+                } else {
+                    runOnUiThread(() -> Toast.makeText(this, "No workout plan found", Toast.LENGTH_SHORT).show());
+                    return;
+                }
+            }
+
+            List<WorkoutSessionEntity> sessions = workoutSessionRepository.getWorkoutSessionsByPlanId(planId);
+
+            sessions.sort((s1, s2) -> {
+                int day1 = extractDayNumber(s1.getDate());
+                int day2 = extractDayNumber(s2.getDate());
+                return Integer.compare(day1, day2);
+            });
+
+            runOnUiThread(() -> {
+                if (goalAdapter == null) {
+                    goalAdapter = new GoalAdapter(sessions, this, sessionExerciseRepository);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(this));
+                    recyclerView.setAdapter(goalAdapter);
+                } else {
+                    goalAdapter.updateData(sessions);
+                }
+
+                // 🔁 Gọi callback (updateCompletePlanButtonState) sau khi dữ liệu load xong
+                if (callback != null) callback.run();
+            });
+        });
     }
 
     @Override
@@ -128,6 +170,7 @@ public class PlanActivity extends AppCompatActivity {
             boolean finalAllSessionsCompleted = allSessionsCompleted;
             runOnUiThread(() -> btnCompletePlan.setEnabled(finalAllSessionsCompleted));
         });
+
     }
 
     private void updateSingleSession(int sessionId) {
@@ -150,7 +193,7 @@ public class PlanActivity extends AppCompatActivity {
     private void initViews() {
         greetingText = findViewById(R.id.greeting_text);
         recyclerView = findViewById(R.id.recycler_view);
-        goal = findViewById(R.id.goal);
+       // goal = findViewById(R.id.goal);
         bmiCard = findViewById(R.id.bmi_card);
         tvBMIValue = findViewById(R.id.tv_bmi_value);
         tvBMIStatus = findViewById(R.id.tv_bmi_status);
@@ -161,7 +204,7 @@ public class PlanActivity extends AppCompatActivity {
             Intent intent = new Intent(PlanActivity.this, BMIDetailActivity.class);
             startActivity(intent);
         });
-
+        updateCompletePlanButtonState();
         // Set click listener for the new "Complete Plan" button
         btnCompletePlan.setOnClickListener(v -> {
             int userId = getCurrentUserId();
@@ -201,7 +244,7 @@ public class PlanActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     greetingText.setText("Hello, " + user.getName());
                     if (userMetrics != null) {
-                        goal.setText(userMetrics.getGoal());
+                       // goal.setText(userMetrics.getGoal());
                         setupBMICard(userMetrics);
                     }
                 });
@@ -273,8 +316,9 @@ public class PlanActivity extends AppCompatActivity {
                     recyclerView.setAdapter(goalAdapter);
                 } else {
                     goalAdapter.updateData(sessions);
+//                    updateCompletePlanButtonState();
                 }
-                updateCompletePlanButtonState(); // Update button state after RecyclerView is set up
+           //     updateCompletePlanButtonState(); // Update button state after RecyclerView is set up
             });
         });
     }
