@@ -1,30 +1,30 @@
 muscleGroupId,name,recoveryTimeInHours,parentId,image,spec
-1,Ngực,0.0,,nguc,Push
-2,Vai,0.0,,vai,Push
-3,Lưng,0.0,,lung,Pull
-4,Tay trước,0.0,,taytrc,Pull
-5,Tay sau,0.0,,taysau,Push
-6,Cơ mông,0.0,,mong,Lower
-7,Chân,0.0,,chan,Lower
-8,Ngực dưới,0.0,1,,Push
-9,Ngực giữa,0.0,1,,Push
-10,Ngực trên,0.0,1,,Push
-11,Vai giữa,0.0,2,,Push
-12,Vai sau,0.0,2,,Push
-13,Vai trước,0.0,2,,Push
-14,Xô(Lat),0.0,3,,Pull
-15,Lưng dưới,0.0,3,,Pull
-16,Lưng giữa,0.0,3,,Pull
-17,Cầu vai trên,0.0,3,,Pull
-18,Tay trước,0.0,4,,Pull
-19,Cơ đầu ngoài,0.0,5,,Push
-20,Cơ đầu dài,0.0,5,,Push
-21,Cơ đầu trong,0.0,5,,Push
-22,Cơ mông lớn,0.0,6,,Lower
-23,Cơ mông nhỡ,0.0,6,,Lower
-24,Cơ mông bé,0.0,6,,Lower
-25,Đùi sau,0.0,7,,Lower
-26,Đùi trước,0.0,7,,Lower
-27,Đùi ngoài,0.0,7,,Lower
-28,Đùi trong,0.0,7,,Lower
-29,Cardio,0.0,,cardio,Cardio
+1,Ngực,0.0,,MusclesGroup/1_Nguc.jpeg,Push
+2,Vai,0.0,,MusclesGroup/2_Vai.jpeg,Push
+3,Lưng,0.0,,MusclesGroup/3_Lung.jpeg,Pull
+4,Tay trước,0.0,,MusclesGroup/4_Tay_truoc_Hammer.jpeg,Pull
+5,Tay sau,0.0,,MusclesGroup/5_Tay_sau.jpeg,Push
+6,Cơ mông,0.0,,MusclesGroup/6_Co_mong.jpeg,Lower
+7,Chân,0.0,,MusclesGroup/7_Chan.jpeg,Lower
+8,Ngực dưới,0.0,1,MusclesGroup/8_Nguc_duoi.jpeg,Push
+9,Ngực giữa,0.0,1,MusclesGroup/10_Nguc_giua.jpeg,Push
+10,Ngực trên,0.0,1,MusclesGroup/Nguc_Tren.jpg,Push
+11,Vai giữa,0.0,2,MusclesGroup/11_Vai_giua.jpeg,Push
+12,Vai sau,0.0,2,MusclesGroup/12_Vai_sau.jpeg,Push
+13,Vai trước,0.0,2,MusclesGroup/13_Vai_truoc.jpeg,Push
+14,Xô(Lat),0.0,3,MusclesGroup/16_Xo_Lat.jpeg,Pull
+15,Lưng dưới,0.0,3,MusclesGroup/3_Lung.jpeg,Pull
+16,Lưng giữa,0.0,3,MusclesGroup/15_Lung_giua.jpeg,Pull
+17,Cầu vai trên,0.0,3,MusclesGroup/19_Cau_vai_tren.jpeg,Pull
+18,Tay trước,0.0,4,MusclesGroup/4_Tay_truoc.jpeg,Pull
+19,Cơ đầu ngoài,0.0,5,MusclesGroup/17_Co_dau_ngoai.jpeg,Push
+20,Cơ đầu dài,0.0,5,MusclesGroup/18_Co_dau_dai.jpeg,Push
+21,Cơ đầu trong,0.0,5,MusclesGroup/17_Co_dau_ngoai.jpeg,Push
+22,Cơ mông lớn,0.0,6,MusclesGroup/6_Co_mong.jpeg,Lower
+23,Cơ mông nhỡ,0.0,6,MusclesGroup/23_Co_mong_be.jpeg,Lower
+24,Cơ mông bé,0.0,6,MusclesGroup/23_Co_mong_be.jpeg,Lower
+25,Đùi sau,0.0,7,MusclesGroup/26_Dui_sau.jpeg,Lower
+26,Đùi trước,0.0,7,MusclesGroup/27_Dui_truoc.jpeg,Lower
+27,Đùi ngoài,0.0,7,MusclesGroup/24_Dui_ngoai.jpeg,Lower
+28,Đùi trong,0.0,7,MusclesGroup/25_Dui_trong.jpeg,Lower
+29,Cardio,0.0,,MusclesGroup/29_Cardio.jpeg,Cardio
