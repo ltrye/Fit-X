@@ -129,32 +129,32 @@
             </LinearLayout>
 
             <!-- Goal -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Your Goal"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:layout_marginBottom="8dp" />
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Your Goal"-->
+<!--                android:textSize="18sp"-->
+<!--                android:textStyle="bold"-->
+<!--                android:textColor="@color/black"-->
+<!--                android:layout_marginBottom="8dp" />-->
 
-            <TextView
-                android:id="@+id/goal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Improve Shape"
-                android:textSize="16sp"
-                android:layout_marginBottom="16dp" />
+<!--            <TextView-->
+<!--                android:id="@+id/goal"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Improve Shape"-->
+<!--                android:textSize="16sp"-->
+<!--                android:layout_marginBottom="16dp" />-->
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Workout Plan"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@color/text_primary"
-                android:layout_marginBottom="12dp"
-                android:layout_marginTop="8dp" />
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Workout Plan"-->
+<!--                android:textSize="18sp"-->
+<!--                android:textStyle="bold"-->
+<!--                android:textColor="@color/text_primary"-->
+<!--                android:layout_marginBottom="12dp"-->
+<!--                android:layout_marginTop="8dp" />-->
         </LinearLayout>
 
         <!-- RecyclerView scrollable -->
