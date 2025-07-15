@@ -199,7 +199,7 @@ public class GeneratePlan {
     private int getExercisesPerDay(BMICategory bmiCategory, boolean isMale) {
         int exercises;
         if (bmiCategory == BMICategory.OBESE) {
-            exercises = 3; // Reduced for obese users
+            exercises = 5; // Reduced for obese users
         } else if (isMale) {
             exercises = 6; // Standard for males
         } else {
