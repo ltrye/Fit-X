@@ -388,7 +388,7 @@ public class BMIDetailActivity extends AppCompatActivity {
         xAxis.setEnabled(false);
 
         YAxis leftAxis = bmiChart.getAxisLeft();
-        leftAxis.setAxisMinimum(15f);
+        leftAxis.setAxisMinimum(10f);
         leftAxis.setAxisMaximum(40f);
         leftAxis.setTextColor(Color.GRAY);
         leftAxis.setTextSize(12f);
