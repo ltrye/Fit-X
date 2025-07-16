@@ -40,6 +40,8 @@ public class WorkoutFrequencyActivity extends AppCompatActivity {
     private ExecutorService executorService;
 
     // UI Components
+    private TextView tvWelcomeMessage;
+    private TextView tvWeeklySlots;
     private ImageButton btnBack;
     private ImageButton btnDecreaseSlots;
     private ImageButton btnIncreaseSlots;
@@ -82,10 +84,32 @@ public class WorkoutFrequencyActivity extends AppCompatActivity {
         initViews();
         setupClickListeners();
         updateSlotsDisplay();
+        GetUserName();
 
     }
 
+    private void GetUserName() {
+        executorService.execute(() -> {
+            int userId = getCurrentUserId();
+            if (userId != -1) {
+                UserEntity user = userRepository.getUserById(userId);
+                if (user != null) {
+                    runOnUiThread(() -> {
+                        if (user.getName() != null && !user.getName().isEmpty()) {
+                            String[] nameParts = user.getName().split(" ");
+                            if (nameParts.length > 0) {
+                                tvWelcomeMessage.setText("Welcome, " + nameParts[0]);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
+
     private void initViews() {
+        tvWelcomeMessage = findViewById(R.id.tv_welcome_message);
+        tvWeeklySlots = findViewById(R.id.tv_weekly_slots);
         btnBack = findViewById(R.id.btn_back);
         btnDecreaseSlots = findViewById(R.id.btn_decrease_slots);
         btnIncreaseSlots = findViewById(R.id.btn_increase_slots);
@@ -133,6 +157,7 @@ public class WorkoutFrequencyActivity extends AppCompatActivity {
 
     private void updateSlotsDisplay() {
         tvSlotsCount.setText(String.valueOf(selectedSlots));
+        tvWeeklySlots.setText("Weekly, " + selectedSlots + " slots");
 
         // Enable/disable buttons based on limits
         btnDecreaseSlots.setEnabled(selectedSlots > 1);
@@ -230,10 +255,10 @@ public class WorkoutFrequencyActivity extends AppCompatActivity {
     }
 
     private void proceedToNextScreen() {
-        // Navigate to PlanActivity
-        Intent intent = new Intent(WorkoutFrequencyActivity.this, PlanActivity.class);
+        // Navigate to BmiResultActivity
+        Intent intent = new Intent(WorkoutFrequencyActivity.this, BmiResultActivity.class);
         intent.putExtra("planId", planId);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.putExtra("userId", getCurrentUserId());
         startActivity(intent);
         finish();
     }

@@ -1,5 +1,7 @@
 package com.example.fitnestx.adapters;
 
+import android.app.Activity;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +15,8 @@ import com.example.fitnestx.Helpers.SectionItem;
 import com.example.fitnestx.R;
 import com.example.fitnestx.data.entity.ExerciseEntity;
 import com.example.fitnestx.viewmodel.ExerciseWithSessionStatus;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.List;
 
@@ -91,14 +95,36 @@ public class SectionExerciseAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             String difficultyText = getDifficultyText(exercise.getDifficulty());
             viewHolder.exerciseDifficulty.setText(difficultyText);
 
-            if (exercise.getImageUrl() != null && !exercise.getImageUrl().isEmpty()) {
-                Glide.with(viewHolder.itemView.getContext())
-                        .load(exercise.getImageUrl())
-                        .placeholder(R.drawable.ic_exercise_placeholder)
-                        .into(viewHolder.exerciseImage);
-            } else {
-                viewHolder.exerciseImage.setImageResource(R.drawable.ic_exercise_placeholder);
-            }
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageRef = storage.getReference().child("Exercise/" + exercise.getImageUrl());
+
+            storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                if (holder.getBindingAdapterPosition() != RecyclerView.NO_POSITION) {
+                    Context context = holder.itemView.getContext();
+                    if (context instanceof Activity) {
+                        Activity activity = (Activity) context;
+                        if (activity.isDestroyed() || activity.isFinishing()) {
+                            return;
+                        }
+                    }
+                    Glide.with(context)
+                            .load(uri.toString())
+                            .placeholder(R.drawable.ic_exercise_placeholder)
+                            .into(viewHolder.exerciseImage);
+                }
+            }).addOnFailureListener(e -> {
+                if (holder.getBindingAdapterPosition() != RecyclerView.NO_POSITION) {
+                    Context context = holder.itemView.getContext();
+                    if (context instanceof Activity) {
+                        Activity activity = (Activity) context;
+                        if (activity.isDestroyed() || activity.isFinishing()) {
+                            return;
+                        }
+                    }
+                    viewHolder.exerciseImage.setImageResource(R.drawable.ic_exercise_placeholder);
+                }
+            });
+
 
             viewHolder.statusIcon.setImageResource(
                     isMarked ? R.drawable.ic_check : R.drawable.ic_arrow_right
