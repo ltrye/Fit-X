@@ -11,8 +11,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.fitnestx.R;
 import com.example.fitnestx.data.entity.ExerciseEntity;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.List;
+
+import android.app.Activity;
 
 public class ExerciseListAdapter extends RecyclerView.Adapter<ExerciseListAdapter.ViewHolder> {
 
@@ -58,16 +62,28 @@ public class ExerciseListAdapter extends RecyclerView.Adapter<ExerciseListAdapte
 
         String difficultyText = getDifficultyText(exercise.getDifficulty());
         holder.exerciseDifficulty.setText(difficultyText);
-
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReference().child("Exercise/" + exercise.getImageUrl());
         // Load image using Glide
-        if (exercise.getImageUrl() != null && !exercise.getImageUrl().isEmpty()) {
+        storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+            if (holder.getBindingAdapterPosition() == RecyclerView.NO_POSITION) {
+                return;
+            }
+            if (holder.itemView.getContext() instanceof Activity) {
+                Activity activity = (Activity) holder.itemView.getContext();
+                if (activity.isDestroyed() || activity.isFinishing()) {
+                    return;
+                }
+            }
             Glide.with(holder.itemView.getContext())
-                    .load(exercise.getImageUrl())
+                    .load(uri.toString())
                     .placeholder(R.drawable.ic_exercise_placeholder)
                     .into(holder.exerciseImage);
-        } else {
-            holder.exerciseImage.setImageResource(R.drawable.ic_exercise_placeholder);
-        }
+        }).addOnFailureListener(e -> {
+            if (holder.getBindingAdapterPosition() != RecyclerView.NO_POSITION) {
+                holder.exerciseImage.setImageResource(R.drawable.ic_exercise_placeholder);
+            }
+        });
 
         holder.itemView.setOnClickListener(v -> {
             if (onItemClickListener != null) {

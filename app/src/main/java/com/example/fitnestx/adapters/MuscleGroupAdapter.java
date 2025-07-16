@@ -1,5 +1,6 @@
 package com.example.fitnestx.adapters;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.fitnestx.R;
 import com.example.fitnestx.data.entity.MuscleGroupEntity;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.List;
 
@@ -32,7 +35,7 @@ public class MuscleGroupAdapter extends RecyclerView.Adapter<MuscleGroupAdapter.
         ImageView muscleGroupImage;
         TextView muscleGroupName;
         TextView muscleGroupSpec;
-        ImageView arrowIcon;
+        ImageView arrowIcon, image;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -40,6 +43,7 @@ public class MuscleGroupAdapter extends RecyclerView.Adapter<MuscleGroupAdapter.
             muscleGroupName = itemView.findViewById(R.id.tvMuscleGroupName);
             muscleGroupSpec = itemView.findViewById(R.id.tvMuscleGroupSpec);
             arrowIcon = itemView.findViewById(R.id.ivArrowIcon);
+
         }
     }
 
@@ -53,6 +57,22 @@ public class MuscleGroupAdapter extends RecyclerView.Adapter<MuscleGroupAdapter.
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         MuscleGroupEntity muscleGroup = muscleGroups.get(position);
+        String imagePath = muscleGroup.getImage();
+        Log.d("haha", "onBindViewHolder: " + imagePath);
+        if (imagePath != null && !imagePath.trim().isEmpty()) {
+            StorageReference storageRef = FirebaseStorage.getInstance().getReference().child(imagePath);
+            storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                Glide.with(holder.itemView.getContext())
+                        .load(uri.toString())
+                        .placeholder(R.drawable.ic_exercise_placeholder)
+                        .into(holder.muscleGroupImage);
+            }).addOnFailureListener(e -> {
+                holder.muscleGroupImage.setImageResource(R.drawable.ic_exercise_placeholder);
+            });
+        } else {
+            holder.muscleGroupImage.setImageResource(R.drawable.ic_exercise_placeholder);
+        }
+
 
         holder.muscleGroupName.setText(muscleGroup.getName());
         holder.muscleGroupSpec.setText(muscleGroup.getSpec());
