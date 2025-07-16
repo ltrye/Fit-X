@@ -1,6 +1,9 @@
 package com.example.fitnestx.ui;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,6 +22,7 @@ import android.widget.Toast;
 
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.core.view.GestureDetectorCompat;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.media3.common.MediaItem;
@@ -29,17 +33,29 @@ import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.ui.AspectRatioFrameLayout;
 import androidx.media3.ui.PlayerView;
 
+import com.example.fitnestx.Helpers.SectionItem;
 import com.example.fitnestx.R;
 import com.example.fitnestx.data.entity.ExerciseEntity;
+import com.example.fitnestx.data.entity.MuscleGroupEntity;
 import com.example.fitnestx.data.entity.SessionExerciseEntity;
+import com.example.fitnestx.data.entity.WorkoutPlanEntity;
+import com.example.fitnestx.data.entity.WorkoutSessionEntity;
 import com.example.fitnestx.data.repository.ExerciseRepository;
+import com.example.fitnestx.data.repository.MuscleGroupRepository;
 import com.example.fitnestx.data.repository.SessionExerciseRepository;
+import com.example.fitnestx.data.repository.WorkoutPlanRepository;
+import com.example.fitnestx.data.repository.WorkoutSessionRepository;
 import com.example.fitnestx.fragments.TopMenuFragment;
 import com.example.fitnestx.viewmodel.ExerciseWithSessionStatus;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -48,7 +64,7 @@ public class DetailExerciseActivity extends AppCompatActivity {
 
     public static final String EXTRA_EXERCISE = "HAHA";
     private static final String TAG = "ExoPlayerDebug";
-//    public static final String EXTRA_EXERCISE_ID = "exercise_id";
+    //    public static final String EXTRA_EXERCISE_ID = "exercise_id";
     private List<ExerciseWithSessionStatus> exerciseList;
     private int currentIndex;
     private PlayerView playerView;
@@ -56,11 +72,15 @@ public class DetailExerciseActivity extends AppCompatActivity {
     private ImageView closeButton;
     private Button skipButton,nextButton;
     private  ExerciseEntity exerciseEntity;
-    private TextView exerciseTitle, exerciseDescription;
+    private TextView exerciseTitle, exerciseDescription,note;
+    private TextView exerciseGuideline;
     private ExerciseRepository exerciseRepository;
     private SessionExerciseRepository sessionExerciseRepository;
     private SessionExerciseEntity sessionExerciseEntity;
-
+    private WorkoutPlanRepository workoutPlanRepository;
+    private WorkoutSessionRepository workoutSessionRepository;
+    private MuscleGroupRepository muscleGroupRepository;
+    boolean finalAllMarked;
     @OptIn(markerClass = UnstableApi.class)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +88,10 @@ public class DetailExerciseActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail_exercise);
         exerciseRepository = new ExerciseRepository(this);
         sessionExerciseRepository = new SessionExerciseRepository(this);
+        workoutPlanRepository = new WorkoutPlanRepository(this);
+        workoutSessionRepository = new WorkoutSessionRepository(this);
+        muscleGroupRepository = new MuscleGroupRepository(this);
+        // Lấy dữ liệu từ Intent
         Intent intent = getIntent();
         currentIndex = intent.getIntExtra("currentIndex", 0);
         exerciseList = (List<ExerciseWithSessionStatus>) intent.getSerializableExtra("exerciseList");
@@ -94,6 +118,8 @@ public class DetailExerciseActivity extends AppCompatActivity {
         closeButton = findViewById(R.id.close_button);
         skipButton = findViewById(R.id.skip_button);
         nextButton = findViewById(R.id.next_button);
+        note = findViewById(R.id.exercise_note);
+        exerciseGuideline = findViewById(R.id.exercise_guideline);
 
     }
 
@@ -186,11 +212,28 @@ public class DetailExerciseActivity extends AppCompatActivity {
         executor.execute(() -> {
             exerciseEntity = exerciseRepository.getExerciseById(exerciseId);
             String des = exerciseRepository.GetDesByExId(exerciseId);
+            String guideline = exerciseRepository.GetGuideByExId(exerciseId);
+            WorkoutSessionEntity workoutSessionEntity = workoutSessionRepository.getWorkoutSessionById(sessionId);
+            WorkoutPlanEntity workoutPlanEntity = workoutPlanRepository.getWorkoutPlanById(workoutSessionEntity.getPlanId());
             if (exerciseEntity != null) {
                 runOnUiThread(() -> {
                     // Cập nhật UI ở đây
                     exerciseTitle.setText(exerciseEntity != null ? exerciseEntity.getName() : "Tên bài tập (Exercise)");
                     exerciseDescription.setText(des);
+                    if (guideline != null && !guideline.isEmpty()) {
+                        String formattedGuideline = guideline.replaceAll(" (?=\\d+\\.)", "\n");
+                        exerciseGuideline.setText(formattedGuideline);
+                    } else {
+                        exerciseGuideline.setText("");
+                    }
+                    String noteText = workoutPlanEntity.getNote();
+                    if (noteText == null || noteText.isEmpty()) {
+                        note.setText(""); // hoặc "Không có ghi chú"
+                        note.setBackground(null); // Xóa background nếu cần
+                    } else {
+                        note.setText(noteText);
+
+                    }
 
                 });
             }
@@ -202,22 +245,90 @@ public class DetailExerciseActivity extends AppCompatActivity {
 
         // Sự kiện nút Skip
         skipButton.setOnClickListener(v -> {
-        ExecutorService executorSkip = Executors.newSingleThreadExecutor();
+            ExecutorService executorSkip = Executors.newSingleThreadExecutor();
 
             executorSkip.execute(() -> {
-        // Cập nhật isMarked = true trong DB
-          sessionExerciseEntity = sessionExerciseRepository.getSessionExercise(sessionId,exerciseId);
+                // Cập nhật isMarked = true trong DB
+                sessionExerciseEntity = sessionExerciseRepository.getSessionExercise(sessionId,exerciseId);
 
-          sessionExerciseEntity.setMarked(true);
-          sessionExerciseRepository.updateSessionExercise(sessionExerciseEntity);
+                sessionExerciseEntity.setMarked(true);
+                sessionExerciseRepository.updateSessionExercise(sessionExerciseEntity);
+                List<Integer> exerciseIds = sessionExerciseRepository.GetListIdExercsieBySessionId(sessionId);
+                List<ExerciseEntity> exercises = new ArrayList<>();
+                for (int id : exerciseIds) {
+                    ExerciseEntity ex = exerciseRepository.getExerciseById(id);
+                    if (ex != null) exercises.add(ex);
+                }
 
-        // Trở lại UI thread để kết thúc activity
-        runOnUiThread(() -> {
-            Toast.makeText(this, "Đã đánh dấu hoàn thành", Toast.LENGTH_SHORT).show();
-            finish(); // Quay lại màn hình trước
+                List<MuscleGroupEntity> allMuscles = muscleGroupRepository.getListMuscleGroup();
+                Map<Integer, MuscleGroupEntity> idToGroup = new HashMap<>();
+                Map<Integer, Integer> childToParentMap = new HashMap<>();
+
+                for (MuscleGroupEntity mg : allMuscles) {
+                    idToGroup.put(mg.getMuscleGroupId(), mg);
+                    if (mg.getParentId() != null) {
+                        childToParentMap.put(mg.getMuscleGroupId(), mg.getParentId());
+                    }
+                }
+
+                Map<Integer, List<ExerciseEntity>> groupedByParent = new HashMap<>();
+                Set<Integer> usedParentIds = new HashSet<>();
+
+                for (ExerciseEntity ex : exercises) {
+                    int childId = ex.getMuscleGroupId();
+                    Integer parentId = childToParentMap.get(childId);
+                    if (parentId != null) {
+                        groupedByParent.computeIfAbsent(parentId, k -> new ArrayList<>()).add(ex);
+                        usedParentIds.add(parentId);
+                    } else {
+                        groupedByParent.computeIfAbsent(childId, k -> new ArrayList<>()).add(ex);
+                        usedParentIds.add(childId);
+                    }
+                }
+                List<SectionItem> sectionItems = new ArrayList<>();
+                for (Integer parentId : groupedByParent.keySet()) {
+                    MuscleGroupEntity group = idToGroup.get(parentId);
+                    String title = (group != null) ? group.getName() : "Nhóm khác";
+
+                    sectionItems.add(new SectionItem(title)); // Header
+                    for (ExerciseEntity ex : groupedByParent.get(parentId)) {
+                        sessionExerciseEntity = sessionExerciseRepository.getSessionExercise(sessionId,ex.getExerciseId());
+                        ExerciseWithSessionStatus exerciseWithSessionStatus = new ExerciseWithSessionStatus(ex, sessionExerciseEntity.isMarked());
+                        sectionItems.add(new SectionItem(exerciseWithSessionStatus));
+                    }
+                }
+
+                List<ExerciseWithSessionStatus> exerciseItems = new ArrayList<>();
+                for (SectionItem item : sectionItems) {
+                    if (item.getType() == SectionItem.TYPE_ITEM) {
+                        exerciseItems.add(item.getExerciseWithStatus());
+                    }
+                }
+
+
+                boolean allMarked = true;
+                for (ExerciseWithSessionStatus item : exerciseItems) {
+                    if (!item.isMarked()) {
+                        allMarked = false;
+                        break;
+                    }
+                }
+
+                finalAllMarked = allMarked;
+                // Trở lại UI thread để kết thúc activity
+                runOnUiThread(() -> {
+                    int userId = getCurrentUserId(); // hoặc bạn lấy userId từ đâu đó
+
+                    if (finalAllMarked && !hasShownNotification(userId, sessionId)) {
+                        showCompletionNotification();
+                        markNotificationAsShown(userId, sessionId);
+                    }
+
+                    Toast.makeText(this, "Đã đánh dấu hoàn thành", Toast.LENGTH_SHORT).show();
+                    finish(); // Quay lại màn hình trước
+                });
+            });
         });
-    });
-});
         nextButton.setOnClickListener(v -> {
             ExecutorService executor1 = Executors.newSingleThreadExecutor();
             executor1.execute(() -> {
@@ -226,8 +337,77 @@ public class DetailExerciseActivity extends AppCompatActivity {
 
                 sessionExerciseEntity.setMarked(true);
                 sessionExerciseRepository.updateSessionExercise(sessionExerciseEntity);
+                List<Integer> exerciseIds = sessionExerciseRepository.GetListIdExercsieBySessionId(sessionId);
+                List<ExerciseEntity> exercises = new ArrayList<>();
+                for (int id : exerciseIds) {
+                    ExerciseEntity ex = exerciseRepository.getExerciseById(id);
+                    if (ex != null) exercises.add(ex);
+                }
 
+                List<MuscleGroupEntity> allMuscles = muscleGroupRepository.getListMuscleGroup();
+                Map<Integer, MuscleGroupEntity> idToGroup = new HashMap<>();
+                Map<Integer, Integer> childToParentMap = new HashMap<>();
+
+                for (MuscleGroupEntity mg : allMuscles) {
+                    idToGroup.put(mg.getMuscleGroupId(), mg);
+                    if (mg.getParentId() != null) {
+                        childToParentMap.put(mg.getMuscleGroupId(), mg.getParentId());
+                    }
+                }
+
+                Map<Integer, List<ExerciseEntity>> groupedByParent = new HashMap<>();
+                Set<Integer> usedParentIds = new HashSet<>();
+
+                for (ExerciseEntity ex : exercises) {
+                    int childId = ex.getMuscleGroupId();
+                    Integer parentId = childToParentMap.get(childId);
+                    if (parentId != null) {
+                        groupedByParent.computeIfAbsent(parentId, k -> new ArrayList<>()).add(ex);
+                        usedParentIds.add(parentId);
+                    } else {
+                        groupedByParent.computeIfAbsent(childId, k -> new ArrayList<>()).add(ex);
+                        usedParentIds.add(childId);
+                    }
+                }
+                List<SectionItem> sectionItems = new ArrayList<>();
+                for (Integer parentId : groupedByParent.keySet()) {
+                    MuscleGroupEntity group = idToGroup.get(parentId);
+                    String title = (group != null) ? group.getName() : "Nhóm khác";
+
+                    sectionItems.add(new SectionItem(title)); // Header
+                    for (ExerciseEntity ex : groupedByParent.get(parentId)) {
+                        sessionExerciseEntity = sessionExerciseRepository.getSessionExercise(sessionId,ex.getExerciseId());
+                        ExerciseWithSessionStatus exerciseWithSessionStatus = new ExerciseWithSessionStatus(ex, sessionExerciseEntity.isMarked());
+                        sectionItems.add(new SectionItem(exerciseWithSessionStatus));
+                    }
+                }
+
+                List<ExerciseWithSessionStatus> exerciseItems = new ArrayList<>();
+                for (SectionItem item : sectionItems) {
+                    if (item.getType() == SectionItem.TYPE_ITEM) {
+                        exerciseItems.add(item.getExerciseWithStatus());
+                    }
+                }
+
+
+                boolean allMarked = true;
+                for (ExerciseWithSessionStatus item : exerciseItems) {
+                    if (!item.isMarked()) {
+                        allMarked = false;
+                        break;
+                    }
+                }
+
+                finalAllMarked = allMarked;
                 runOnUiThread(() -> {
+                    int userId = getCurrentUserId(); // hoặc bạn lấy userId từ đâu đó
+
+                    if (finalAllMarked && !hasShownNotification(userId, sessionId)) {
+                        showCompletionNotification();
+                        markNotificationAsShown(userId, sessionId);
+                    }
+
+
                     if (currentIndex + 1 < exerciseList.size()) {
                         Intent nextIntent = new Intent(DetailExerciseActivity.this, DetailExerciseActivity.class);
                         nextIntent.putExtra("currentIndex", currentIndex + 1);
@@ -248,7 +428,30 @@ public class DetailExerciseActivity extends AppCompatActivity {
 
     }
 
+    private boolean hasShownNotification(int userId, int sessionId) {
+        String key = "shown_user_" + userId + "session" + sessionId;
+        return getSharedPreferences("notification_prefs", MODE_PRIVATE)
+                .getBoolean(key, false);
+    }
 
+    private void markNotificationAsShown(int userId, int sessionId) {
+        String key = "shown_user_" + userId + "session" + sessionId;
+        getSharedPreferences("notification_prefs", MODE_PRIVATE)
+                .edit()
+                .putBoolean(key, true)
+                .apply();
+    }
+
+
+
+    private int getCurrentUserId() {
+        SharedPreferences prefs = getSharedPreferences("AuthPrefs", MODE_PRIVATE);
+        int userId = prefs.getInt("userId", -1);
+        if (userId == -1) {
+            Log.e("UserSurveyActivity", "No userId found in SharedPreferences");
+        }
+        return userId;
+    }
     @Override
     protected void onResume() {
         super.onResume();
@@ -273,4 +476,31 @@ public class DetailExerciseActivity extends AppCompatActivity {
             player = null;
         }
     }
+
+    private void showCompletionNotification() {
+        String channelId = "exercise_channel";
+        String channelName = "Exercise Completion";
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        // Android 8.0+ yêu cầu NotificationChannel
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    channelId,
+                    channelName,
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
+                .setSmallIcon(R.drawable.ic_check) // đảm bảo có icon, bạn có thể thay bằng R.drawable.ic_done hoặc icon của bạn
+                .setContentTitle("🎉 Chúc mừng!")
+                .setContentText("Bạn đã hoàn thành xong 1 ngày luyện tập!")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(true);
+
+        notificationManager.notify(1001, builder.build());
+    }
+
+
 }

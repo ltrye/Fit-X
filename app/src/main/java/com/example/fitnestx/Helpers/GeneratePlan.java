@@ -80,6 +80,20 @@ public class GeneratePlan {
         Log.d("GeneratePlan", "Workout plan generation completed");
     }
 
+    // New method to regenerate exercises for existing sessions
+    public void regeneratePlanExercises() {
+        Log.d("GeneratePlan", "Starting exercise regeneration for planId: " + planId);
+        // Delete existing session exercises for this plan
+        List<WorkoutSessionEntity> sessions = workoutSessionRepository.getWorkoutSessionsByPlanId(planId);
+        for (WorkoutSessionEntity session : sessions) {
+            sessionExerciseRepository.deleteSessionExercisesBySessionId(session.getSessionId());
+        }
+        // No need for Thread.sleep here if called from ExecutorService
+        generateWorkoutPlan(); // This will re-populate exercises for existing sessions
+        Log.d("GeneratePlan", "Exercise regeneration completed for planId: " + planId);
+    }
+
+
     private void insertWorkoutSessions() {
         Log.d("GeneratePlan", "Inserting " + daysPerWeek + " workout sessions");
         for (int day = 1; day <= daysPerWeek; day++) {
@@ -185,7 +199,7 @@ public class GeneratePlan {
     private int getExercisesPerDay(BMICategory bmiCategory, boolean isMale) {
         int exercises;
         if (bmiCategory == BMICategory.OBESE) {
-            exercises = 3; // Reduced for obese users
+            exercises = 5; // Reduced for obese users
         } else if (isMale) {
             exercises = 6; // Standard for males
         } else {

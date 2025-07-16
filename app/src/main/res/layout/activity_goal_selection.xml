@@ -180,7 +180,7 @@
             android:background="@drawable/bg_login_button"
             android:enabled="false"
             android:text="Confirm"
-            android:textColor="@android:color/white"
+            android:textColor="@color/gray_disabled"
             android:textSize="16sp"
             android:textStyle="bold" />
 

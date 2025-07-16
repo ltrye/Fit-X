@@ -1,37 +1,199 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/plan"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:background="#F5F5F5">
+    android:background="@color/white"
+    tools:context=".ui.PlanActivity">
+
     <FrameLayout
         android:id="@+id/fragment_top_menu"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true" />
-    <TextView
-        android:id="@+id/greeting_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello, (ten user)"
-        android:textSize="18sp"
-        android:textColor="#333"
-        android:layout_marginBottom="8dp" />
+        android:layout_height="wrap_content" />
 
-    <TextView
-        android:id="@+id/goal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Mục tiêu: (Goal)"
-        android:textSize="14sp"
-        android:textColor="#666"
-        android:layout_marginBottom="16dp" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view"
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/white">
+
+        <!-- Top Fragment -->
+        <FrameLayout
+            android:id="@+id/fragment_top_menu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:ignore="DuplicateIds" />
+
+        <!-- Header content cố định -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/greeting_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hello, User"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Welcome back, ready for your workout?"
+                android:textSize="16sp"
+                android:layout_marginBottom="16dp" />
+
+            <!-- BMI Card giữ nguyên -->
+            <LinearLayout
+                android:id="@+id/bmi_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/rounded_background"
+                android:padding="16dp"
+                android:layout_marginBottom="16dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_exercise"
+                    android:layout_marginEnd="16dp"
+                    android:scaleType="centerCrop"
+                    android:clipToOutline="true" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="BMI (Body Mass Index)"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary"
+                        android:layout_marginBottom="4dp" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/tv_bmi_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="20.5"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/text_primary"
+                            android:layout_marginEnd="8dp" />
+
+                        <TextView
+                            android:id="@+id/tv_bmi_status"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Bình thường"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/green_success" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nhấn để xem chi tiết"
+                        android:textSize="12sp"
+                        android:textColor="@color/gray_hint"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_arrow_right"
+                    app:tint="@color/icon_color" />
+            </LinearLayout>
+
+            <!-- Goal -->
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Your Goal"-->
+<!--                android:textSize="18sp"-->
+<!--                android:textStyle="bold"-->
+<!--                android:textColor="@color/black"-->
+<!--                android:layout_marginBottom="8dp" />-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/goal"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Improve Shape"-->
+<!--                android:textSize="16sp"-->
+<!--                android:layout_marginBottom="16dp" />-->
+
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Workout Plan"-->
+<!--                android:textSize="18sp"-->
+<!--                android:textStyle="bold"-->
+<!--                android:textColor="@color/text_primary"-->
+<!--                android:layout_marginBottom="12dp"-->
+<!--                android:layout_marginTop="8dp" />-->
+        </LinearLayout>
+
+        <!-- RecyclerView scrollable -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            tools:listitem="@layout/item_plan" />
+
+        <!-- Button hoàn thành -->
+        <Button
+            android:id="@+id/btn_complete_plan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Hoàn thành kế hoạch"
+            android:background="@drawable/button_rounded"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:padding="12dp"
+            android:layout_margin="16dp"
+            android:enabled="false"
+            tools:ignore="DuplicateIds" />
+    </LinearLayout>
+
+
+    <Button
+        android:id="@+id/btn_complete_plan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Hoàn thành kế hoạch"
+        android:background="@drawable/button_rounded"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:padding="12dp"
+        android:layout_margin="16dp"
+        android:enabled="false"
+        tools:ignore="DuplicateIds" /> <!-- Initially disabled -->
 
 </LinearLayout>
