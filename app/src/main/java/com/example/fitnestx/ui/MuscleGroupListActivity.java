@@ -45,7 +45,7 @@ public class MuscleGroupListActivity extends AppCompatActivity {
         muscleGroupRepository = new MuscleGroupRepository(this);
 
         btnBack.setOnClickListener(v -> finish());
-        titleText.setText("Nhóm cơ bảng");
+        titleText.setText("Nhóm cơ");
     }
 
     private void setupRecyclerView() {
