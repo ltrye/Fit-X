@@ -1,4 +1,11 @@
 # Android build outputs
+
+.mailmap
+com.py
+git-filter-repo
+replace-msg.txt
+task.txt
+
 build/
 */build/
 *.apk
