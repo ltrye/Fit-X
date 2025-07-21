@@ -50,7 +50,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp"
-                android:text="6 bài doggy, 69, oral have"
+                android:text="ok"
                 android:textColor="#333"
                 android:textSize="14sp" />
 
