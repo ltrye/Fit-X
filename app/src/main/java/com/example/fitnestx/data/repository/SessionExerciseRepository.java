@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.example.fitnestx.data.AppDatabase;
 import com.example.fitnestx.data.dao.SessionExerciseDAO;
+import com.example.fitnestx.data.entity.ExerciseEntity;
 import com.example.fitnestx.data.entity.SessionExerciseEntity;
 
 public class SessionExerciseRepository {
@@ -17,6 +18,17 @@ public class SessionExerciseRepository {
     public SessionExerciseRepository(Context context) {
         AppDatabase appDatabase = AppDatabase.getInstance(context);
         sessionExerciseDAO = appDatabase.sessionExerciseDAO();
+    }
+
+    // Check if current exercise is the only inCompleted one
+    public boolean IsCurrentLastExercise(int sessionId, int exerciseId){
+        // find incomplete exercise
+        List<SessionExerciseEntity> incompleted = sessionExerciseDAO.getIncompletedExercisesInSession(sessionId);
+
+        if(incompleted.size() == 1 && exerciseId == incompleted.get(0).getExerciseId()){
+            return true;
+        }
+        return false;
     }
     public List<Integer> GetListIdExercsieBySessionId(int sessionId) {
         return sessionExerciseDAO.GetListIdExercsieBySessionId(sessionId);

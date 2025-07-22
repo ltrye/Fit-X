@@ -22,6 +22,8 @@ public interface SessionExerciseDAO {
 
     @Delete
     void deleteSessionExercise(SessionExerciseEntity sessionExercise);
+    @Query("SELECT * FROM SESSION_EXERCISE WHERE isMarked=0 AND sessionId =:sessionId")
+    List<SessionExerciseEntity> getIncompletedExercisesInSession(int sessionId);
 
     @Query("SELECT * FROM SESSION_EXERCISE")
     LiveData<List<SessionExerciseEntity>> getAllSessionExercises();
