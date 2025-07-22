@@ -88,6 +88,7 @@ public class GeneratePlan {
         for (WorkoutSessionEntity session : sessions) {
             sessionExerciseRepository.deleteSessionExercisesBySessionId(session.getSessionId());
         }
+        addSpecialNotes();
         // No need for Thread.sleep here if called from ExecutorService
         generateWorkoutPlan(); // This will re-populate exercises for existing sessions
         Log.d("GeneratePlan", "Exercise regeneration completed for planId: " + planId);

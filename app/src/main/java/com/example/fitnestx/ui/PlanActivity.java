@@ -37,7 +37,7 @@ public class PlanActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private GoalAdapter goalAdapter;
     private List<WorkoutSessionEntity> goalList;
-    private TextView greetingText, goal, tvBMIValue, tvBMIStatus;
+    private TextView greetingText, goal, tvBMIValue, tvBMIStatus, planNote;
     private LinearLayout bmiCard;
     private Button btnCompletePlan; // Declare the new button
 
@@ -61,7 +61,6 @@ public class PlanActivity extends AppCompatActivity {
         goalList = new ArrayList<>();
         userRepository = new UserRepository(this);
         userMetricsRepository = new UserMetricsRepository(this);
-
 
         // Thêm nút để truy cập danh sách bài tập đơn lẻ
         Button btnIndividualExercises = findViewById(R.id.btn_individual_exercises);
@@ -87,11 +86,85 @@ public class PlanActivity extends AppCompatActivity {
         new android.os.Handler().postDelayed(() -> {
             updateCompletePlanButtonState();
         }, 1000);
+
+        // Refetch data
+        executorService.execute(() -> {
+            UserEntity user = userRepository.getUserById(getCurrentUserId());
+            UserMetricsEntity userMetrics = userMetricsRepository.getUserMetricByUserId(getCurrentUserId());
+            if (user != null) {
+                // Update UI trên UI thread
+                runOnUiThread(() -> {
+                    greetingText.setText("Hello, " + user.getName());
+                    if (userMetrics != null) {
+                        // goal.setText(userMetrics.getGoal());
+                        setupBMICard(userMetrics);
+                        checkBMIGoalClashAndShowDialog(userMetrics);
+                    }
+                });
+            } else {
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "User not found", Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
     }
+
+    /**
+     * Check for clash between BMI and goal, and show a warning dialog if needed
+     */
+    private void checkBMIGoalClashAndShowDialog(UserMetricsEntity userMetrics) {
+        double bmi = userMetrics.getBmi();
+        String goal = userMetrics.getGoal();
+        boolean clash = false;
+        String message = null;
+        // Clash logic: skinny (BMI < 18.5) shouldn't lose fat, obese (BMI >= 30)
+        // shouldn't focus on lean_tone
+        if (bmi < 18.5 && "lose_fat".equals(goal)) {
+            clash = true;
+            message = "Bạn đang thiếu cân (BMI < 18.5), mục tiêu 'Giảm mỡ' có thể không phù hợp. Bạn có muốn thay đổi kế hoạch?";
+        } else if (bmi >= 30 && "lean_tone".equals(goal)) {
+            clash = true;
+            message = "Bạn đang béo phì (BMI >= 30), mục tiêu 'Săn chắc cơ thể' nên ưu tiên giảm cân trước. Bạn có muốn thay đổi kế hoạch?";
+        } else if (bmi >= 30 && "improve_shape".equals(goal)) {
+            clash = true;
+            message = "Bạn đang béo phì (BMI >= 30), mục tiêu 'Cải thiện vóc dáng' nên ưu tiên giảm cân trước. Bạn có muốn thay đổi kế hoạch?";
+        } else if (bmi < 18.5 && "lean_tone".equals(goal)) {
+            clash = true;
+            message = "Bạn đang thiếu cân (BMI < 18.5), mục tiêu 'Săn chắc cơ thể' nên ưu tiên tăng cân trước. Bạn có muốn thay đổi kế hoạch?";
+        }
+        if (clash && message != null) {
+            new androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle("Cảnh báo mục tiêu không phù hợp")
+                    .setMessage(message)
+                    .setCancelable(false)
+                    .setPositiveButton("Thay đổi kế hoạch", (dialog, which) -> {
+                        // Open WorkoutCompletionActivity
+                        int userId = getCurrentUserId();
+                        executorService.execute(() -> {
+                            WorkoutPlanEntity currentPlan = workoutPlanRepository.getWorkoutPlansByUserId(userId);
+                            if (currentPlan != null) {
+                                runOnUiThread(() -> {
+                                    Intent intent = new Intent(PlanActivity.this, WorkoutCompletionActivity.class);
+                                    intent.putExtra("planId", currentPlan.getPlanId());
+                                    intent.putExtra("userId", userId);
+                                    startActivityForResult(intent, REQUEST_CODE_COMPLETION);
+                                });
+                            } else {
+                                runOnUiThread(() -> Toast.makeText(PlanActivity.this,
+                                        "Không tìm thấy kế hoạch tập luyện để thay đổi.", Toast.LENGTH_SHORT).show());
+                            }
+                        });
+                    })
+                    .setNegativeButton("Bỏ qua", (dialog, which) -> dialog.dismiss())
+                    .show();
+        }
+    }
+
     private void setupRecyclerViewWithCallback(Runnable callback) {
         int planIdFromIntent = getIntent().getIntExtra("planId", -1);
         int userId = getCurrentUserId();
-        if (userId == -1) return;
+        if (userId == -1)
+            return;
 
         executorService.execute(() -> {
             int planId = planIdFromIntent;
@@ -123,7 +196,8 @@ public class PlanActivity extends AppCompatActivity {
                 }
 
                 // 🔁 Gọi callback (updateCompletePlanButtonState) sau khi dữ liệu load xong
-                if (callback != null) callback.run();
+                if (callback != null)
+                    callback.run();
             });
         });
     }
@@ -139,7 +213,8 @@ public class PlanActivity extends AppCompatActivity {
             }
         } else if (requestCode == REQUEST_CODE_COMPLETION) {
             if (resultCode == RESULT_OK) {
-                // If WorkoutCompletionActivity returned OK, it means a reset/regeneration happened
+                // If WorkoutCompletionActivity returned OK, it means a reset/regeneration
+                // happened
                 setupRecyclerView(); // Refresh UI
                 updateCompletePlanButtonState(); // Update button state after reset
             }
@@ -161,7 +236,8 @@ public class PlanActivity extends AppCompatActivity {
                 return;
             }
 
-            List<WorkoutSessionEntity> sessions = workoutSessionRepository.getWorkoutSessionsByPlanId(currentPlan.getPlanId());
+            List<WorkoutSessionEntity> sessions = workoutSessionRepository
+                    .getWorkoutSessionsByPlanId(currentPlan.getPlanId());
 
             boolean allSessionsCompleted = true;
             if (sessions.isEmpty()) {
@@ -184,7 +260,8 @@ public class PlanActivity extends AppCompatActivity {
     private void updateSingleSession(int sessionId) {
         executorService.execute(() -> {
             WorkoutSessionEntity updatedSession = workoutSessionRepository.getWorkoutSessionById(sessionId);
-            if (updatedSession == null) return;
+            if (updatedSession == null)
+                return;
 
             runOnUiThread(() -> {
                 for (int i = 0; i < goalAdapter.getItemCount(); i++) {
@@ -201,7 +278,8 @@ public class PlanActivity extends AppCompatActivity {
     private void initViews() {
         greetingText = findViewById(R.id.greeting_text);
         recyclerView = findViewById(R.id.recycler_view);
-       // goal = findViewById(R.id.goal);
+        planNote = findViewById(R.id.plan_note);
+        // goal = findViewById(R.id.goal);
         bmiCard = findViewById(R.id.bmi_card);
         tvBMIValue = findViewById(R.id.tv_bmi_value);
         tvBMIStatus = findViewById(R.id.tv_bmi_status);
@@ -230,11 +308,12 @@ public class PlanActivity extends AppCompatActivity {
                         startActivityForResult(intent, REQUEST_CODE_COMPLETION);
                     });
                 } else {
-                    runOnUiThread(() -> Toast.makeText(PlanActivity.this, "No workout plan found to complete.", Toast.LENGTH_SHORT).show());
+                    runOnUiThread(() -> Toast
+                            .makeText(PlanActivity.this, "No workout plan found to complete.", Toast.LENGTH_SHORT)
+                            .show());
                 }
             });
         });
-
 
         int userId = getCurrentUserId();
         if (userId == -1) {
@@ -252,7 +331,7 @@ public class PlanActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     greetingText.setText("Hello, " + user.getName());
                     if (userMetrics != null) {
-                       // goal.setText(userMetrics.getGoal());
+                        // goal.setText(userMetrics.getGoal());
                         setupBMICard(userMetrics);
                     }
                 });
@@ -295,7 +374,8 @@ public class PlanActivity extends AppCompatActivity {
         int planIdFromIntent = getIntent().getIntExtra("planId", -1);
 
         int userId = getCurrentUserId();
-        if (userId == -1) return;
+        if (userId == -1)
+            return;
 
         executorService.execute(() -> {
             int planId = planIdFromIntent;
@@ -303,6 +383,7 @@ public class PlanActivity extends AppCompatActivity {
                 WorkoutPlanEntity plan = workoutPlanRepository.getWorkoutPlansByUserId(userId);
                 if (plan != null) {
                     planId = plan.getPlanId();
+                    runOnUiThread(() -> planNote.setText(plan.getNote()));
                 } else {
                     runOnUiThread(() -> Toast.makeText(this, "No workout plan found", Toast.LENGTH_SHORT).show());
                     return;
@@ -324,9 +405,10 @@ public class PlanActivity extends AppCompatActivity {
                     recyclerView.setAdapter(goalAdapter);
                 } else {
                     goalAdapter.updateData(sessions);
-//                    updateCompletePlanButtonState();
+                    // updateCompletePlanButtonState();
                 }
-           //     updateCompletePlanButtonState(); // Update button state after RecyclerView is set up
+                // updateCompletePlanButtonState(); // Update button state after RecyclerView is
+                // set up
             });
         });
     }
@@ -341,7 +423,8 @@ public class PlanActivity extends AppCompatActivity {
     }
 
     private int extractDayNumber(String date) {
-        if (date == null) return 0;
+        if (date == null)
+            return 0;
         try {
             date = date.trim().toLowerCase().replace("ngày", "").trim();
             return Integer.parseInt(date);

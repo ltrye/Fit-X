@@ -310,11 +310,44 @@ public class WorkoutCompletionActivity extends AppCompatActivity {
         slotsSelector.addView(slotsCount);
         slotsSelector.addView(btnIncrease);
 
+        // --- Goal selection spinner ---
+        TextView goalLabel = new TextView(this);
+        goalLabel.setText("Mục tiêu tập luyện:");
+        goalLabel.setTextSize(16);
+        goalLabel.setPadding(0, 30, 0, 10);
+
+        android.widget.Spinner goalSpinner = new android.widget.Spinner(this);
+        String[] goalValues = { "lose_fat", "improve_shape", "lean_tone" };
+        String[] goalDisplayNames = { "Giảm mỡ", "Cải thiện vóc dáng", "Săn chắc cơ thể" };
+        android.widget.ArrayAdapter<String> goalAdapter = new android.widget.ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, goalDisplayNames);
+        goalAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        goalSpinner.setAdapter(goalAdapter);
+
+        // Set current goal as default selection
+        executorService.execute(() -> {
+            UserMetricsEntity currentMetrics = userMetricsRepository.getUserMetricByUserId(userId);
+            if (currentMetrics != null) {
+                String currentGoal = currentMetrics.getGoal();
+                int defaultSelection = 0;
+                for (int i = 0; i < goalValues.length; i++) {
+                    if (goalValues[i].equals(currentGoal)) {
+                        defaultSelection = i;
+                        break;
+                    }
+                }
+                int finalDefaultSelection = defaultSelection;
+                runOnUiThread(() -> goalSpinner.setSelection(finalDefaultSelection));
+            }
+        });
+
         // Add views to dialog layout
         dialogLayout.addView(titleText);
         dialogLayout.addView(slotsCard);
         dialogLayout.addView(slotsLabel);
         dialogLayout.addView(slotsSelector);
+        dialogLayout.addView(goalLabel);
+        dialogLayout.addView(goalSpinner);
 
         // Create dialog
         AlertDialog dialog = new AlertDialog.Builder(this)
@@ -348,17 +381,34 @@ public class WorkoutCompletionActivity extends AppCompatActivity {
         buttonLayout.addView(updateButton);
         dialogLayout.addView(buttonLayout);
 
+        // Helper to update goal in UserMetricsEntity
+        Runnable updateGoalRunnable = () -> {
+            int selectedGoalIndex = goalSpinner.getSelectedItemPosition();
+            String selectedGoal = goalValues[selectedGoalIndex];
+            UserMetricsEntity currentMetrics = userMetricsRepository.getUserMetricByUserId(userId);
+            if (currentMetrics != null) {
+                currentMetrics.setGoal(selectedGoal);
+                userMetricsRepository.updateUserMetric(currentMetrics);
+            }
+        };
+
         // Skip button click listener - use current frequency
         skipButton.setOnClickListener(v -> {
             dialog.dismiss();
-            regenerateWorkoutExercises();
+            executorService.execute(() -> {
+                updateGoalRunnable.run();
+                runOnUiThread(this::regenerateWorkoutExercises);
+            });
         });
 
         // Update button click listener - use selected frequency
         updateButton.setOnClickListener(v -> {
             int selectedFrequency = Integer.parseInt(slotsCount.getText().toString());
             dialog.dismiss();
-            regenerateWorkoutExercisesWithNewFrequency(selectedFrequency);
+            executorService.execute(() -> {
+                updateGoalRunnable.run();
+                runOnUiThread(() -> regenerateWorkoutExercisesWithNewFrequency(selectedFrequency));
+            });
         });
 
         dialog.show();

@@ -126,6 +126,12 @@
                     app:tint="@color/icon_color" />
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/plan_note"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TextView" />
+
             <Button
                 android:id="@+id/btn_individual_exercises"
                 android:layout_width="match_parent"
