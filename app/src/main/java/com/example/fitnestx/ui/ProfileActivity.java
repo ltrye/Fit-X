@@ -231,7 +231,7 @@ public class ProfileActivity extends AppCompatActivity {
         // Configure Y-axis
         YAxis leftAxis = bmiChart.getAxisLeft();
         leftAxis.setAxisMinimum(5f);
-        leftAxis.setAxisMaximum(70f);
+        leftAxis.setAxisMaximum(100f);
         leftAxis.setDrawGridLines(true);
 
         YAxis rightAxis = bmiChart.getAxisRight();
@@ -475,7 +475,7 @@ public class ProfileActivity extends AppCompatActivity {
                 String newGoal = goalValues[selectedGoalIndex];
 
                 // Validate input
-                if (newWeight < 20 || newWeight > 300 || newHeight < 100 || newHeight > 250) {
+                if (newWeight < 20 || newWeight > 700 || newHeight < 50 || newHeight > 250) {
                     Toast.makeText(this, "Vui lòng nhập thông tin hợp lệ", Toast.LENGTH_SHORT).show();
                     return;
                 }
