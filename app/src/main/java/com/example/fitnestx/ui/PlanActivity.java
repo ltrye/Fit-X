@@ -117,6 +117,11 @@ public class PlanActivity extends AppCompatActivity {
         String goal = userMetrics.getGoal();
         boolean clash = false;
         String message = null;
+        String skipKey = goal + "_skip";
+        SharedPreferences prefs = getSharedPreferences("PlanPrefs", MODE_PRIVATE);
+        if (prefs.getBoolean(skipKey, false)) {
+            return; // User has chosen to skip this warning before
+        }
         // Clash logic: skinny (BMI < 18.5) shouldn't lose fat, obese (BMI >= 30)
         // shouldn't focus on lean_tone
         if (bmi < 18.5 && "lose_fat".equals(goal)) {
@@ -155,7 +160,11 @@ public class PlanActivity extends AppCompatActivity {
                             }
                         });
                     })
-                    .setNegativeButton("Bỏ qua", (dialog, which) -> dialog.dismiss())
+                    .setNegativeButton("Bỏ qua", (dialog, which) -> {
+                        // Save skip flag so we don't show this again for this goal
+                        prefs.edit().putBoolean(skipKey, true).apply();
+                        dialog.dismiss();
+                    })
                     .show();
         }
     }
