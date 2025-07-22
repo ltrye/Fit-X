@@ -286,6 +286,17 @@ public class ProfileActivity extends AppCompatActivity {
         dialogLayout.setOrientation(LinearLayout.VERTICAL);
         dialogLayout.setPadding(50, 50, 50, 50);
 
+
+        // Name Input
+        TextView nameLabel = new TextView(this);
+        nameLabel.setText("Name:");
+        nameLabel.setTextSize(16);
+        nameLabel.setPadding(0, 20, 0, 8);
+
+        EditText etName = new EditText(this);
+        etName.setText(currentUser.getName());
+        etName.setInputType(android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+
         // Email input
         TextView emailLabel = new TextView(this);
         emailLabel.setText("Email:");
@@ -331,6 +342,8 @@ public class ProfileActivity extends AppCompatActivity {
         }
 
         // Add views to layout
+        dialogLayout.addView(nameLabel);
+        dialogLayout.addView(etName);
         dialogLayout.addView(emailLabel);
         dialogLayout.addView(etEmail);
         dialogLayout.addView(ageLabel);
@@ -348,14 +361,14 @@ public class ProfileActivity extends AppCompatActivity {
                 String newEmail = etEmail.getText().toString().trim();
                 int newAge = Integer.parseInt(etAge.getText().toString().trim());
                 boolean newGender = rgGender.getCheckedRadioButtonId() == rbMale.getId();
-
+                String newName = etName.getText().toString().trim();
                 // Validate input
                 if (newEmail.isEmpty() || newAge < 1 || newAge > 150) {
                     Toast.makeText(this, "Vui lòng nhập thông tin hợp lệ", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                updateUserInfo(newEmail, newAge, newGender);
+                updateUserInfo(newName,newEmail, newAge, newGender);
 
             } catch (NumberFormatException e) {
                 Toast.makeText(this, "Vui lòng nhập tuổi hợp lệ", Toast.LENGTH_SHORT).show();
@@ -481,12 +494,12 @@ public class ProfileActivity extends AppCompatActivity {
     /**
      * Update user basic information in database
      */
-    private void updateUserInfo(String newEmail, int newAge, boolean newGender) {
+    private void updateUserInfo(String newName, String newEmail, int newAge, boolean newGender) {
         executorService.execute(() -> {
             try {
 
                 UserEntity cur = userRepository.getUserById(getCurrentUserId());
-
+            cur.setName(newName);
                 cur.setEmail(newEmail);
                 cur.setAge(newAge);
                 cur.setGender(newGender);
@@ -503,6 +516,7 @@ public class ProfileActivity extends AppCompatActivity {
                 currentUser.setEmail(newEmail);
                 currentUser.setAge(newAge);
                 currentUser.setGender(newGender);
+                currentUser.setName(newName);
 
                 }catch(RuntimeException e){
                     runOnUiThread(() -> {

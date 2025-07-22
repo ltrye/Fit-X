@@ -380,7 +380,7 @@ public class DetailExerciseActivity extends AppCompatActivity {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
             try {
-                UserMetricsEntity currentMetrics = userMetricsRepository.getUserMetricById(userId);
+                UserMetricsEntity currentMetrics = userMetricsRepository.getUserMetricByUserId(userId);
 
                 runOnUiThread(() -> {
                     displayMetricsDialog(currentMetrics, sessionId);
